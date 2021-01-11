@@ -8,6 +8,9 @@
     "lint": "eslint src"
   },
   "dependencies": {
+    "navigation": "^5.3.1",
+    "navigation-react": "^4.1.1",
+    "navigation-react-native": "^7.3.2",
     "react": "16.13.1",
     "react-native": "0.63.4"
   },

@@ -1,9 +1,6 @@
 const
     React = require('react'),
-    {AppRegistry, Text} = require('react-native')
-
-
-const App = () =>
-    <Text>hello world</Text>
+    {AppRegistry} = require('react-native'),
+    App = require('./src/App')
 
 AppRegistry.registerComponent('ixoWallet', () => () => <App />)
