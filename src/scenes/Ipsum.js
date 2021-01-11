@@ -1,7 +1,7 @@
 const
     React = require('react'),
     {View, Text, TouchableHighlight} = require('react-native'),
-    {withNav} = require('../lib/nav')
+    {withNav} = require('$/lib/nav')
 
 
 const Ipsum = ({nav}) =>
