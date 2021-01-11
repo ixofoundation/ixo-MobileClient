@@ -13,6 +13,8 @@ AsyncStorage.getItem('test')
 
 AsyncStorage.setItem('test', 'mest' + Date.now())
 
+console.log('env var example', process.env.FOO)
+
 
 module.exports = () =>
     <NavigationHandler stateNavigator={nav}>
