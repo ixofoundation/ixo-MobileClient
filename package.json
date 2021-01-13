@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@react-native-async-storage/async-storage": "^1.13.2",
+    "bip39": "^3.0.3",
     "navigation": "^5.3.1",
     "navigation-react": "^4.1.1",
     "navigation-react-native": "^7.3.2",
