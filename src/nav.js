@@ -1,18 +1,18 @@
 const
+    React = require('react'),
     {StateNavigator} = require('navigation'),
-    {Lorem, Ipsum} = require('./scenes')
+    {CreateId} = require('./scenes')
 
 
 const routes = [
-    ['lorem', Lorem],
-    ['ipsum', Ipsum, {trackCrumbTrail: true}],
+    ['createId', CreateId],
 ]
 
 
 const nav = new StateNavigator(routes.map(([key, , opts]) => ({key, ...opts})))
 
-routes.forEach(([key, comp]) =>
-    nav.states[key].renderScene = comp)
+routes.forEach(([key, Component]) =>
+    nav.states[key].renderScene = () => <Component />)
 
 
 module.exports = nav

@@ -10,6 +10,8 @@ target 'ixoWallet' do
 
   pod 'react-native-randombytes', :path => '../node_modules/react-native-randombytes'
 
+  pod 'react-native-camera', :path => '../node_modules/react-native-camera'
+
   target 'ixoWalletTests' do
     inherit! :complete
     # Pods for testing

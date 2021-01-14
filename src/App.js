@@ -6,7 +6,7 @@ const
     nav = require('./nav')
 
 
-nav.navigate('lorem')
+nav.navigate('createId')
 
 AsyncStorage.getItem('test')
     .then(console.log)
