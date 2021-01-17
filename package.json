@@ -8,10 +8,10 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "@ixo/cosmosjs": "git+https://github.com/ixofoundation/cosmosjs.git#master",
+    "@ixo/client-sdk": "git+https://github.com/gwn/ixo-client-sdk.git",
     "@react-native-async-storage/async-storage": "^1.13.2",
-    "bip39": "^3.0.3",
     "crypto-js": "^4.0.0",
+    "debug": "^4.3.1",
     "lodash-es": "^4.17.20",
     "navigation": "^5.3.1",
     "navigation-react": "^4.1.1",
@@ -21,7 +21,11 @@
     "react-native": "0.63.4",
     "react-native-camera": "^3.42.0",
     "react-native-keychain": "^6.2.0",
-    "react-native-randombytes": "^3.6.0"
+    "react-native-qrcode-svg": "^6.0.6",
+    "react-native-randombytes": "^3.6.0",
+    "react-native-svg": "^12.1.0",
+    "secp256k1": "^4.0.2",
+    "zustand": "^3.3.1"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",

@@ -4,22 +4,26 @@ const
     {View, Text, Modal, TextInput} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {RNCamera} = require('react-native-camera'),
-    {entropyToMnemonic} = require('bip39'),
     {randomBytes} = require('react-native-randombytes'),
     cryptoJS = require('crypto-js'),
     {shuffle, pull, isEqual} = require('lodash-es'),
-    cosmosjs = require('@ixo/cosmosjs'),
-    keychain = require('react-native-keychain'),
-    {Button} = require('$/lib/ui')
+    {initForExistingId} = require('$/init'),
+    {useId} = require('$/stores'),
+    {Button} = require('$/lib/ui'),
+    {crypto: {
+        generateMnemonic, deriveAddress, deriveECKeyPair, deriveDidDoc,
+        deriveClaimAddress,
+    }}
+        = require('@ixo/client-sdk')
 
 
 const IdCreation = () => {
     const
         [currentSubscene, setSubscene] = useState(),
-        [ids, setIds] = useState(),
+        {id, set: setId} = useId(),
         {stateNavigator: nav} = useContext(NavigationContext)
 
-    return !ids
+    return !id
         ? <View>
             <Text>Create / Import ID</Text>
 
@@ -42,11 +46,10 @@ const IdCreation = () => {
             >
                 {currentSubscene && createElement(subScenes[currentSubscene], {
                     onReturn: async mnemonic => {
-                        const ids = generateIds(mnemonic)
+                        const id = generateId(mnemonic)
 
                         try {
-                            await saveIds(ids)
-                            setIds(ids)
+                            setId({id})
                             setSubscene(null)
                         } catch (e) {
                             console.error(e)
@@ -57,13 +60,13 @@ const IdCreation = () => {
         </View>
 
         : <View>
-            <Text>Ids are created and saved successfully:</Text>
+            <Text>Your id is created and saved successfully:</Text>
 
-            <Text>{JSON.stringify(ids, null, 2)}</Text>
+            <Text>{JSON.stringify(id, null, 2)}</Text>
 
             <Button
                 text='Proceed'
-                onPress={() => nav.navigate('register')}
+                onPress={() => initForExistingId(nav, id)}
             />
         </View>
 }
@@ -131,7 +134,7 @@ const subScenes = {
 
                 <Button
                     onPress={() =>
-                        setMm(entropyToMnemonic(randomBytes(16)).split(' '))}
+                        setMm(generateMnemonic(randomBytes(16)).split(' '))}
                     text='(Re)generate mnemonic'
                 />
 
@@ -205,29 +208,15 @@ const decryptAES = (text, pwd) => {
     return JSON.parse(payloadJson)
 }
 
-const generateIds = mnemonic => {
-    const ixo = cosmosjs.network(
-        'https://ixo-testnet-validator-mt.simply-vc.com.mt/api',
-        'pandora-1',
-    )
+const generateId = mnemonic => {
+    const
+        address = deriveAddress(mnemonic),
+        pkey = deriveECKeyPair(mnemonic).privateKey.toString('hex'),
+        didDoc = deriveDidDoc(mnemonic),
+        claimAddress = deriveClaimAddress(didDoc.verifyKey)
 
-    ixo.setBech32MainPrefix('ixo')
-    ixo.setPath('m/44\'/118\'/0\'/0/0')
-
-    return {
-        address: ixo.getIxoAddress(mnemonic),
-        did: ixo.getIxoDid(mnemonic),
-        cosmosAddress: ixo.getAddress(mnemonic),
-        cosmosPkey: ixo.getECPairPriv(mnemonic).toString('hex'),
-    }
+    return {address, pkey, didDoc, claimAddress}
 }
-
-const saveIds = ids =>
-    keychain.setGenericPassword('ixouser', JSON.stringify(ids), {
-        service: 'ixoWallet',
-        accessControl: keychain.ACCESS_CONTROL.USER_PRESENCE,
-        accessible: keychain.ACCESSIBLE.WHEN_UNLOCKED,
-    })
 
 
 module.exports = IdCreation

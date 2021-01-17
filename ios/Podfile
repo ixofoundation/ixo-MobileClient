@@ -12,6 +12,8 @@ target 'ixoWallet' do
 
   pod 'react-native-camera', :path => '../node_modules/react-native-camera'
 
+  pod 'RNSVG', :path => '../node_modules/react-native-svg'
+
   target 'ixoWalletTests' do
     inherit! :complete
     # Pods for testing

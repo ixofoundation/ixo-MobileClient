@@ -1,11 +1,14 @@
 const
     React = require('react'),
     {StateNavigator} = require('navigation'),
-    {CreateId} = require('./scenes')
+    {CreateId, Register, Projects, Credit} = require('./scenes')
 
 
 const routes = [
     ['createId', CreateId],
+    ['register', Register],
+    ['projects', Projects],
+    ['credit', Credit],
 ]
 
 
