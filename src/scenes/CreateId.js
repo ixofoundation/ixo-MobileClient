@@ -3,13 +3,12 @@ const
     {useState, useContext, createElement} = React,
     {View, Text, Modal, TextInput} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
-    {RNCamera} = require('react-native-camera'),
     {randomBytes} = require('react-native-randombytes'),
     cryptoJS = require('crypto-js'),
     {shuffle, pull, isEqual} = require('lodash-es'),
     {initForExistingId} = require('$/init'),
     {useId} = require('$/stores'),
-    {Button} = require('$/lib/ui'),
+    {Button, QRScanner} = require('$/lib/ui'),
     {crypto: {
         generateMnemonic, deriveAddress, deriveECKeyPair, deriveDidDoc,
         deriveClaimAddress,
@@ -187,16 +186,6 @@ const subScenes = {
 
     },
 }
-
-const QRScanner = ({onScan, text}) =>
-    <RNCamera
-        type={RNCamera.Constants.Type.back}
-        onBarCodeRead={onScan}
-        flashMode={RNCamera.Constants.FlashMode.on}
-        captureAudio={false}
-    >
-        <Text>{text}</Text>
-    </RNCamera>
 
 
 const decryptAES = (text, pwd) => {
