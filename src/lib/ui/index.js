@@ -1,2 +1,5 @@
-export {default as Button} from './Button'
-export {default as QRScanner} from './QRScanner'
+module.exports = {
+    Button: require('./Button'),
+    QRScanner: require('./QRScanner'),
+    Text: require('./Text'),
+}

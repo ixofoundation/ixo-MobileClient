@@ -1,11 +1,26 @@
-import React from 'react'
-import {Text, TouchableHighlight} from 'react-native'
+const
+    React = require('react'),
+    {Text, TouchableHighlight} = require('react-native')
 
 
-const Button = ({text, onPress}) =>
-    <TouchableHighlight onPress={onPress}>
-        <Text>{text}</Text>
-    </TouchableHighlight>
+module.exports = ({text, onPress}) =>
+    <TouchableHighlight
+        onPress={onPress}
+        style={wrapperStyle}
+        children={
+            <Text style={textStyle} children={text} />
+        }
+    />
 
 
-export default Button
+const
+    wrapperStyle = {
+        backgroundColor: 'yellow',
+        padding: 10,
+        margin: 5,
+        borderRadius: 10,
+    },
+
+    textStyle = {
+        fontSize: 20,
+    }

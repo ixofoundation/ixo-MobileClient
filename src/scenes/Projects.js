@@ -3,7 +3,6 @@ const
     React = require('react'),
     {useState} = React,
     {View, Text, Modal} = require('react-native'),
-    {RNCamera} = require('react-native-camera'),
     ixo = require('$/ixoClient'),
     {Button, QRScanner} = require('$/lib/ui')
 
