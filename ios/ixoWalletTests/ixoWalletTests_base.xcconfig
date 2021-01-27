@@ -1,0 +1,8 @@
+BUNDLE_LOADER = $(TEST_HOST)
+INFOPLIST_FILE = ixoWalletTests/Info.plist
+IPHONEOS_DEPLOYMENT_TARGET = 10.0
+LD_RUNPATH_SEARCH_PATHS = $(inherited) @executable_path/Frameworks @loader_path/Frameworks
+OTHER_LDFLAGS = $(inherited) -ObjC -l"c++"
+PRODUCT_BUNDLE_IDENTIFIER = org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)
+PRODUCT_NAME = $(TARGET_NAME)
+TEST_HOST = $(BUILT_PRODUCTS_DIR)/ixoWallet.app/ixoWallet

@@ -1,0 +1,3 @@
+#include "ixoWallet/ixoWallet_base.xcconfig"
+ENABLE_BITCODE = NO
+SWIFT_OPTIMIZATION_LEVEL = -Onone

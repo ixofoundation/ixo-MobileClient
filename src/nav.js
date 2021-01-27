@@ -1,5 +1,6 @@
 const
     React = require('react'),
+    {SafeAreaView} = require('react-native'),
     {StateNavigator} = require('navigation'),
     {CreateId, Register, Projects, Credit} = require('./scenes')
 
@@ -15,7 +16,11 @@ const routes = [
 const nav = new StateNavigator(routes.map(([key, , opts]) => ({key, ...opts})))
 
 routes.forEach(([key, Component]) =>
-    nav.states[key].renderScene = () => <Component />)
+    nav.states[key].renderScene = () =>
+        <SafeAreaView
+            children={<Component />}
+            style={{flex: 1}}
+        />)
 
 
 module.exports = nav

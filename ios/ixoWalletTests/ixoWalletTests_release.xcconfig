@@ -1,0 +1,2 @@
+#include "ixoWalletTests/ixoWalletTests_base.xcconfig"
+COPY_PHASE_STRIP = NO
