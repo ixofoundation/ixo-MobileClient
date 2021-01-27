@@ -23,7 +23,7 @@
     "react-native-keychain": "^6.2.0",
     "react-native-qrcode-svg": "^6.0.6",
     "react-native-randombytes": "^3.6.0",
-    "react-native-svg": "^12.1.0",
+    "react-native-svg": "^9.13.6",
     "react-rasa-assistant": "^0.2.0",
     "secp256k1": "^4.0.2",
     "zustand": "^3.3.1"
