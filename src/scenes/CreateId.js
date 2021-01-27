@@ -11,7 +11,7 @@ const
     {Button, QRScanner} = require('$/lib/ui'),
     {crypto: {
         generateMnemonic, deriveAddress, deriveECKeyPair, deriveDidDoc,
-        deriveClaimAddress,
+        deriveAgentAddress,
     }}
         = require('@ixo/client-sdk')
 
@@ -202,7 +202,7 @@ const generateId = mnemonic => {
         address = deriveAddress(mnemonic),
         pkey = deriveECKeyPair(mnemonic).privateKey.toString('hex'),
         didDoc = deriveDidDoc(mnemonic),
-        claimAddress = deriveClaimAddress(didDoc.verifyKey)
+        claimAddress = deriveAgentAddress(didDoc.verifyKey)
 
     return {address, pkey, didDoc, claimAddress}
 }
