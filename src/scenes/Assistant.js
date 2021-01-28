@@ -1,9 +1,9 @@
 const
     React = require('react'),
     {useRef, Fragment} = React,
-    {ScrollView, TextInput} = require('react-native'),
+    {ScrollView} = require('react-native'),
     useBot = require('react-rasa-assistant'),
-    {Text, Button} = require('$/lib/ui'),
+    {Text, Button, TextInput} = require('$/lib/ui'),
     handleCustomAssistantResponse = require('$/assistantResponseHandler')
 
 
