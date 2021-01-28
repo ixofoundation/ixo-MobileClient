@@ -2,14 +2,12 @@ require('node-libs-react-native/globals')
 
 const
     React = require('react'),
-    {AppRegistry, LogBox} = require('react-native'),
+    {AppRegistry} = require('react-native'),
     App = require('./src/App'),
     nav = require('./src/nav'),
     {init} = require('./src/init')
 
 AppRegistry.registerComponent('ixoWallet', () => () => <App />)
-
-LogBox.ignoreAllLogs()
 
 init(nav).catch(e => {
     alert(e)
