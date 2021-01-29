@@ -13,7 +13,14 @@ const routes = [
 ]
 
 
-const nav = new StateNavigator(routes.map(([key, , opts]) => ({key, ...opts})))
+const nav =
+    new StateNavigator(
+        routes.map(([key, , opts]) => ({
+            key,
+            trackCrumbTrail: true,
+            ...opts,
+        })),
+    )
 
 routes.forEach(([key, Component]) =>
     nav.states[key].renderScene = () =>
