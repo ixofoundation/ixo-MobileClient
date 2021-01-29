@@ -3,13 +3,14 @@ const
     {Text, TouchableHighlight} = require('react-native')
 
 
-module.exports = ({text, onPress}) =>
+module.exports = ({text, onPress, style, ...props}) =>
     <TouchableHighlight
         onPress={onPress}
-        style={wrapperStyle}
+        style={{...wrapperStyle, ...style}}
         children={
             <Text style={textStyle} children={text} />
         }
+        {...props}
     />
 
 
@@ -23,4 +24,5 @@ const
 
     textStyle = {
         fontSize: 20,
+        textAlign: 'center',
     }

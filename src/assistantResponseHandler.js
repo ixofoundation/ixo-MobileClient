@@ -1,6 +1,6 @@
 const
     React = require('react'),
-    {Share} = require('react-native'),
+    {View, Share} = require('react-native'),
     QRCode = require('react-native-qrcode-svg').default,
     {useId} = require('$/stores')
 
@@ -11,7 +11,10 @@ const handlers = {
 
         showAddressQRCode: () => [
             {text: 'See below'},
-            {component: <QRCode value={useId.getState().id.address} />},
+
+            {component: <View style={{alignItems: 'center', margin: 20}}>
+                <QRCode value={useId.getState().id.address} size={200} />
+            </View>},
         ],
 
         shareAddress: () => {
