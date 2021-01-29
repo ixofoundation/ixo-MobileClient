@@ -1,7 +1,17 @@
 const
     React = require('react'),
-    Assistant = require('./Assistant')
+    {Text, Button} = require('$/lib/ui'),
+    AssistantLayout = require('$/AssistantLayout')
 
 
-module.exports = () =>
-    <Assistant initMsg='I want to credit my account' />
+const Credit = () =>
+    <AssistantLayout
+        initMsg='I want to credit my account'
+    >
+        <Text children='testing falan filans' />
+
+        <Button text='Continue' onPress={console.log} />
+    </AssistantLayout>
+
+
+module.exports = Credit
