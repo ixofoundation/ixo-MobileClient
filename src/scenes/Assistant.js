@@ -8,7 +8,7 @@ const
     handleCustomAssistantResponse = require('$/assistantResponseHandler')
 
 
-const Assistant = ({initMsg}) => {
+const Assistant = ({initMsg, onClose = () => {}}) => {
     const
         {
             msgHistory, onInputRef, userText, setUserText, sendUserText,
@@ -67,6 +67,11 @@ const Assistant = ({initMsg}) => {
 
             <Button text='Send' onPress={sendUserText} />
         </View>
+
+        <View style={s.sessionCtrlView}>
+            <Button text='R' onPress={restartSession} style={s.sessionCtrlBtn}/>
+            <Button text='X' onPress={onClose} style={s.sessionCtrlBtn} />
+        </View>
     </>
 
 }
@@ -83,11 +88,19 @@ const s = {
     msgSendView: {
         borderTopWidth: 1,
         borderColor: '#aaa',
-        display: 'flex',
         flexDirection: 'row',
     },
 
     msgInput: {flexGrow: 1},
+
+    sessionCtrlView: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        borderTopWidth: 1,
+        borderColor: '#aaa',
+    },
+
+    sessionCtrlBtn: {width: 50, height: 50},
 }
 
 
