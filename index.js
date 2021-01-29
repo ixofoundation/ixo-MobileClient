@@ -7,7 +7,7 @@ const
     nav = require('./src/nav'),
     {init} = require('./src/init')
 
-AppRegistry.registerComponent('ixoWallet', () => () => <App />)
+AppRegistry.registerComponent('ixoWallet', () => App)
 
 init(nav).catch(e => {
     alert(e)
