@@ -1,7 +1,7 @@
 const
     React = require('react'),
     {Text, Button} = require('$/lib/ui'),
-    AssistantLayout = require('$/AssistantLayout')
+    AssistantLayout = require('$/assistant/AssistantLayout')
 
 
 const Credit = () =>

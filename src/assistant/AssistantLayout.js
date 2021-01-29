@@ -3,7 +3,7 @@ const
     {useState} = React,
     {View, Modal} = require('react-native'),
     {Button} = require('$/lib/ui'),
-    Assistant = require('$/scenes/Assistant')
+    Assistant = require('./Assistant')
 
 
 const AssistantLayout = ({initMsg, children}) => {

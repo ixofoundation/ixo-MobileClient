@@ -5,7 +5,7 @@ const
     useBot = require('react-rasa-assistant'),
     {memoize} = require('lodash-es'),
     {Text, Button, TextInput} = require('$/lib/ui'),
-    handleCustomAssistantResponse = require('$/assistantResponseHandler')
+    handleCustomAssistantResponse = require('./assistantResponseHandler')
 
 
 const Assistant = ({initMsg, onClose = () => {}}) => {
