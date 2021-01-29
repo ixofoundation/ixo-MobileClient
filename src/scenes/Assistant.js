@@ -1,6 +1,6 @@
 const
     React = require('react'),
-    {useRef, Fragment} = React,
+    {useRef, createElement: e} = React,
     {View, ScrollView} = require('react-native'),
     useBot = require('react-rasa-assistant'),
     {memoize} = require('lodash-es'),
@@ -49,10 +49,10 @@ const Assistant = ({initMsg}) => {
                         />)
 
                 if (m.component)
-                    return <Fragment
-                        key={m.ts + '-comp'}
-                        children={m.component}
-                    />
+                    return e(m.component, {
+                        key: m.ts + '-comp',
+                        msg: m,
+                    })
             })}
 
         </ScrollView>

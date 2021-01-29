@@ -12,9 +12,10 @@ const handlers = {
         showAddressQRCode: () => [
             {text: 'See below'},
 
-            {component: <View style={{alignItems: 'center', margin: 20}}>
-                <QRCode value={useId.getState().id.address} size={200} />
-            </View>},
+            {component: () =>
+                <View style={{alignItems: 'center', margin: 20}}>
+                    <QRCode value={useId.getState().id.address} size={200} />
+                </View>},
         ],
 
         shareAddress: () => {
