@@ -6,7 +6,7 @@ const
 
 
 const routes = [
-    ['createId', CreateId],
+    ['createId', CreateId, {trackCrumbTrail: false}],
     ['register', Register],
     ['projects', Projects],
     ['credit', Credit],

@@ -2,7 +2,7 @@ const
     React = require('react'),
     {useContext} = React,
     {NavigationContext} = require('navigation-react'),
-    {Text, Button} = require('$/lib/ui'),
+    {Heading, Text, Button} = require('$/lib/ui'),
     AssistantLayout = require('$/assistant/AssistantLayout')
 
 
@@ -12,6 +12,8 @@ const Credit = () => {
     return <AssistantLayout
         initMsg='I want to credit my account'
     >
+        <Heading children='Credit your account' />
+
         <Text>
             If you are done crediting your account, please continue to
             registration.

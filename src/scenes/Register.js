@@ -1,41 +1,50 @@
 const
     React = require('react'),
-    {useContext} = React,
-    {View, Text} = require('react-native'),
+    {useContext, useCallback} = React,
+    {View} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     ixo = require('$/ixoClient'),
     {useId} = require('$/stores'),
-    {Button} = require('$/lib/ui')
+    {Heading, Button, Text, Code} = require('$/lib/ui')
 
 
-module.exports = () => {
+const Register = () => {
     const
         {id, set: setId} = useId(),
         {stateNavigator: nav} = useContext(NavigationContext)
 
-    return <View>
-        <Text>Registration</Text>
-        <Text>You have already generated an identity:</Text>
-        <Text>{JSON.stringify(id, null, 2)}</Text>
-        <Text>Wanna register now?</Text>
-        <Button
-            onPress={async () => {
-                try {
-                    await ixo.sync.registerUser(id.didDoc) }
-                catch (e) {
-                    alert('Could not register, try again later!') }
+    const register = useCallback(async () => {
+        try {
+            await ixo.sync.registerUser(id.didDoc)
+            alert('Registration complete!')
+            nav.navigate('projects')
+        } catch (e) {
+            alert(
+                'Could not register, please try again! '
+                + 'If the error persists, consider creating a new ID.',
+            )
+        }
+    })
 
-                alert('Registration complete!')
-                nav.navigate('projects')
-            }}
-            text='Yes please'
-        />
-        <Button
-            onPress={() => {
-                setId({id: null})
-                nav.navigate('createId')
-            }}
-            text='No, remove this id and start over'
-        />
+    const createNewId = useCallback(() => {
+        nav.navigate('createId')
+        setId({id: null})
+    })
+
+    if (!id)
+        return null
+
+    return <View>
+        <Heading children='Register' />
+
+        <Text>You have already generated an identity:</Text>
+        <Code>did:ixo:{id.didDoc.did}</Code>
+        <Text>Would you like to register now?</Text>
+
+        <Button onPress={register} text='Sure' />
+        <Button onPress={createNewId} text='No, create a new id' />
     </View>
 }
+
+
+module.exports = Register

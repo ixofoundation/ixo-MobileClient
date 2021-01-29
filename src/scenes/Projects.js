@@ -2,16 +2,16 @@ const
     url = require('url'),
     React = require('react'),
     {useState} = React,
-    {View, Text, Modal} = require('react-native'),
+    {View, Modal} = require('react-native'),
     ixo = require('$/ixoClient'),
-    {Button, QRScanner} = require('$/lib/ui')
+    {Heading, Text, Button, QRScanner} = require('$/lib/ui')
 
 
-module.exports = () => {
+const Projects = () => {
     const [scannerShown, toggleScanner] = useState(false)
 
     return <View>
-        <Text>Projects</Text>
+        <Heading children='Projects' />
 
         <Button
             onPress={() => toggleScanner(true)}
@@ -37,3 +37,6 @@ module.exports = () => {
         </Modal>
     </View>
 }
+
+
+module.exports = Projects

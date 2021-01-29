@@ -1,14 +1,15 @@
 const
     React = require('react'),
     {useState, useContext, createElement} = React,
-    {View, Text, Modal, TextInput} = require('react-native'),
+    {View, Modal} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {randomBytes} = require('react-native-randombytes'),
     cryptoJS = require('crypto-js'),
     {shuffle, pull, isEqual} = require('lodash-es'),
     {initForExistingId} = require('$/init'),
     {useId} = require('$/stores'),
-    {Button, QRScanner} = require('$/lib/ui'),
+    {Heading, Text, Button, ButtonGroup, QRScanner, TextInput, Code, Alert}
+        = require('$/lib/ui'),
     {crypto: {
         generateMnemonic, deriveAddress, deriveECKeyPair, deriveDidDoc,
         deriveAgentAddress,
@@ -20,11 +21,12 @@ const IdCreation = () => {
     const
         [currentSubscene, setSubscene] = useState(),
         {id, set: setId} = useId(),
+        [idGenerating, setIdGenerating] = useState(false),
         {stateNavigator: nav} = useContext(NavigationContext)
 
     return !id
         ? <View>
-            <Text>Create / Import ID</Text>
+            <Heading children='Create / Import ID' />
 
             <Button
                 text='Import by scanning Keysafe QR code'
@@ -43,25 +45,42 @@ const IdCreation = () => {
                 visible={!!currentSubscene}
                 onRequestClose={() => setSubscene(null)}
             >
-                {currentSubscene && createElement(subScenes[currentSubscene], {
-                    onReturn: async mnemonic => {
-                        const id = generateId(mnemonic)
+                <Heading children='Create / Import ID' />
 
-                        try {
-                            setId({id})
-                            setSubscene(null)
-                        } catch (e) {
-                            console.error(e)
-                        }
-                    },
-                })}
+                {idGenerating
+                    ? <Alert
+                        children='Your id is being generated. Please wait.'/>
+
+                    : null}
+
+                {(currentSubscene && !idGenerating) &&
+                    createElement(subScenes[currentSubscene], {
+                        onReturn: async mnemonic => {
+                            setIdGenerating(true)
+
+                            setTimeout(() => {
+                                const id = generateId(mnemonic)
+
+                                try {
+                                    setId({id})
+                                    setSubscene(null)
+                                    setIdGenerating(false)
+                                } catch (e) {
+                                    console.error(e)
+                                }
+                            }, 0)
+                        },
+                    })
+                }
             </Modal>
         </View>
 
         : <View>
-            <Text>Your id is created and saved successfully:</Text>
+            <Heading children='Create / Import ID' />
 
-            <Text>{JSON.stringify(id, null, 2)}</Text>
+            <Alert children='Your id is created and saved successfully:' />
+
+            <Code>did:ixo:{id.didDoc.did}</Code>
 
             <Button
                 text='Proceed'
@@ -83,12 +102,15 @@ const subScenes = {
                     setEncryptedUserData(data)
                     setScanCompleted(true)
                 }}
-                text='Scan QR code'
+                text='Please scan QR code'
             />
 
             : <>
+                <Text children='Enter Keysafe password to unlock:'  />
+
                 <TextInput
-                    placeholder='Enter password'
+                    placeholder='password'
+                    secureTextEntry={true}
                     onChangeText={setPwd}
                 />
 
@@ -109,6 +131,7 @@ const subScenes = {
 
         return <>
             <TextInput
+                multiline
                 placeholder='Enter mnemonic'
                 onChangeText={setText}
             />
@@ -129,51 +152,62 @@ const subScenes = {
 
         return !mmChosen
             ? <>
-                {mm && <Text>Mnemonic: {mm.join(' ')}</Text>}
+                {!mm.length
+                    ? null
+                    : <>
+                        <Code children={mm.slice(0, 4).join(' ')} />
+                        <Code children={mm.slice(4, 8).join(' ')} />
+                        <Code children={mm.slice(8, 12).join(' ')} />
+                    </>}
 
                 <Button
                     onPress={() =>
                         setMm(generateMnemonic(randomBytes(16)).split(' '))}
-                    text='(Re)generate mnemonic'
+                    text={
+                        mm.length ? 'Give me another' : 'Generate mnemonic'}
                 />
 
-                <Button
-                    onPress={() => {
-                        setMmChosen(true)
-                        setShuffledMm(shuffle(mm))
-                    }}
-                    text='Proceed with this mnemonic'
-                />
+                {!mm.length
+                    ? null
+                    : <Button
+                        onPress={() => {
+                            setMmChosen(true)
+                            setShuffledMm(shuffle(mm))
+                        }}
+                        text='Ok I like this'
+                    />}
             </>
 
             : <>
-                <Text>Prove that you saved your mnemonic</Text>
+                <Text>
+                    Prove that you saved your mnemonic, select the mnemonic
+                    words with the right order:
+                </Text>
 
-                {shuffledMm.map(word =>
-                    <Button
-                        key={word}
-                        text={word}
-                        onPress={() => {
-                            const nextReconstructedMm =
-                                [...reconstructedMm, word]
+                <ButtonGroup size='lg' items={shuffledMm.map(word => ({
+                    text: word,
+                    onPress: () => {
+                        const nextReconstructedMm =
+                            [...reconstructedMm, word]
 
-                            setShuffledMm(pull(shuffledMm, word))
-                            setReconstructedMm(nextReconstructedMm)
+                        setShuffledMm(pull(shuffledMm, word))
+                        setReconstructedMm(nextReconstructedMm)
 
-                            if (shuffledMm.length > 0)
-                                return
+                        if (shuffledMm.length > 0)
+                            return
 
-                            if (isEqual(nextReconstructedMm, mm))
-                                onReturn(mm.join(' '))
-                            else {
-                                setShuffledMm(shuffle(mm))
-                                setReconstructedMm([])
-                            }
-                        }}
-                    />,
-                )}
+                        if (isEqual(nextReconstructedMm, mm))
+                            onReturn(mm.join(' '))
+                        else {
+                            setShuffledMm(shuffle(mm))
+                            setReconstructedMm([])
+                        }
+                    },
+                }))} />
 
-                <Text>{reconstructedMm.join(' ')}</Text>
+                <Code children={reconstructedMm.slice(0, 4).join(' ')} />
+                <Code children={reconstructedMm.slice(4, 8).join(' ')} />
+                <Code children={reconstructedMm.slice(8, 12).join(' ')} />
 
                 <Button
                     text='Retry'

@@ -1,5 +1,6 @@
 const
     {LogBox} = require('react-native'),
+    debug = require('debug')('init'),
     ignoredWarnings = require('./ignoredWarnings'),
     ixo = require('./ixoClient'),
     {useId} = require('./stores')
@@ -12,8 +13,10 @@ const init = async nav => {
 
     const {id} = useId.getState()
 
-    if (!id)
+    if (!id) {
+        debug('No identity found, navigating to the id creation scene')
         return nav.navigate('createId')
+    }
 
     initForExistingId(nav, id)
 }
@@ -32,14 +35,19 @@ const configureLogging = () => {
 const initForExistingId = async (nav, id) => {
     const {didDoc: {did}, address} = id
 
-    if (await isDidRegistered(did))
+    if (await isDidRegistered(did)) {
+        debug('The DID is registered, navigating to the project listing scene')
         return nav.navigate('projects')
+    }
 
     const uixoBalance = await getAccountBalance(address)
 
-    if (uixoBalance < 100)
+    if (uixoBalance < 100) {
+        debug('Too little account balance, navigating to the credit scene')
         return nav.navigate('credit', {uixoBalance, address})
+    }
 
+    debug('Navigating to the registration scene')
     nav.navigate('register')
 }
 
@@ -48,13 +56,19 @@ const isDidRegistered = did =>
         .then(({body: {did}}) => !!did)
 
 const getAccountBalance = async (address, denom = 'uixo') => {
-    const
-        {body: {result: tokenBalanceList}} =
-            await ixo.chain.raw('/bank/balances/' + address),
+    return 0
 
-        targetTokenRecord = tokenBalanceList.find(item => item.denom === denom)
+    // TODO
+    // Temporarily disabled as the endpoint below is not working currently
+    // apparently due to some work being done on the blockchain API.
+    //
+    // const
+    //     {body: {result: tokenBalanceList}} =
+    //         await ixo.chain.raw('/bank/balances/' + address),
 
-    return targetTokenRecord ? targetTokenRecord.amount : 0
+    //     targetTokenRecord = tokenBalanceList.find(item => item.denom === denom)
+
+    // return targetTokenRecord ? targetTokenRecord.amount : 0
 }
 
 

@@ -3,14 +3,18 @@ const
     {Text} = require('react-native')
 
 
-module.exports = ({style: overrideStyles, ...props}) =>
+const Code = ({style: overrideStyles, ...props}) =>
     <Text
         style={{...style, ...overrideStyles}}
         {...props}
     />
 
-
 const style = {
-    fontSize: 20,
+    fontFamily: 'monospace',
+    backgroundColor: '#eee',
+    fontSize: 18,
     padding: 5,
 }
+
+
+module.exports = Code
