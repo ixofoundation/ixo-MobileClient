@@ -1,10 +1,10 @@
 const
     React = require('react'),
-    {useRef, createElement: e} = React,
-    {View, ScrollView} = require('react-native'),
+    {useState, useRef, useCallback, createElement: e} = React,
+    {View, ScrollView, Modal} = require('react-native'),
     useBot = require('react-rasa-assistant'),
     {memoize} = require('lodash-es'),
-    {Text, Button, TextInput} = require('$/lib/ui'),
+    {Text, Button, TextInput, QRScanner} = require('$/lib/ui'),
     handleCustomAssistantResponse = require('./assistantResponseHandler')
 
 
@@ -24,7 +24,11 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
                         handleCustomAssistantResponse(msg, botUtter),
             }),
 
-        viewRef = useRef()
+        viewRef = useRef(),
+
+        [qrModalVisible, setQrModalVisibility] = useState(false),
+        openModal = useCallback(() => setQrModalVisibility(true)),
+        closeModal = useCallback(() => setQrModalVisibility(false))
 
     return <>
         <View style={s.sessionCtrlView}>
@@ -71,6 +75,8 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
         </ScrollView>
 
         <View style={s.msgSendView}>
+            <Button text='Scan' onPress={openModal} />
+
             <TextInput
                 value={userText}
                 onChangeText={setUserText}
@@ -81,6 +87,15 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
             <Button text='Send' onPress={sendUserText} />
         </View>
 
+        <Modal
+            visible={qrModalVisible}
+            onRequestClose={closeModal}
+        >
+            <QRScanner onScan={({data}) => {
+                setUserText(userText + ' ' + data)
+                closeModal()
+            }} />
+        </Modal>
     </>
 
 }
