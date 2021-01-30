@@ -27,6 +27,19 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
         viewRef = useRef()
 
     return <>
+        <View style={s.sessionCtrlView}>
+            <Button
+                text='*'
+                onLongPress={restartSession}
+                style={s.sessionRestartBtn}
+            />
+            <Button
+                text='X'
+                onPress={onClose}
+                style={s.sessionCloseBtn}
+            />
+        </View>
+
         <ScrollView
             ref={viewRef}
             onContentSizeChange={() => viewRef.current.scrollToEnd()}
@@ -68,15 +81,29 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
             <Button text='Send' onPress={sendUserText} />
         </View>
 
-        <View style={s.sessionCtrlView}>
-            <Button text='R' onPress={restartSession} style={s.sessionCtrlBtn}/>
-            <Button text='X' onPress={onClose} style={s.sessionCtrlBtn} />
-        </View>
     </>
 
 }
 
 const s = {
+    sessionCtrlView: {
+        borderBottomWidth: 1,
+        borderColor: '#aaa',
+    },
+
+    sessionRestartBtn: {
+        width: 50,
+        height: 50,
+        alignSelf: 'center',
+    },
+
+    sessionCloseBtn: {
+        position: 'absolute',
+        right: 0,
+        width: 50,
+        height: 50,
+    },
+
     textMsg: memoize(direction => ({
         width: '75%',
         margin: 5,
@@ -92,15 +119,6 @@ const s = {
     },
 
     msgInput: {flexGrow: 1},
-
-    sessionCtrlView: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        borderTopWidth: 1,
-        borderColor: '#aaa',
-    },
-
-    sessionCtrlBtn: {width: 50, height: 50},
 }
 
 
