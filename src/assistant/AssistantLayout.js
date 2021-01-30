@@ -6,8 +6,8 @@ const
     Assistant = require('./Assistant')
 
 
-const AssistantLayout = ({initMsg, children}) => {
-    const [astShown, setAstVisibility] = useState(true)
+const AssistantLayout = ({initMsg, children, autoOpen = false}) => {
+    const [astShown, setAstVisibility] = useState(autoOpen)
 
     return <>
         <Modal visible={astShown}>

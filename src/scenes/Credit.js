@@ -11,6 +11,7 @@ const Credit = () => {
 
     return <AssistantLayout
         initMsg='I want to credit my account'
+        autoOpen={true}
     >
         <Heading children='Credit your account' />
 
