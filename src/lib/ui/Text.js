@@ -1,16 +1,17 @@
 const
     React = require('react'),
-    {Text} = require('react-native')
+    {Text} = require('react-native'),
+    {memoize} = require('lodash-es')
 
 
-module.exports = ({style: overrideStyles, ...props}) =>
+module.exports = ({style: overrideStyles, size = 'md', ...props}) =>
     <Text
-        style={{...style, ...overrideStyles}}
+        style={{...style(size), ...overrideStyles}}
         {...props}
     />
 
 
-const style = {
-    fontSize: 20,
+const style = memoize(size => ({
+    fontSize: {sm: 15, md: 20, lg: 25}[size],
     padding: 5,
-}
+}))

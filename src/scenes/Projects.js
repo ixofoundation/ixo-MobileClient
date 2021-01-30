@@ -2,15 +2,16 @@ const
     url = require('url'),
     React = require('react'),
     {useState} = React,
-    {View, Modal} = require('react-native'),
+    {Modal} = require('react-native'),
+    MenuLayout = require('$/MenuLayout'),
     ixo = require('$/ixoClient'),
-    {Heading, Text, Button, QRScanner} = require('$/lib/ui')
+    {Heading, Button, QRScanner} = require('$/lib/ui')
 
 
 const Projects = () => {
     const [scannerShown, toggleScanner] = useState(false)
 
-    return <View>
+    return <MenuLayout>
         <Heading children='Projects' />
 
         <Button
@@ -35,7 +36,7 @@ const Projects = () => {
                 }}
             />
         </Modal>
-    </View>
+    </MenuLayout>
 }
 
 

@@ -1,4 +1,5 @@
 require('node-libs-react-native/globals')
+require('react-native-gesture-handler')
 
 const
     React = require('react'),

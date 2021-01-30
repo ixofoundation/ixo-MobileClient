@@ -5,6 +5,7 @@ const
     {CreateId, Register, Projects, Credit} = require('./scenes')
 
 
+
 const routes = [
     ['createId', CreateId, {trackCrumbTrail: false}],
     ['register', Register],
@@ -23,11 +24,13 @@ const nav =
     )
 
 routes.forEach(([key, Component]) =>
-    nav.states[key].renderScene = () =>
-        <SafeAreaView
-            children={<Component />}
-            style={{flex: 1}}
-        />)
+    nav.states[key].renderScene =
+        () =>
+            <SafeAreaView
+                style={{flex: 1}}
+                children={<Component />}
+            />
+)
 
 
 module.exports = nav
