@@ -8,6 +8,7 @@
     "android": "react-native run-android",
     "ios": "react-native run-ios",
     "start": "env `cat .env` FORCE_COLOR=1 react-native start | grep -vf .metroWarningIgnore",
+    "start-nocache": "env `cat .env` FORCE_COLOR=1 react-native start --reset-cache | grep -vf .metroWarningIgnore",
     "lint": "eslint src"
   },
   "dependencies": {
