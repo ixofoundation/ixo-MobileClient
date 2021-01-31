@@ -7,7 +7,7 @@
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
-    "start": "env `cat .env` react-native start",
+    "start": "env `cat .env` FORCE_COLOR=1 react-native start | grep -vf .metroWarningIgnore",
     "lint": "eslint src"
   },
   "dependencies": {

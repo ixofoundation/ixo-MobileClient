@@ -1,14 +1,10 @@
 const
-    {LogBox} = require('react-native'),
     debug = require('debug')('init'),
-    ignoredWarnings = require('./ignoredWarnings'),
     ixo = require('./ixoClient'),
     {useId} = require('./stores')
 
 
 const init = async nav => {
-    configureLogging()
-
     await useId.loaded
 
     const {id} = useId.getState()
@@ -19,17 +15,6 @@ const init = async nav => {
     }
 
     initForExistingId(nav, id)
-}
-
-const configureLogging = () => {
-    LogBox.ignoreAllLogs()
-
-    const origConsoleWarn = console.warn
-
-    console.warn = (...args) => {
-        if (ignoredWarnings.every(pattern => !pattern.test(args[0])))
-            origConsoleWarn(...args)
-    }
 }
 
 const initForExistingId = async (nav, id) => {

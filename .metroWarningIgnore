@@ -1,0 +1,2 @@
+Setting a timer for a long period of time,.*See https://github.com/facebook/react-native/issues/12981 for more info.$
+^(Saw setTimeout with duration 85000ms)$
