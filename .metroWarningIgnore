@@ -1,2 +1,6 @@
+Require cycle: node_modules/react-native-randombytes/index.js -> node_modules/sjcl/sjcl.js -> node_modules/react-native-crypto/index.js -> node_modules/react-native-randombytes/index.js$
+^Require cycles are allowed, but can result in uninitialized values. Consider refactoring to remove the need for a cycle.$
+There was an error collecting entropy from the browser:$
+\[TypeError: undefined is not an object (evaluating 'sjcl.random')\]$
 Setting a timer for a long period of time,.*See https://github.com/facebook/react-native/issues/12981 for more info.$
 ^(Saw setTimeout with duration 85000ms)$
