@@ -9,7 +9,7 @@ const
 
 const Menu = () => {
     const
-        {id, set: setId} = useId(),
+        {id, clear: clearId} = useId(),
         {stateNavigator: nav} = useContext(NavigationContext)
 
     if (!id)
@@ -36,7 +36,7 @@ const Menu = () => {
             text='Log out'
             onPress={() => {
                 nav.navigate('createId')
-                setId({id: null})
+                clearId()
             }}
         />
     </>

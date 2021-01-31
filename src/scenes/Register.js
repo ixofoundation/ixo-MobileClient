@@ -10,7 +10,7 @@ const
 
 const Register = () => {
     const
-        {id, set: setId} = useId(),
+        {id, clear: clearId} = useId(),
         {stateNavigator: nav} = useContext(NavigationContext)
 
     const register = useCallback(async () => {
@@ -28,7 +28,7 @@ const Register = () => {
 
     const createNewId = useCallback(() => {
         nav.navigate('createId')
-        setId({id: null})
+        clearId()
     })
 
     if (!id)
