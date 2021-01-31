@@ -12,8 +12,11 @@ const logMw = (key, conf) => (set, get, api) => conf(args => {
 
 
 const securePersistMw = (key, conf) => (set, get, api) => {
-    const store = conf(args => {
-        const nextState = {...get(), ...args}
+    const store = conf((updater, shouldOverwrite) => {
+        const nextState = {
+            ...(shouldOverwrite ? {} : get()),
+            ...(typeof updater === 'function' ? updater(get()) : updater),
+        }
 
         return keychain.setGenericPassword(
             'ixouser',
