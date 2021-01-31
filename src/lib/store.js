@@ -2,13 +2,14 @@
 // clearer namings.
 
 const
+    {inspect} = require('util'),
     debug = require('debug')('store'),
     create = require('zustand').default,
     keychain = require('react-native-keychain')
 
 
 const logMw = (key, conf) => (set, get, api) => conf(args => {
-    debug(key, ': Applying patch', args)
+    debug(key, ': Applying patch:\n', inspect(args, {depth: 10}))
     set(args)
 }, get, api)
 
