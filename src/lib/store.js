@@ -5,7 +5,17 @@ const
     {inspect} = require('util'),
     debug = require('debug')('store'),
     create = require('zustand').default,
-    keychain = require('react-native-keychain')
+    keychain = require('react-native-keychain'),
+    produce = require('immer')
+
+
+const immerMw = conf => (set, get, api) =>
+    conf(
+        updater =>
+            set(typeof updater === 'function' ? produce(updater) : updater),
+        get,
+        api,
+    )
 
 
 const logMw = (key, conf) => (set, get, api) => conf(args => {
@@ -54,7 +64,7 @@ const securePersistMw = makePersistMw(
 
 
 const
-    makeStore = (key, conf) => create(logMw(key, conf)),
+    makeStore = (key, conf) => create(logMw(key, immerMw(conf))),
 
     makeSecurePersistentStore = (key, conf) =>
         makeStore(key, securePersistMw(key, conf))
