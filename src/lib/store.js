@@ -6,6 +6,7 @@ const
     debug = require('debug')('store'),
     create = require('zustand').default,
     keychain = require('react-native-keychain'),
+    asyncStorage = require('@react-native-async-storage/async-storage').default,
     produce = require('immer')
 
 
@@ -49,6 +50,9 @@ const makePersistMw = (getter, setter) => (key, conf) => (set, get, api) => {
 }
 
 
+const persistMw = makePersistMw(asyncStorage.getItem, asyncStorage.setItem)
+
+
 const securePersistMw = makePersistMw(
     key =>
         keychain.getGenericPassword({service: 'ixoWallet-' + key})
@@ -66,11 +70,15 @@ const securePersistMw = makePersistMw(
 const
     makeStore = (key, conf) => create(logMw(key, immerMw(conf))),
 
+    makePersistentStore = (key, conf) =>
+        makeStore(key, persistMw(key, conf)),
+
     makeSecurePersistentStore = (key, conf) =>
         makeStore(key, securePersistMw(key, conf))
 
 
 module.exports = {
     makeStore,
+    makePersistentStore,
     makeSecurePersistentStore,
 }
