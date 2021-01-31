@@ -1,3 +1,6 @@
+// TODO: Document. Very elegant but some parts need explanations or at least
+// clearer namings.
+
 const
     debug = require('debug')('store'),
     create = require('zustand').default,
@@ -7,39 +10,46 @@ const
 const logMw = (key, conf) => (set, get, api) => conf(args => {
     debug(key, ': Applying patch', args)
     set(args)
-    debug(key, ': New state', get())
 }, get, api)
 
 
-const securePersistMw = (key, conf) => (set, get, api) => {
-    const store = conf((updater, shouldOverwrite) => {
+const makePersistMw = (getter, setter) => (key, conf) => (set, get, api) => {
+    const store = conf(async (updater, shouldOverwrite) => {
         const nextState = {
             ...(shouldOverwrite ? {} : get()),
             ...(typeof updater === 'function' ? updater(get()) : updater),
         }
 
-        return keychain.setGenericPassword(
-            'ixouser',
-            JSON.stringify(nextState),
-            {service: 'ixoWallet-' + key},
-        )
-            .then(() => {
-                debug(key, ': Persisted the new state in the secure data store')
-                set(nextState, true)
-            })
+        await setter(key, JSON.stringify(nextState))
+        debug(key, ': Persisted the new state in the data store')
+        set(nextState, true)
     }, get, api)
 
     api.loaded =
-        keychain.getGenericPassword({service: 'ixoWallet-' + key})
-            .then(({password}) => {
-                debug(key, ': Initializing from secure data store', password)
+        getter(key)
+            .then(value => {
+                if (!value) return
 
-                if (password)
-                    set(JSON.parse(password))
+                debug(key, ': Initializing from data store')
+                set(JSON.parse(value))
             })
 
     return store
 }
+
+
+const securePersistMw = makePersistMw(
+    key =>
+        keychain.getGenericPassword({service: 'ixoWallet-' + key})
+            .then(({password}) => password),
+
+    (key, value) =>
+        keychain.setGenericPassword(
+            'ixouser',
+            value,
+            {service: 'ixoWallet-' + key},
+        ),
+)
 
 
 const
