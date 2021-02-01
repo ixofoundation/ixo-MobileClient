@@ -1,14 +1,17 @@
 const
     React = require('react'),
     {useState, useContext, createElement} = React,
-    {View, Modal} = require('react-native'),
+    {View} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {randomBytes} = require('react-native-randombytes'),
     cryptoJS = require('crypto-js'),
     {shuffle, pull, isEqual} = require('lodash-es'),
     {initForExistingId} = require('$/init'),
     {useId} = require('$/stores'),
-    {Heading, Text, Button, ButtonGroup, QRScanner, TextInput, Code, Alert}
+    {
+        Modal, Heading, Text, Button, ButtonGroup, QRScanner, TextInput, Code,
+        Alert,
+    }
         = require('$/lib/ui'),
     {crypto: {
         generateMnemonic, deriveAddress, deriveECKeyPair, deriveDidDoc,

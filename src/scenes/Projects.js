@@ -2,13 +2,13 @@ const
     url = require('url'),
     React = require('react'),
     {useState} = React,
-    {TouchableOpacity, Modal, ScrollView, View, Image, Alert, Linking}
+    {TouchableOpacity, ScrollView, View, Image, Alert, Linking}
         = require('react-native'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/assistant/AssistantLayout'),
     ixo = require('$/ixoClient'),
     {useProjects} = require('$/stores'),
-    {Heading, Text, Button, QRScanner} = require('$/lib/ui'),
+    {Modal, Heading, Text, Button, QRScanner} = require('$/lib/ui'),
     {entries} = Object
 
 

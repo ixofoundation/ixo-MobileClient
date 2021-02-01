@@ -1,10 +1,10 @@
 const
     React = require('react'),
     {useState, useRef, useCallback, createElement: e} = React,
-    {View, ScrollView, Modal} = require('react-native'),
+    {View, ScrollView} = require('react-native'),
     useBot = require('react-rasa-assistant'),
     {memoize} = require('lodash-es'),
-    {Text, Button, TextInput, QRScanner} = require('$/lib/ui'),
+    {Modal, Text, Button, TextInput, QRScanner} = require('$/lib/ui'),
     handleCustomAssistantResponse = require('./assistantResponseHandler')
 
 

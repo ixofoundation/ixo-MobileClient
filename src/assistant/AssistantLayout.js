@@ -1,8 +1,8 @@
 const
     React = require('react'),
     {useState} = React,
-    {View, Modal} = require('react-native'),
-    {Button} = require('$/lib/ui'),
+    {View} = require('react-native'),
+    {Button, Modal} = require('$/lib/ui'),
     Assistant = require('./Assistant')
 
 

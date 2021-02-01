@@ -1,4 +1,5 @@
 module.exports = {
+    Modal: require('./Modal'),
     Heading: require('./Heading'),
     Code: require('./Code'),
     Alert: require('./Alert'),
