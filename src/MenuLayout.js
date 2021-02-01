@@ -13,7 +13,7 @@ const MenuLayout = gestureHandlerRootHOC(({children}) =>
         drawerBackgroundColor='#ddd'
         renderNavigationView={() => <Menu />}
         children={children}
-    />
+    />,
 )
 
 

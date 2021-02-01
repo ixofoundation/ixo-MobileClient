@@ -29,7 +29,7 @@ routes.forEach(([key, Component]) =>
             <SafeAreaView
                 style={{flex: 1}}
                 children={<Component />}
-            />
+            />,
 )
 
 
