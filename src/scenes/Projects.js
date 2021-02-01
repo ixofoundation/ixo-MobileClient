@@ -33,7 +33,7 @@ const Projects = () => {
                         logoUrl={proj.data.logo}
                         imageUrl={proj.data.image}
                     />
-                </TouchableOpacity>
+                </TouchableOpacity>,
             )}
         </ScrollView>
 
@@ -77,21 +77,21 @@ const Projects = () => {
                     name={focusedProj.data.name}
                     logoUrl={focusedProj.data.logo}
                     imageUrl={focusedProj.data.image}
-                    onRemove={() => {
-                        Alert.alert('You sure?', '', [{
-                            text: 'Yes, delete',
-                            onPress: () => ps.rm(projDid),
-                        }, {
-                            text: 'Cancel',
-                            style: 'cancel',
-                        }])
-                    }}
                 />
                 <Button
                     text='Disconnect from this Project'
                     onPress={() => {
-                        ps.rm(focusedProjDid)
-                        setFocusedProj(null)
+
+                        Alert.alert('You sure?', '', [{
+                            text: 'Yes, delete',
+                            onPress: () => {
+                                ps.rm(focusedProjDid)
+                                setFocusedProj(null)
+                            },
+                        }, {
+                            text: 'Cancel',
+                            style: 'cancel',
+                        }])
                     }}
                 />
                 <Button
@@ -100,7 +100,7 @@ const Projects = () => {
                         Linking.openURL(
                             'https://app_uat.ixo.world/projects/'
                             + focusedProjDid
-                            + '/overview'
+                            + '/overview',
                         )
                     }
                 />
@@ -109,18 +109,28 @@ const Projects = () => {
     </AssistantLayout></MenuLayout>
 }
 
-const Project = ({name, logoUrl, imageUrl, onRemove}) =>
+const Project = ({name, logoUrl, imageUrl}) =>
     <View style={style.proj.root}>
-        <Image source={{uri: proxyUri(imageUrl)}} style={style.proj.coverImg} />
+        <Image
+            source={{uri: dashedHostname(imageUrl)}}
+            style={style.proj.coverImg}
+        />
 
         <View style={style.proj.title.root}>
             <Text children={name} style={style.proj.title.heading} />
-            <Image source={{uri: proxyUri(logoUrl)}} style={style.proj.title.logoImg} />
+
+            <Image
+                source={{uri: dashedHostname(logoUrl)}}
+                style={style.proj.title.logoImg}
+            />
         </View>
     </View>
 
-const proxyUri = uri =>
-    'http:/localhost:8084' + url.parse(uri).path
+const dashedHostname = urlStr =>
+    urlStr.replace(
+        /^(https?:\/\/)([^/]+)(\/.*)/,
+        (_, proto, host, path) => proto + host.replace('_', '-') + path,
+    )
 
 const style = {
     proj: {
@@ -144,7 +154,7 @@ const style = {
             heading: {flex: 1, fontWeight: 'bold'},
 
             logoImg: {flex: 0, width: 40, height: 40},
-        }
+        },
     },
 }
 
