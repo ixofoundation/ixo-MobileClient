@@ -41,19 +41,13 @@ const isDidRegistered = did =>
         .then(({body: {did}}) => !!did)
 
 const getAccountBalance = async (address, denom = 'uixo') => {
-    return 0
+    const
+        {body: {result: tokenBalanceList}} =
+            await ixo.chain.raw('/api/bank/balances/' + address),
 
-    // TODO
-    // Temporarily disabled as the endpoint below is not working currently
-    // apparently due to some work being done on the blockchain API.
-    //
-    // const
-    //     {body: {result: tokenBalanceList}} =
-    //         await ixo.chain.raw('/bank/balances/' + address),
+        targetTokenRecord = tokenBalanceList.find(item => item.denom === denom)
 
-    //     targetTokenRecord = tokenBalanceList.find(item => item.denom === denom)
-
-    // return targetTokenRecord ? targetTokenRecord.amount : 0
+    return targetTokenRecord ? targetTokenRecord.amount : 0
 }
 
 
