@@ -10,7 +10,10 @@ const AssistantLayout = ({initMsg, children, autoOpen = false}) => {
     const [astShown, setAstVisibility] = useState(autoOpen)
 
     return <>
-        <Modal visible={astShown}>
+        <Modal
+            visible={astShown}
+            onRequestClose={() => setAstVisibility(false)}
+        >
             <Assistant
                 initMsg={initMsg}
                 onClose={() => setAstVisibility(false)}
