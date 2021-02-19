@@ -19,35 +19,51 @@ const immerMw = conf => (set, get, api) =>
     )
 
 
-const logMw = (key, conf) => (set, get, api) => conf(args => {
-    debug(key, ': Applying patch:\n', inspect(args, {depth: 10}))
+const logMw = (logKey, conf) => (set, get, api) => conf(args => {
+    debug(logKey, ': Applying patch:\n', inspect(args, {depth: 10}))
     set(args)
 }, get, api)
 
 
-const makePersistMw = (getter, setter) => (key, conf) => (set, get, api) => {
-    const store = conf(async (updater, shouldOverwrite) => {
-        const nextState = {
-            ...(shouldOverwrite ? {} : get()),
-            ...(typeof updater === 'function' ? updater(get()) : updater),
-        }
+const makePersistMw =
+    (load, save) =>
+        (storageKey, conf, {
+            serialize = JSON.stringify,
+            deserialize = JSON.parse,
+            onLoad = () => {},
+        } = {}) =>
+            (set, get, api) => {
+                const store = conf(async (updater, shouldOverwrite) => {
+                    const nextState = {
+                        ...(shouldOverwrite ? {} : get()),
 
-        await setter(key, JSON.stringify(nextState))
-        debug(key, ': Persisted the new state in the data store')
-        set(nextState, true)
-    }, get, api)
+                        ...(typeof updater === 'function'
+                            ? updater(get())
+                            : updater),
+                    }
 
-    api.loaded =
-        getter(key)
-            .then(value => {
-                if (!value) return
+                    await save(storageKey, serialize(nextState))
+                    debug(storageKey, ': Persisted the new state in the data store') // eslint-disable-line max-len
+                    set(nextState, true)
+                }, get, api)
 
-                debug(key, ': Initializing from data store')
-                set(JSON.parse(value))
-            })
+                const loadPromise =
+                    load(storageKey)
+                        .then(value => {
+                            if (!value) return
 
-    return store
-}
+                            const deserializedValue = deserialize(value)
+
+                            debug(storageKey, ': Initializing from data store')
+                            set(deserializedValue)
+
+                            return onLoad(deserializedValue)
+                        })
+
+                api.loaded = loadPromise
+
+                return store
+            }
 
 
 const persistMw = makePersistMw(asyncStorage.getItem, asyncStorage.setItem)
@@ -70,11 +86,11 @@ const securePersistMw = makePersistMw(
 const
     makeStore = (key, conf) => create(logMw(key, immerMw(conf))),
 
-    makePersistentStore = (key, conf) =>
-        makeStore(key, persistMw(key, conf)),
+    makePersistentStore = (key, conf, opts) =>
+        makeStore(key, persistMw(key, conf, opts)),
 
-    makeSecurePersistentStore = (key, conf) =>
-        makeStore(key, securePersistMw(key, conf))
+    makeSecurePersistentStore = (key, conf, opts) =>
+        makeStore(key, securePersistMw(key, conf, opts))
 
 
 module.exports = {

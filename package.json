@@ -12,8 +12,9 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "@ixo/client-sdk": "^0.1.2",
+    "@ixo/client-sdk": "^1.0.11",
     "@react-native-async-storage/async-storage": "^1.13.2",
+    "bip39": "^3.0.3",
     "crypto-js": "^4.0.0",
     "debug": "^4.3.1",
     "immer": "^8.0.1",

@@ -6,28 +6,25 @@ const
     {randomBytes} = require('react-native-randombytes'),
     cryptoJS = require('crypto-js'),
     {shuffle, pull, isEqual} = require('lodash-es'),
-    {initForExistingId} = require('$/init'),
-    {useId} = require('$/stores'),
+    {entropyToMnemonic} = require('bip39'),
+    {initForExistingWallet} = require('$/init'),
+    {useWallet} = require('$/stores'),
+    {sleep} = require('$/lib/util'),
     {
         Modal, Heading, Text, Button, ButtonGroup, QRScanner, TextInput, Code,
         Alert,
     }
-        = require('$/lib/ui'),
-    {crypto: {
-        generateMnemonic, deriveAddress, deriveECKeyPair, deriveDidDoc,
-        deriveAgentAddress,
-    }}
-        = require('@ixo/client-sdk')
+        = require('$/lib/ui')
 
 
 const IdCreation = () => {
     const
         [currentSubscene, setSubscene] = useState(),
-        {id, set: setId} = useId(),
+        ws /*wallet store*/ = useWallet(),
         [idGenerating, setIdGenerating] = useState(false),
         {stateNavigator: nav} = useContext(NavigationContext)
 
-    return !id
+    return !ws.secp
         ? <View>
             <Heading children='Create / Import ID' />
 
@@ -60,18 +57,10 @@ const IdCreation = () => {
                     createElement(subScenes[currentSubscene], {
                         onReturn: async mnemonic => {
                             setIdGenerating(true)
-
-                            setTimeout(() => {
-                                const id = generateId(mnemonic)
-
-                                try {
-                                    setId({id})
-                                    setSubscene(null)
-                                    setIdGenerating(false)
-                                } catch (e) {
-                                    console.error(e)
-                                }
-                            }, 0)
+                            await sleep(0) // See [0]
+                            await ws.make(mnemonic)
+                            setSubscene(null)
+                            setIdGenerating(false)
                         },
                     })
                 }
@@ -83,11 +72,11 @@ const IdCreation = () => {
 
             <Alert children='Your id is created and saved successfully:' />
 
-            <Code>did:ixo:{id.didDoc.did}</Code>
+            <Code>did:ixo:{ws.agent.did}</Code>
 
             <Button
                 text='Proceed'
-                onPress={() => initForExistingId(nav, id)}
+                onPress={() => initForExistingWallet(nav)}
             />
         </View>
 }
@@ -165,7 +154,7 @@ const subScenes = {
 
                 <Button
                     onPress={() =>
-                        setMm(generateMnemonic(randomBytes(16)).split(' '))}
+                        setMm(entropyToMnemonic(randomBytes(16)).split(' '))}
                     text={
                         mm.length ? 'Give me another' : 'Generate mnemonic'}
                 />
@@ -234,15 +223,14 @@ const decryptAES = (text, pwd) => {
     return JSON.parse(payloadJson)
 }
 
-const generateId = mnemonic => {
-    const
-        address = deriveAddress(mnemonic),
-        pkey = deriveECKeyPair(mnemonic).privateKey.toString('hex'),
-        didDoc = deriveDidDoc(mnemonic),
-        claimAddress = deriveAgentAddress(didDoc.verifyKey)
-
-    return {address, pkey, didDoc, claimAddress}
-}
-
 
 module.exports = IdCreation
+
+
+
+// [0]: Delaying the following code until the next tick as we first want to see
+//      the effects of "setIdGenerating". Although "setIdGenerating" returns
+//      immediately, its carries out its job asynchronously, yet it doesn't
+//      return a Promise so we resort to this hack. This problem originates from
+//      Zustand. We may solve this issue with a Zustand middleware in the
+//      future.

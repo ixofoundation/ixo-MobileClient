@@ -2,19 +2,22 @@ const
     React = require('react'),
     {View, Share} = require('react-native'),
     QRCode = require('react-native-qrcode-svg').default,
-    {useId} = require('$/stores')
+    {useWallet} = require('$/stores')
 
 
 const handlers = {
     credit: {
-        showAddressText: () => [{text:  useId.getState().id.address}],
+        showAddressText: () => [{text:  useWallet.getState().secp.address}],
 
         showAddressQRCode: () => [
             {text: 'See below'},
 
             {component: () =>
                 <View style={{alignItems: 'center', margin: 20}}>
-                    <QRCode value={useId.getState().id.address} size={200} />
+                    <QRCode
+                        value={useWallet.getState().secp.address}
+                        size={200}
+                    />
                 </View>},
         ],
 
@@ -22,7 +25,7 @@ const handlers = {
             Share.share({
                 message:
                     'I need some uixo tokens sent to '
-                        + useId.getState().id.address
+                        + useWallet.getState().secp.address
                         + '. Care to help?',
             })
 

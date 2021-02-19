@@ -6,7 +6,6 @@ const
         = require('react-native'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/assistant/AssistantLayout'),
-    ixo = require('$/ixoClient'),
     {useProjects} = require('$/stores'),
     {Modal, Heading, Text, Button, QRScanner} = require('$/lib/ui'),
     {entries} = Object
@@ -51,14 +50,16 @@ const Projects = () => {
                 onScan={async ({data}) => {
                     toggleScanner(false)
 
-                    const
-                        projDid = url.parse(data).path.split('/')[2],
-                        {body: projRec} = await ixo.sync.getProject(projDid)
+                    const projDid = url.parse(data).path.split('/')[2]
 
                     if (ps.items[projDid])
                         return alert('Project already exists!')
 
-                    ps.add(projDid, projRec)
+                    try {
+                        await ps.connect(projDid)
+                    } catch (e) {
+                        alert('Couldn\'t connect to project, please try again later!') // eslint-disable-line max-len
+                    }
                 }}
             />
         </Modal>
@@ -85,7 +86,7 @@ const Projects = () => {
                         Alert.alert('You sure?', '', [{
                             text: 'Yes, delete',
                             onPress: () => {
-                                ps.rm(focusedProjDid)
+                                ps.disconnect(focusedProjDid)
                                 setFocusedProj(null)
                             },
                         }, {
