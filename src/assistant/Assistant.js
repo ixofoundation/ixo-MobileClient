@@ -16,8 +16,7 @@ const
     ScanIcon = require('$/lib/icons/scan.svg').default,
     CloseIcon = require('$/lib/icons/close.svg').default,
     AssistantIcon = require('$/lib/icons/assistant.svg').default,
-    ArrowUpIcon = require('$/lib/icons/arrowUp.svg').default,
-    {default: LinearGradient} = require('react-native-linear-gradient')
+    ArrowUpIcon = require('$/lib/icons/arrowUp.svg').default
 
 
 const Assistant = ({initMsg, onClose = () => {}}) => {
@@ -83,12 +82,11 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
                             key={m.ts + '-btn-' + opt.payload}
                             onPress={() => selectOption(mIdx, optIdx)}
                         >
-                            <LinearGradient colors={['#FFFFFF', '#F8FAFD']} 
-                                style={s.optionBtn}>
+                            <View style={s.optionBtn}>
                                 <Text>
                                     {opt.title}
                                 </Text>
-                            </LinearGradient>
+                            </View>
                         </Pressable>)
 
                 if (m.component) {
@@ -165,6 +163,7 @@ const s = StyleSheet.create({
         paddingTop: theme.spacing(1),
     },
     optionBtn: {
+        backgroundColor: '#F8FAFD',
         borderRadius: 8, 
         padding: theme.spacing(1), 
         marginBottom: theme.spacing(1),
@@ -183,6 +182,7 @@ const s = StyleSheet.create({
         paddingLeft: theme.spacing(1),
         backgroundColor: 'transparent',
         justifyContent: 'space-between',
+        alignItems: 'center',
         flexDirection: 'row',
     },
     msgInput: {flex: 1, fontSize: 16},
@@ -190,8 +190,8 @@ const s = StyleSheet.create({
     sendBtn: {
         backgroundColor: '#49BFE0', 
         borderRadius: 50, 
-        width: 40, 
-        height: 40, 
+        width: 50, 
+        height: 50, 
         justifyContent: 'center', 
         alignItems: 'center',
     },

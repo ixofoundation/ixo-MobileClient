@@ -1,7 +1,5 @@
 PODS:
   - boost-for-react-native (1.63.0)
-  - BVLinearGradient (2.5.6):
-    - React
   - CocoaAsyncSocket (7.6.5)
   - CocoaLibEvent (1.0.0)
   - DoubleConversion (1.1.6)
@@ -316,14 +314,13 @@ PODS:
     - React-Core
   - RNKeychain (6.2.0):
     - React
-  - RNSVG (9.13.6):
+  - RNSVG (12.1.0):
     - React
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
 
 DEPENDENCIES:
-  - BVLinearGradient (from `../node_modules/react-native-linear-gradient`)
   - DoubleConversion (from `../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../node_modules/react-native/Libraries/FBReactNativeSpec`)
@@ -395,8 +392,6 @@ SPEC REPOS:
     - YogaKit
 
 EXTERNAL SOURCES:
-  BVLinearGradient:
-    :path: "../node_modules/react-native-linear-gradient"
   DoubleConversion:
     :podspec: "../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
   FBLazyVector:
@@ -466,7 +461,6 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  BVLinearGradient: e3aad03778a456d77928f594a649e96995f1c872
   CocoaAsyncSocket: 065fd1e645c7abab64f7a6a2007a48038fdc6a99
   CocoaLibEvent: 2fab71b8bd46dd33ddb959f7928ec5909f838e3f
   DoubleConversion: cde416483dac037923206447da6e1454df403714
@@ -508,7 +502,7 @@ SPEC CHECKSUMS:
   RNCAsyncStorage: bc2f81cc1df90c267ce9ed30bb2dbc93b945a8ee
   RNGestureHandler: 9b7e605a741412e20e13c512738a31bd1611759b
   RNKeychain: b8e0711b959a19c5b057d1e970d3c83d159b6da5
-  RNSVG: 8ba35cbeb385a52fd960fd28db9d7d18b4c2974f
+  RNSVG: ce9d996113475209013317e48b05c21ee988d42e
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
