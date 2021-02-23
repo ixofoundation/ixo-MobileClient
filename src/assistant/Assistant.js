@@ -1,7 +1,3 @@
-// const {default: AssistantLogo} = require('../assets/top-assistant-icon.svg')
-// const {default: CloseIcon} = require('../assets/close-icon.svg')
-// const {default: ScanIcon} = require('../assets/qr-scan.svg')
-
 const
     React = require('react'),
     {useState, useRef, useCallback, createElement: e} = React,
