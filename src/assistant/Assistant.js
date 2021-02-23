@@ -13,10 +13,10 @@ const
     handleCustomAssistantResponse = require('./assistantResponseHandler'),
     theme = require('$/lib/theme'),
     MessageBubble = require('$/assistant/MessageBubble'),
-    ScanIcon = require('$/lib/icons/Scan'),
-    CloseIcon = require('$/lib/icons/Close'),
-    AssistantIcon = require('$/lib/icons/Assistant'),
-    ArrowUpIcon = require('$/lib/icons/ArrowUp'),
+    ScanIcon = require('./icons/Scan'),
+    CloseIcon = require('./icons/Close'),
+    AssistantIcon = require('./icons/Assistant'),
+    ArrowUpIcon = require('./icons/ArrowUp'),
     {default: LinearGradient} = require('react-native-linear-gradient')
 
 
