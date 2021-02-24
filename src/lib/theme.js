@@ -21,8 +21,23 @@ const colors = {
     black: '',
 }
 
+const fontSizes = {
+    h1: 96,
+    h2: 60,
+    h3: 48,
+    h4: 34,
+    h5: 24,
+    h6: 20,
+    p1: 16,
+    p2: 14,
+    button: 16,
+    caption: 12,
+    overline: 10,
+}
+
 module.exports =  {
     spacing,
     shadow,
     colors,
+    fontSizes,
 }
