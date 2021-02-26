@@ -9,4 +9,7 @@ module.exports = {
     QRScanner: require('./QRScanner'),
     Text: require('./Text'),
     TextInput: require('./TextInput'),
+    Select: require('./Select'),
+    DateRangePicker: require('./DateRangePicker'),
+    EntityFilter: require('./EntityFilter'),
 }
