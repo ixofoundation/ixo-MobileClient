@@ -4,6 +4,7 @@
   "version": "0.0.1",
   "license": "ISC",
   "repository": "https://github.com/gwn/ixo-app",
+  "author": "gwn <dev@gwn.wtf>",
   "scripts": {
     "android": "react-native run-android",
     "ios": "react-native run-ios",
