@@ -1,9 +1,11 @@
 const
     React = require('react'),
     {useState} = React,
-    {View} = require('react-native'),
-    {Button, Modal} = require('$/lib/ui'),
-    Assistant = require('./Assistant')
+    {View, StyleSheet, Pressable} = require('react-native'),
+    {Modal} = require('$/lib/ui'),
+    Assistant = require('./Assistant'),
+    theme = require('$/lib/theme'),
+    AssistantIcon = require('$/lib/icons/assistant.svg').default
 
 
 const AssistantLayout = ({initMsg, children, autoOpen = false}) => {
@@ -20,15 +22,30 @@ const AssistantLayout = ({initMsg, children, autoOpen = false}) => {
             />
         </Modal>
 
-        <View style={{flexGrow: 1}} children={children} />
+        <View style={style.content} children={children} />
 
-        <Button
-            text='A'
-            onPress={() => setAstVisibility(true)}
-            style={{width: 50, height: 50, alignSelf: 'center'}}
-        />
+        <View style={style.bottomBar}>
+            <Pressable
+                onPress={() => setAstVisibility(true)}
+            >
+                <AssistantIcon/>
+            </Pressable>
+        </View>
     </>
 }
+
+const style = StyleSheet.create({
+    bottomBar: {
+        flexDirection: 'row',
+        backgroundColor: 'black',
+        padding: theme.spacing(1),
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    content: {
+        flexGrow: 1,
+    },
+})
 
 
 module.exports = AssistantLayout
