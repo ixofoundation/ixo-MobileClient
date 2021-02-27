@@ -12,8 +12,8 @@ const
     {sortBy, filter} = require('lodash-es'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/assistant/AssistantLayout'),
-    ProjectModal = require('$/project/ProjectModal'),
-    ProjectListItem = require('$/project/ProjectListItem'),
+    ProjectActions = require('./ProjectActions'),
+    ProjectListItem = require('./ProjectListItem'),
     {useProjects} = require('$/stores'),
     {Modal, Button, QRScanner, EntityFilter} = require('$/lib/ui'),
     theme = require('$/lib/theme'),
@@ -116,20 +116,13 @@ const Projects = () => {
             </View>
 
             <ScrollView style={style.projectsContainer}>
-                {entries(projects).map(([
-                    projDid, 
-                    {
-                        data: {
-                            name, 
-                            logo, 
-                            image, 
-                            description,
-                        },
-                    },
-                ]) =>
+                {projects.map(({
+                    projectDid,
+                    data: {name, logo, image, description},
+                }) =>
                     <TouchableOpacity
-                        key={projDid}
-                        onPress={() =>  setFocusedProj(projDid)}
+                        key={projectDid}
+                        onPress={() =>  setFocusedProj(projectDid)}
                     >
                         <ProjectListItem
                             name={name}
@@ -176,9 +169,19 @@ const Projects = () => {
                 />
             </Modal>
 
-            <ProjectModal 
-                projectId={focusedProjDid} 
-                onClose={() => setFocusedProj(null)}
+            <Modal
+                visible={!!focusedProjDid}
+                onRequestClose={() => setFocusedProj(null)}
+                transparent
+                children={
+                    <ProjectActions
+                        project={ps.items[focusedProjDid]}
+                        onClose={() => setFocusedProj(null)}
+                        onDisconnect={() => {
+                            setFocusedProj(null)
+                            ps.disconnect(focusedProjDid)
+                        }}
+                />}
             />
         </View>
     </AssistantLayout></MenuLayout>

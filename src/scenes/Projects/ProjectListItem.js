@@ -3,7 +3,7 @@ const
     {View, Image, StyleSheet, Text, Pressable}
         = require('react-native'),
     theme = require('$/lib/theme'),
-    ProgressBar = require('$/project/ProgressBar'),
+    ProgressBar = require('./ProgressBar'),
     DotsVerticalIcon = require('$/lib/icons/dotsVertical.svg').default
 
 const Project = ({name, logoUrl, imageUrl, description}) =>
