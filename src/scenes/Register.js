@@ -1,7 +1,7 @@
 const
     React = require('react'),
     {useContext, useCallback} = React,
-    {View} = require('react-native'),
+    {View, Alert} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {useWallet} = require('$/stores'),
     {Heading, Button, Text, Code} = require('$/lib/ui')
@@ -18,9 +18,13 @@ const Register = () => {
             alert('Registration complete!')
             nav.navigate('projects')
         } catch (e) {
-            alert(
-                'Could not register, please try again! '
-                + 'If the error persists, consider creating a new ID.',
+            console.error(e)
+
+            Alert.alert(
+                'Registration Error',
+                'Could not register! You presumably have no tokens in your account so we\'re redirecting you to the crediting page', // eslint-disable-line max-len
+                [{text: 'OK', onPress: () => nav.navigate('credit')}],
+                {cancelable: false},
             )
         }
     })
