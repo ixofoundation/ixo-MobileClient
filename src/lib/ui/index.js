@@ -9,4 +9,5 @@ module.exports = {
     QRScanner: require('./QRScanner'),
     Text: require('./Text'),
     TextInput: require('./TextInput'),
+    Select: require('./Select'),
 }
