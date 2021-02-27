@@ -10,4 +10,6 @@ module.exports = {
     Text: require('./Text'),
     TextInput: require('./TextInput'),
     Select: require('./Select'),
+    DatePicker: require('./DatePicker'),
+    DateRangePicker: require('./DateRangePicker'),
 }
