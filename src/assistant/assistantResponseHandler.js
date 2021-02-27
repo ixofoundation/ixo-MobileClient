@@ -7,7 +7,7 @@ const
 
 const handlers = {
     credit: {
-        showAddressText: () => [{text:  useWallet.getState().secp.address}],
+        showAddressText: () => [{text:  useWallet.getState().agent.address}],
 
         showAddressQRCode: () => [
             {text: 'See below'},
@@ -15,7 +15,7 @@ const handlers = {
             {component: () =>
                 <View style={{alignItems: 'center', margin: 20}}>
                     <QRCode
-                        value={useWallet.getState().secp.address}
+                        value={useWallet.getState().agent.address}
                         size={200}
                     />
                 </View>},
@@ -25,7 +25,7 @@ const handlers = {
             Share.share({
                 message:
                     'I need some uixo tokens sent to '
-                        + useWallet.getState().secp.address
+                        + useWallet.getState().agent.address
                         + '. Care to help?',
             })
 
