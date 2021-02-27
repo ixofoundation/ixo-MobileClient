@@ -73,7 +73,10 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
                     </MessageBubble>
 
                 if (m.quick_replies || m.buttons)
-                    return <View style={s.optionBtnContainer}>
+                    return <View
+                        key={m.ts + '-btns'}
+                        style={s.optionBtnContainer}
+                    >
                         {
                             (m.quick_replies || m.buttons).map((opt, optIdx) =>
                                 <Pressable
