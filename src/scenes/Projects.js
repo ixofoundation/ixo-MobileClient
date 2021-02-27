@@ -4,25 +4,93 @@ const
     {useState} = React,
     {TouchableOpacity, ScrollView, View, Image, Alert, Linking}
         = require('react-native'),
+    {sortBy, filter} = require('lodash-es'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/assistant/AssistantLayout'),
     {useProjects} = require('$/stores'),
-    {Modal, Heading, Text, Button, QRScanner} = require('$/lib/ui'),
+    {Modal, Heading, Text, Button, QRScanner, EntityFilter}
+        = require('$/lib/ui'),
     {entries} = Object
+
+
+const filterSpec = [{
+    type: 'option',
+    id: 'sortBy',
+    title: 'Sort by',
+    opts: [{
+        value: 'data.startDate',
+        title: 'Recently Added',
+    }, {
+        value: 'data.claimStats.currentSuccessful',
+        title: 'Most Active',
+    }, {
+        value: 'data.name',
+        title: 'Name',
+    }],
+}, {
+    type: 'option',
+    id: 'stage',
+    multiple: true,
+    opts: [
+        'Proposal', 'Planning', 'Delivery', 'Closing',
+        'Ended',
+    ],
+}, {
+    type: 'dateRange',
+    id: 'dateRange',
+    title: 'Date',
+}]
 
 
 const Projects = () => {
     const
         ps = useProjects(),
         [scannerShown, toggleScanner] = useState(false),
+        [filterShown, toggleFilter] = useState(false),
+        [filters, setFilters] = useState({}),
         [focusedProjDid, setFocusedProj] = useState(),
-        focusedProj = ps.items[focusedProjDid] || {data: {}}
+        focusedProj = ps.items[focusedProjDid] || {data: {}},
+
+        projFilter = p => {
+            if (filters.stage && !filters.stage.includes(p.data.stage))
+                return false
+
+            return !filters.dateRange
+                ? true
+                : (
+                    p.data.startDate >= filters.dateRange[0]
+                    && p.data.endDate <= filters.dateRange[1]
+                )
+        },
+
+        projects = sortBy(filter(ps.items, projFilter), filters.sortBy)
 
     return <MenuLayout><AssistantLayout>
         <Heading children='Projects' />
 
+        <Button
+            text='Filter'
+            onPress={() => toggleFilter(true)}
+        />
+
+        <Modal
+            visible={filterShown}
+            onRequestClose={() => toggleFilter(false)}
+            children={
+                <EntityFilter
+                    spec={filterSpec}
+                    onCancel={() => toggleFilter(false)}
+                    onChange={filters => {
+                        setFilters(filters)
+                        toggleFilter(false)
+                    }}
+                    initialValue={filters}
+                />
+            }
+        />
+
         <ScrollView style={{flex: 1}}>
-            {entries(ps.items).map(([projDid, proj]) =>
+            {entries(projects).map(([projDid, proj]) =>
                 <TouchableOpacity
                     key={projDid}
                     onPress={() =>  setFocusedProj(projDid)}
