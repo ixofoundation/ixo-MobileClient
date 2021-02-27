@@ -12,4 +12,5 @@ module.exports = {
     Select: require('./Select'),
     DatePicker: require('./DatePicker'),
     DateRangePicker: require('./DateRangePicker'),
+    EntityFilter: require('./EntityFilter'),
 }
