@@ -36,7 +36,7 @@ const initForExistingWallet = async nav => {
 
     if (uixoBalance < 100) {
         debug('Too little account balance, navigating to the credit scene')
-        return nav.navigate('credit', {address: ws.secp.address})
+        return nav.navigate('credit')
     }
 
     debug('Navigating to the registration scene')
