@@ -15,6 +15,8 @@ const icons = {
     menu: require('./assets/menu.svg').default,
     scan: require('./assets/scan.svg').default,
     web: require('./assets/web.svg').default,
+    chevronRight: require('./assets/chevronRight.svg').default,
+    chevronLeft: require('./assets/chevronLeft.svg').default,
 }
 
 const Icon = ({name, ...props}) =>
