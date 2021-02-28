@@ -7,7 +7,7 @@ const
     {noop} = require('lodash-es'),
 
     {Button} = require('$/lib/ui'),
-    theme = require('$/lib/theme'),
+    theme = require('$/theme'),
 
 
     WebIcon = require('$/lib/icons/web.svg').default,

@@ -2,7 +2,7 @@ const
     React = require('react'),
     {View, StyleSheet}
         = require('react-native'),
-    theme = require('$/lib/theme')
+    theme = require('$/theme')
     
 const ProgressBar = ({percent = 0, progress = 0}) => {
     const percentValue = Math.min(

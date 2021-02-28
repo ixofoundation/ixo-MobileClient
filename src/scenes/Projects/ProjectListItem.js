@@ -2,7 +2,7 @@ const
     React = require('react'),
     {View, Image, StyleSheet, Text, Pressable}
         = require('react-native'),
-    theme = require('$/lib/theme'),
+    theme = require('$/theme'),
     ProgressBar = require('./ProgressBar'),
     DotsVerticalIcon = require('$/lib/icons/dotsVertical.svg').default
 

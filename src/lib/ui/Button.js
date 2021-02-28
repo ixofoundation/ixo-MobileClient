@@ -1,7 +1,7 @@
 const
     React = require('react'),
     {Text, Pressable, StyleSheet, View} = require('react-native'),
-    theme = require('$/lib/theme')
+    theme = require('$/theme')
 
 
 

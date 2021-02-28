@@ -16,7 +16,7 @@ const
     ProjectListItem = require('./ProjectListItem'),
     {useProjects} = require('$/stores'),
     {Modal, Button, QRScanner, EntityFilter} = require('$/lib/ui'),
-    theme = require('$/lib/theme'),
+    theme = require('$/theme'),
     {entries} = Object,
     MainMenuIcon = require('$/lib/icons/mainMenu.svg').default,
     AutorenewIcon = require('$/lib/icons/autorenew.svg').default,

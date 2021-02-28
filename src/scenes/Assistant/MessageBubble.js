@@ -1,6 +1,6 @@
 const React = require('react'),
     {StyleSheet, View} = require('react-native'),
-    theme = require('$/lib/theme')
+    theme = require('$/theme')
 
 const MessageBubble = ({children, direction}) => {
     const directionStyle = direction === 'in' ? 

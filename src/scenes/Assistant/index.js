@@ -7,7 +7,7 @@ const
     useBot = require('react-rasa-assistant'),
     {Modal, Text, QRScanner} = require('$/lib/ui'),
     handleCustomAssistantResponse = require('./assistantResponseHandler'),
-    theme = require('$/lib/theme'),
+    theme = require('$/theme'),
     MessageBubble = require('./MessageBubble'),
     ScanIcon = require('$/lib/icons/scan.svg').default,
     CloseIcon = require('$/lib/icons/close.svg').default,
