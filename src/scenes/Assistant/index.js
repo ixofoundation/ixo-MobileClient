@@ -8,7 +8,7 @@ const
     {Modal, Text, QRScanner} = require('$/lib/ui'),
     handleCustomAssistantResponse = require('./assistantResponseHandler'),
     theme = require('$/lib/theme'),
-    MessageBubble = require('$/assistant/MessageBubble'),
+    MessageBubble = require('./MessageBubble'),
     ScanIcon = require('$/lib/icons/scan.svg').default,
     CloseIcon = require('$/lib/icons/close.svg').default,
     AssistantIcon = require('$/lib/icons/assistant.svg').default,

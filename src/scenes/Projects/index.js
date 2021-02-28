@@ -11,7 +11,7 @@ const
     } = require('react-native'),
     {sortBy, filter} = require('lodash-es'),
     MenuLayout = require('$/MenuLayout'),
-    AssistantLayout = require('$/assistant/AssistantLayout'),
+    AssistantLayout = require('$/AssistantLayout'),
     ProjectActions = require('./ProjectActions'),
     ProjectListItem = require('./ProjectListItem'),
     {useProjects} = require('$/stores'),

@@ -3,7 +3,7 @@ const
     {useState} = React,
     {View, StyleSheet, Pressable} = require('react-native'),
     {Modal} = require('$/lib/ui'),
-    Assistant = require('./Assistant'),
+    Assistant = require('$/scenes/Assistant'),
     theme = require('$/lib/theme'),
     AssistantIcon = require('$/lib/icons/assistant.svg').default
 

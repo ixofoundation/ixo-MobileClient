@@ -3,7 +3,7 @@ const
     {useContext} = React,
     {NavigationContext} = require('navigation-react'),
     {Heading, Text, Button} = require('$/lib/ui'),
-    AssistantLayout = require('$/assistant/AssistantLayout')
+    AssistantLayout = require('$/AssistantLayout')
 
 
 const Credit = () => {
