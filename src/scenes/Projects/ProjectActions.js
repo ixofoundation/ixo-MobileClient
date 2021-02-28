@@ -1,15 +1,22 @@
 const
     React = require('react'),
 
+    {useContext} = React,
+
     {View, Image, Alert, Linking, StyleSheet, Text}
         = require('react-native'),
 
     {noop} = require('lodash-es'),
 
+    {NavigationContext} = require('navigation-react'),
+
     {Button, Icon} = require('$/lib/ui'),
     theme = require('$/theme')
 
-const ProjectDetail = ({project, onClose = noop, onDisconnect = noop}) => <>
+const ProjectDetail = ({project, onClose = noop, onDisconnect = noop}) => {
+    const {stateNavigator: nav} = useContext(NavigationContext)
+
+    return <>
     <View style={style.root}>
         <View style={style.header}>
             <Image
@@ -30,6 +37,11 @@ const ProjectDetail = ({project, onClose = noop, onDisconnect = noop}) => <>
         <ProjectActionButton
             text='View Claim Forms'
             icon={<Icon name='menu' fill='white'/>}
+            onPress={() =>
+                nav.navigate('claim-forms', {
+                    projectDid: project.projectDid,
+                })
+            }
         />
         <ProjectActionButton
             text='Disconnect from this Project'
@@ -63,7 +75,8 @@ const ProjectDetail = ({project, onClose = noop, onDisconnect = noop}) => <>
         style={style.closeBtn}
         onPress={onClose}
     />
-</>
+    </>
+}
 
 const style = StyleSheet.create({
     root: {
