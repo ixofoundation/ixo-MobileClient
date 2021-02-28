@@ -111,24 +111,15 @@ const Projects = () => {
                 />
             </View>
 
-            <ScrollView style={style.projectsContainer}>
-                {projects.map(({
-                    projectDid,
-                    data: {name, logo, image, description},
-                }) =>
+            <ScrollView
+                style={style.projectsContainer}
+                children={projects.map(p =>
                     <TouchableOpacity
-                        key={projectDid}
-                        onPress={() =>  setFocusedProj(projectDid)}
-                    >
-                        <ProjectListItem
-                            name={name}
-                            logoUrl={logo}
-                            imageUrl={image}
-                            description={description}
-                        />
-                    </TouchableOpacity>,
-                )}
-            </ScrollView>
+                        key={p.projectDid}
+                        onPress={() =>  setFocusedProj(p.projectDid)}
+                        children={<ProjectListItem project={p} />}
+                    />)}
+            />
 
             <Button
                 onPress={() => toggleScanner(true)}

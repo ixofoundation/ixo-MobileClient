@@ -6,8 +6,17 @@ const
     {Icon} = require('$/lib/ui'),
     ProgressBar = require('./ProgressBar')
 
-const ProjectListItem = ({name, logoUrl, imageUrl, description}) =>
-    <View style={style.root}>
+const ProjectListItem = ({project}) => {
+    const {
+        data: {
+            name,
+            logo: logoUrl,
+            image: imageUrl,
+            description,
+        }
+    } = project
+
+    return <View style={style.root}>
         <Image
             source={{uri: dashedHostname(imageUrl)}}
             style={style.coverImg}
@@ -56,6 +65,7 @@ const ProjectListItem = ({name, logoUrl, imageUrl, description}) =>
             />
         </View>
     </View>
+}
 
 const style = StyleSheet.create({
     root: {
