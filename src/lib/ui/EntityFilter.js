@@ -1,43 +1,25 @@
 const
     React = require('react'),
-    {createElement, useState} = React,
-    {View, Text, Switch} = require('react-native'),
-    CalendarPicker = require('react-native-calendar-picker').default,
-    {noop, capitalize} = require('lodash-es'),
+    {useState, Children, cloneElement} = React,
+    {View} = require('react-native'),
+    {noop} = require('lodash-es'),
     ButtonGroup = require('./ButtonGroup'),
     Button = require('./Button'),
     Select = require('./Select'),
+    Switch = require('./Switch'),
     Heading = require('./Heading'),
     DatePicker = require('./DatePicker'),
     DateRangePicker = require('./DateRangePicker')
 
-
-const filterComp = {
-    option: {
-        component: Select,
-        valueProp: 'value',
-        onChangeProp: 'onChange',
-    },
-    switch: {
-        component: Switch,
-        valueProp: 'value',
-        onChangeProp: 'onValueChange',
-    },
-    date: {
-        component: DatePicker,
-        valueProp: 'value',
-        onChangeProp: 'onChange',
-    },
-    dateRange: {
-        component: DateRangePicker,
-        valueProp: 'value',
-        onChangeProp: 'onChange',
-    },
-}
-
+const filterComponents = [
+    Select,
+    Switch,
+    DatePicker,
+    DateRangePicker,
+]
 
 const EntityFilter = ({
-    spec,
+    children,
     initialValue = {},
     onChange = noop,
     onCancel = noop,
@@ -47,40 +29,29 @@ const EntityFilter = ({
     return <View>
         <Heading children='Filter' />
 
-        <ButtonGroup items={[
-            {text: 'Close', onPress: onCancel},
-            {text: 'Reset', onPress: () => setValue({})},
-        ]} />
+        <ButtonGroup>
+            <Button text='Close' onPress={onCancel}/>
+            <Button text='Reset' onPress={() => setValue({})}/>
+        </ButtonGroup>
 
-        {spec.flatMap(({type, id, title = capitalize(id), ...props}) => [
-            <Text
-                key={id + '_title'}
-                children={title}
-                style={s.heading}
-            />,
-
-            createElement(filterComp[type].component, {
-                key: id,
-
-                [filterComp[type].valueProp]: value[id],
-
-                [filterComp[type].onChangeProp]: val =>
-                    setValue(prevValue => ({...value, [id]: val})),
-
-                ...props,
-            }),
-        ])}
+        {
+            Children.map(children, (child) => {
+                if (filterComponents.some(comp => comp === child.type)) {
+                    const {id} = child.props
+                    return cloneElement(child, {
+                        ...child.props, 
+                        key: id,
+                        onChange: val =>
+                            setValue(prevValue => ({...prevValue, [id]: val})),
+                        value: value[id],
+                    })
+                }
+                return child
+            })
+        }
 
         <Button text='Apply' onPress={() => onChange(value)} />
     </View>
-}
-
-const s = {
-    heading: {
-        fontWeight: 'bold',
-        marginTop: 10,
-        borderTopWidth: 1,
-    },
 }
 
 

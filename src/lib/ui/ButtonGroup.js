@@ -1,21 +1,20 @@
 const
     React = require('react'),
-    {View} = require('react-native'),
-    Button = require('./Button')
+    {View, StyleSheet} = require('react-native')
 
-
-const ButtonGroup = ({style: overrideStyles, items, ...props}) =>
+const ButtonGroup = ({style: overrideStyles, children}) =>
     <View
-        style={{...style, ...overrideStyles}}
-        children={items.map(btn =>
-            <Button key={btn.text} {...props} {...btn} />)}
+        style={StyleSheet.compose(style.container, overrideStyles)}
+        children={children}
     />
 
-const style = {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-}
+const style = StyleSheet.create({
+    container: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+    },
+})
 
 
 module.exports = ButtonGroup
