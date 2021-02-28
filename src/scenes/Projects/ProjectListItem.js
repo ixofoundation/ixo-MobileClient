@@ -6,7 +6,7 @@ const
     {Icon} = require('$/lib/ui'),
     ProgressBar = require('./ProgressBar')
 
-const Project = ({name, logoUrl, imageUrl, description}) =>
+const ProjectListItem = ({name, logoUrl, imageUrl, description}) =>
     <View style={style.root}>
         <Image
             source={{uri: dashedHostname(imageUrl)}}
@@ -119,4 +119,4 @@ const dashedHostname = urlStr =>
         (_, proto, host, path) => proto + host.replace('_', '-') + path,
     )
 
-module.exports = Project
+module.exports = ProjectListItem
