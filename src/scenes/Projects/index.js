@@ -16,8 +16,7 @@ const
     ProjectListItem = require('./ProjectListItem'),
     {useProjects} = require('$/stores'),
     {Modal, Button, QRScanner, EntityFilter, Icon} = require('$/lib/ui'),
-    theme = require('$/theme'),
-    {entries} = Object
+    theme = require('$/theme')
 
 
 const filterSpec = [{
@@ -178,7 +177,7 @@ const Projects = () => {
                             setFocusedProj(null)
                             ps.disconnect(focusedProjDid)
                         }}
-                />}
+                    />}
             />
         </View>
     </AssistantLayout></MenuLayout>
