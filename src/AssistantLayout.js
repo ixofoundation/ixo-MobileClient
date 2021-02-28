@@ -2,10 +2,9 @@ const
     React = require('react'),
     {useState} = React,
     {View, StyleSheet, Pressable} = require('react-native'),
-    {Modal} = require('$/lib/ui'),
+    {Modal, Icon} = require('$/lib/ui'),
     Assistant = require('$/scenes/Assistant'),
-    theme = require('$/theme'),
-    AssistantIcon = require('$/lib/icons/assistant.svg').default
+    theme = require('$/theme')
 
 
 const AssistantLayout = ({initMsg, children, autoOpen = false}) => {
@@ -28,7 +27,7 @@ const AssistantLayout = ({initMsg, children, autoOpen = false}) => {
             <Pressable
                 onPress={() => setAstVisibility(true)}
             >
-                <AssistantIcon/>
+                <Icon name='assistant' />
             </Pressable>
         </View>
     </>

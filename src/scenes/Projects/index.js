@@ -15,12 +15,9 @@ const
     ProjectActions = require('./ProjectActions'),
     ProjectListItem = require('./ProjectListItem'),
     {useProjects} = require('$/stores'),
-    {Modal, Button, QRScanner, EntityFilter} = require('$/lib/ui'),
+    {Modal, Button, QRScanner, EntityFilter, Icon} = require('$/lib/ui'),
     theme = require('$/theme'),
-    {entries} = Object,
-    MainMenuIcon = require('$/lib/icons/mainMenu.svg').default,
-    AutorenewIcon = require('$/lib/icons/autorenew.svg').default,
-    FilterIcon = require('$/lib/icons/filter.svg').default
+    {entries} = Object
 
 
 const filterSpec = [{
@@ -92,12 +89,12 @@ const Projects = () => {
     return <MenuLayout><AssistantLayout>
         <View style={style.root}>
             <View style={style.appBar}>
-                <MainMenuIcon fill='white'/>
+                <Icon name='mainMenu' fill='white'/>
                 <View style={style.redBtn}>
                     <Text style={style.redBtnText}>
                             5
                     </Text>
-                    <AutorenewIcon fill='white' />
+                    <Icon name='autoRenew' fill='white' />
                 </View>
             </View>
 
@@ -109,7 +106,7 @@ const Projects = () => {
                 <Button 
                     text='Filter'
                     type='outlined'
-                    prefix={<FilterIcon fill='#83D9F2'/>}
+                    prefix={<Icon name='filter' fill='#83D9F2'/>}
                     style={style.filterBtn}
                     onPress={() => toggleFilter(true)}
                 />

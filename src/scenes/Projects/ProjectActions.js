@@ -6,14 +6,8 @@ const
 
     {noop} = require('lodash-es'),
 
-    {Button} = require('$/lib/ui'),
-    theme = require('$/theme'),
-
-
-    WebIcon = require('$/lib/icons/web.svg').default,
-    LinkOffIcon = require('$/lib/icons/linkOff.svg').default,
-    BellOffIcon = require('$/lib/icons/bellOff.svg').default,
-    MenuIcon = require('$/lib/icons/menu.svg').default
+    {Button, Icon} = require('$/lib/ui'),
+    theme = require('$/theme')
 
 const ProjectDetail = ({project, onClose = noop, onDisconnect = noop}) => <>
     <View style={style.root}>
@@ -35,11 +29,11 @@ const ProjectDetail = ({project, onClose = noop, onDisconnect = noop}) => <>
         </View>
         <ProjectActionButton
             text='View Claim Forms'
-            icon={<MenuIcon fill='white'/>}
+            icon={<Icon name='menu' fill='white'/>}
         />
         <ProjectActionButton
             text='Disconnect from this Project'
-            icon={<LinkOffIcon fill='white'/>}
+            icon={<Icon name='linkOff' fill='white'/>}
             onPress={() => {
                 Alert.alert('You sure?', '', [{
                     text: 'Yes, delete',
@@ -52,11 +46,11 @@ const ProjectDetail = ({project, onClose = noop, onDisconnect = noop}) => <>
         />
         <ProjectActionButton
             text='Turn off Project Notifications'
-            icon={<BellOffIcon fill='white'/>}
+            icon={<Icon name='bellOff' fill='white'/>}
         />
         <ProjectActionButton
             text='View the Project Page'
-            icon={<WebIcon fill='white'/>}
+            icon={<Icon name='web' fill='white'/>}
             onPress={() => Linking.openURL(getProjectURL(project))}
         /> 
     </View>

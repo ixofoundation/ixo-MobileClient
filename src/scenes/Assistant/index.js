@@ -5,14 +5,10 @@ const
         View, ScrollView, StyleSheet, TextInput, Pressable,
     } = require('react-native'),
     useBot = require('react-rasa-assistant'),
-    {Modal, Text, QRScanner} = require('$/lib/ui'),
+    {Modal, Text, QRScanner, Icon} = require('$/lib/ui'),
     handleCustomAssistantResponse = require('./assistantResponseHandler'),
     theme = require('$/theme'),
-    MessageBubble = require('./MessageBubble'),
-    ScanIcon = require('$/lib/icons/scan.svg').default,
-    CloseIcon = require('$/lib/icons/close.svg').default,
-    AssistantIcon = require('$/lib/icons/assistant.svg').default,
-    ArrowUpIcon = require('$/lib/icons/arrowUp.svg').default
+    MessageBubble = require('./MessageBubble')
 
 
 const Assistant = ({initMsg, onClose = () => {}}) => {
@@ -44,13 +40,13 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
                 style={s.headerBtn}
                 onLongPress={restartSession}
             >
-                <AssistantIcon/>
+                <Icon name='assistant' />
             </Pressable>
             <Pressable
                 style={s.headerBtn}
                 onPress={onClose}
             >
-                <CloseIcon/>
+                <Icon name='close' />
             </Pressable>
         </View>
 
@@ -108,7 +104,7 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
 
         <View style={s.msgSendView}>
             <Pressable  style={s.scanBtn} onPress={openModal} >
-                <ScanIcon/>
+                <Icon name='scan' />
             </Pressable>
 
             <View style={s.msgInputContainer}>
@@ -122,7 +118,7 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
                 <Pressable 
                     style={s.sendBtn}
                     onPress={sendUserText}>
-                    <ArrowUpIcon/>
+                    <Icon name='arrowUp' />
                 </Pressable>
             </View>
         </View>

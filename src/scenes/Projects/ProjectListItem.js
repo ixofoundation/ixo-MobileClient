@@ -3,8 +3,8 @@ const
     {View, Image, StyleSheet, Text, Pressable}
         = require('react-native'),
     theme = require('$/theme'),
-    ProgressBar = require('./ProgressBar'),
-    DotsVerticalIcon = require('$/lib/icons/dotsVertical.svg').default
+    {Icon} = require('$/lib/ui'),
+    ProgressBar = require('./ProgressBar')
 
 const Project = ({name, logoUrl, imageUrl, description}) =>
     <View style={style.root}>
@@ -26,7 +26,8 @@ const Project = ({name, logoUrl, imageUrl, description}) =>
                     <Pressable
                         onPress={() => console.log('detail is clicked!')}
                     >
-                        <DotsVerticalIcon 
+                        <Icon
+                            name='dotsVertical'
                             height={40} width={40} 
                             fill='#085F7D'
                         />
