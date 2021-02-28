@@ -1,7 +1,8 @@
 const
     React = require('react'),
-    {useState} = React,
+    {useState, useContext} = React,
     {View, Text, TouchableHighlight, Modal} = require('react-native'),
+    {NavigationContext} = require('navigation-react'),
     {get, keyBy, sortBy, filter} = require('lodash-es'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
@@ -28,6 +29,7 @@ const filterSpec = [{
 
 const ClaimForms = ({projectDid}) => {
     const
+        {stateNavigator: nav} = useContext(NavigationContext),
         project = useProjects().items[projectDid],
         claimTemplates = get(project, 'data.entityClaims.items', []),
         claimTemplatesByDid = keyBy(claimTemplates, '@id'),
@@ -135,7 +137,14 @@ const ClaimForms = ({projectDid}) => {
                 <Button
                     text='Make Claim'
                     type='contained'
-                    onPress={() => {}}
+                    onPress={() =>
+                        nav.navigate('new-claim', {
+                            projectDid,
+
+                            templateDid:
+                                claimTemplatesByDid[focusedTplDid]['@id'],
+                        })
+                    }
                 />
             </View>
         </Modal>

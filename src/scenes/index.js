@@ -8,4 +8,5 @@ module.exports = {
     ClaimForms: require('./ClaimForms'),
     Claims: require('./Claims'),
     ClaimActivity: require('./ClaimActivity'),
+    NewClaim: require('./NewClaim'),
 }
