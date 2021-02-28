@@ -2,6 +2,7 @@ const
     React = require('react'),
     {SafeAreaView} = require('react-native'),
     {StateNavigator} = require('navigation'),
+    {NavigationContext} = require('navigation-react'),
     {CreateId, Register, Projects, Credit} = require('./scenes')
 
 
@@ -26,9 +27,11 @@ const nav =
 routes.forEach(([key, Component]) =>
     nav.states[key].renderScene =
         () =>
-            <SafeAreaView
-                style={{flex: 1}}
-                children={<Component />}
+            <NavigationContext.Consumer children={({data: routeData}) =>
+                <SafeAreaView
+                    style={{flex: 1}}
+                    children={<Component {...routeData} />}
+                />}
             />,
 )
 
