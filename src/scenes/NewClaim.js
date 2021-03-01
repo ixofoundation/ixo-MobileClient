@@ -10,6 +10,7 @@ const
     {readFile} = require('react-native-fs'),
     {Recorder, Player, MediaStates} =
         require('@react-native-community/audio-toolkit'),
+    Video = require('react-native-video').default,
     {useProjects} = require('$/stores'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
@@ -378,8 +379,120 @@ const GiveDetailedAnswer = ({value, onChange}) =>
 const SelectImage = ({value, onChange}) =>
     <Text children='select image' />
 
-const UploadVideo = ({value, onChange}) =>
-    <Text children='upload video' />
+const UploadVideo = ({value, onChange, projectDid}) => {
+    const
+        ps = useProjects(),
+        camRef = useRef(),
+        playerRef = useRef(),
+        [recorderOpen, toggleRecorder] = useState(false),
+        [isRecording, toggleRecordingState] = useState(false),
+        [videoFile, setVideoFile] = useState(),
+        [isPlaying, togglePlaying] = useState(false),
+
+        startRecording = useCallback(async () => {
+            toggleRecordingState(true)
+
+            const resp = await camRef.current.recordAsync({
+                quality: RNCamera.Constants.VideoQuality['288p'],
+            })
+
+            toggleRecordingState(false)
+
+            setVideoFile({uri: resp.uri, type: 'video/mp4'})
+        }),
+
+        stopRecording = useCallback(async () => {
+            await camRef.current.stopRecording()
+            toggleRecorder(false)
+        }),
+
+        selectVideo = useCallback(async () => {
+            const vid = await selectFile('audio')
+
+            if (vid)
+                setVideoFile(vid)
+        }),
+
+        uploadVideo = useCallback(async () => {
+            const fileUrl =
+                await uploadFileToCellNode(
+                    ps, projectDid, videoFile.type, videoFile.uri)
+
+            onChange(fileUrl)
+
+            alert('Complete!')
+        })
+
+    return <View>
+        <Text children='upload video' />
+
+        {videoFile && <>
+            <Video
+                ref={ref => playerRef.current = ref}
+                source={{uri: videoFile.uri}}
+                paused={!isPlaying}
+                onEnd={() => {
+                    togglePlaying(false)
+                    playerRef.current.seek(0)
+                }}
+                style={{
+                    width: '100%',
+                    height: 250,
+                    alignSelf: 'center',
+                }}
+                resizeMode='contain'
+            />
+            <Button
+                type='contained'
+                text={isPlaying ? 'Pause' : 'Play'}
+                onPress={() => togglePlaying(s => !s)}
+            />
+        </>}
+
+        <Button
+            type='contained'
+            text='Start recording'
+            onPress={() => toggleRecorder(true)}
+        />
+        <Button
+            type='contained'
+            text='Select video'
+            onPress={selectVideo}
+        />
+
+        {videoFile &&
+            <Button
+                type='contained'
+                text='Upload video'
+                onPress={uploadVideo}
+            />}
+
+        <Modal
+            visible={recorderOpen}
+            onRequestClose={() => {
+                if (isRecording)
+                    stopRecording()
+
+                toggleRecorder(false)
+            }}
+        >
+            <RNCamera
+                ref={ref => camRef.current = ref}
+                type={RNCamera.Constants.Type.back}
+                flashMode={RNCamera.Constants.FlashMode.on}
+                defaultVideoQuality={RNCamera.Constants.VideoQuality['480p']}
+                captureAudio={true}
+                style={style.cam}
+            >
+                <Button
+                    type='contained'
+                    text={isRecording ? 'Stop' : 'Start'}
+                    onPress={isRecording ? stopRecording : startRecording}
+                />
+            </RNCamera>
+        </Modal>
+    </View>
+}
 
 const ScanQRCode = ({value, onChange}) =>
     <Text children='scan QR code' />
