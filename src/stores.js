@@ -68,6 +68,8 @@ const useProjects = makePersistentStore('projects', set => ({
     },
 
     disconnect: projDid => set(({items}) => delete items[projDid]),
+
+    createFile: ixoSDKInstances.client.createProjectFile,
 }))
 
 

@@ -1,8 +1,12 @@
 const
     React = require('react'),
-    {createElement, useContext, useState} = React,
-    {View, Text, Modal} = require('react-native'),
+    {createElement, useContext, useState, useCallback} = React,
+    {View, Text, Modal, Image} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
+    DocumentPicker = require('react-native-document-picker').default,
+    {RNCamera} = require('react-native-camera'),
+    {readFile} = require('react-native-fs'),
+    {useProjects} = require('$/stores'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
     {Heading, ButtonGroup, Button, TextInput, Select} = require('$/lib/ui')
@@ -44,12 +48,17 @@ const NewClaim = ({projectDid, templateDid}) => {
         <Modal
             visible={formShown}
             onRequestClose={() => toggleForm(false)}
-            children={<ClaimForm onClose={() => toggleForm(false)} />}
+            children={
+                <ClaimForm
+                    projectDid={projectDid}
+                    templateDid={templateDid}
+                    onClose={() => toggleForm(false)}
+                />}
         />
     </AssistantLayout></MenuLayout>
 }
 
-const ClaimForm = ({onClose}) => {
+const ClaimForm = ({projectDid, templateDid, onClose}) => {
     const
         [currentStepIdx, setCurrentStep] = useState(0),
         currentStep = claimFormSteps[currentStepIdx],
@@ -62,6 +71,8 @@ const ClaimForm = ({onClose}) => {
         <Button type='contained' text='Close' onPress={onClose} />
 
         {createElement(currentStep.comp, {
+            projectDid,
+            templateDid,
             value: formState[currentStep.id],
             onChange: val =>
                 setFormState(fs => ({...fs, [currentStep.id]: val})),
@@ -74,7 +85,10 @@ const ClaimForm = ({onClose}) => {
             <Button
                 text='Prev'
                 type='outlined'
-                onPress={() => setCurrentStep(s => s - 1)}
+                onPress={() => {
+                    setFormError(null)
+                    setCurrentStep(s => s - 1)
+                }}
             />}
 
         {currentStepIdx < claimFormSteps.length - 1 &&
@@ -113,8 +127,110 @@ const ChooseBetweenOptions = ({value, onChange}) => <>
     />
 </>
 
-const UploadImage = ({value, onChange}) =>
-    <Text children='upload image' />
+const UploadImage = ({value, onChange, projectDid}) => {
+    const
+        ps = useProjects(),
+        [selectedImg, setSelectedImg] = useState(),
+        [camShown, toggleCam] = useState(false)
+
+    const takePhoto = useCallback(async cam => {
+        const
+            options = {quality: 0.3},
+            data = await cam.takePictureAsync(options)
+
+        data.type = 'image/jpeg'
+
+        console.log('photo taken', data)
+        setSelectedImg(data)
+        toggleCam(false)
+    })
+
+    const selectImage = useCallback(async () => {
+        try {
+            const res = await DocumentPicker.pick({
+                type: [DocumentPicker.types.images],
+            })
+
+            setSelectedImg(res)
+            console.log('image selected', res)
+
+        } catch (err) {
+            if (!DocumentPicker.isCancel(err))
+                throw err
+        }
+    })
+
+    const uploadImage = useCallback(async () => {
+        const base64Content = await readFile(selectedImg.uri, 'base64')
+
+        const serviceEndpoint =
+            dashedHostname(
+                ps.items[projectDid].data.nodes.items
+                    .find(i => i['@type'] === 'CellNode')
+                    .serviceEndpoint
+                    .replace(/\/$/, '')
+            )
+
+        const fileId =
+            await ps.createFile(
+                serviceEndpoint,
+                'data:' + selectedImg.type + ';base64,' + base64Content,
+            )
+
+        const fileUrl = serviceEndpoint + '/public/' + fileId
+
+        onChange(fileUrl)
+    })
+
+    return <View>
+        <Text children='upload image' />
+
+        {selectedImg &&
+            <Image
+                source={{uri: selectedImg.uri}}
+                style={{width: '60%', height: 200, alignSelf: 'center'}}
+            />}
+
+        <Button
+            type='contained'
+            text='Take a Photo'
+            onPress={() => toggleCam(true)}
+        />
+
+        <Button
+            type='contained'
+            text='Select Image'
+            onPress={selectImage}
+        />
+
+        {selectedImg &&
+            <Button
+                type='contained'
+                text='Upload Image'
+                onPress={uploadImage}
+            />}
+
+        <Modal
+            visible={camShown}
+            onRequestClose={() => toggleCam(false)}
+        >
+            <RNCamera
+                type={RNCamera.Constants.Type.back}
+                flashMode={RNCamera.Constants.FlashMode.on}
+                defaultVideoQuality={RNCamera.Constants.VideoQuality['480p']}
+                captureAudio={false}
+                style={style.cam}
+            >
+                {({camera}) =>
+                    <Button
+                        type='contained'
+                        text='Take Photo'
+                        onPress={() => takePhoto(camera)}
+                    />}
+            </RNCamera>
+        </Modal>
+    </View>
+}
 
 const UploadAudio = ({value, onChange}) =>
     <Text children='upload audio' />
@@ -145,6 +261,18 @@ const claimFormSteps = [
     {id: 'video',        comp: UploadVideo},
     {id: 'qr',           comp: ScanQRCode},
 ]
+
+const dashedHostname = urlStr =>
+    urlStr.replace(
+        /^(https?:\/\/)([^/]+)(\/.*)?/,
+        (_, proto, host, path) => proto + host.replace('_', '-') + (path || ''),
+    )
+
+const style = {
+    cam: {
+        height: '100%',
+    }
+}
 
 
 module.exports = NewClaim
