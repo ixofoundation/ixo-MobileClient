@@ -130,7 +130,7 @@ const ChooseBetweenOptions = ({value, onChange}) => <>
 const UploadImage = ({value, onChange, projectDid}) => {
     const
         ps = useProjects(),
-        [selectedImg, setSelectedImg] = useState(),
+        [selectedImg, setSelectedImg] = useState({uri: value}),
         [camShown, toggleCam] = useState(false)
 
     const takePhoto = useCallback(async cam => {
@@ -171,6 +171,8 @@ const UploadImage = ({value, onChange, projectDid}) => {
         const fileUrl = serviceEndpoint + '/public/' + fileId
 
         onChange(fileUrl)
+
+        alert('Complete!')
     })
 
     return <View>
