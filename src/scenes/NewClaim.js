@@ -159,7 +159,7 @@ const UploadImage = ({value, onChange, projectDid}) => {
                 ps.items[projectDid].data.nodes.items
                     .find(i => i['@type'] === 'CellNode')
                     .serviceEndpoint
-                    .replace(/\/$/, '')
+                    .replace(/\/$/, ''),
             )
 
         const fileId =
@@ -285,7 +285,7 @@ const dashedHostname = urlStr =>
 const style = {
     cam: {
         height: '100%',
-    }
+    },
 }
 
 
