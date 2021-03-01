@@ -1,11 +1,15 @@
 const
     React = require('react'),
-    {createElement, useContext, useState, useCallback} = React,
-    {View, Text, Modal, Image} = require('react-native'),
+    {createElement, useContext, useState, useCallback, useRef} = React,
+    {
+        Platform, PermissionsAndroid, View, Text, Modal, Image,
+    } = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     DocumentPicker = require('react-native-document-picker').default,
     {RNCamera} = require('react-native-camera'),
     {readFile} = require('react-native-fs'),
+    {Recorder, Player, MediaStates} =
+        require('@react-native-community/audio-toolkit'),
     {useProjects} = require('$/stores'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
@@ -152,23 +156,9 @@ const UploadImage = ({value, onChange, projectDid}) => {
     })
 
     const uploadImage = useCallback(async () => {
-        const base64Content = await readFile(selectedImg.uri, 'base64')
-
-        const serviceEndpoint =
-            dashedHostname(
-                ps.items[projectDid].data.nodes.items
-                    .find(i => i['@type'] === 'CellNode')
-                    .serviceEndpoint
-                    .replace(/\/$/, ''),
-            )
-
-        const fileId =
-            await ps.createFile(
-                serviceEndpoint,
-                'data:' + selectedImg.type + ';base64,' + base64Content,
-            )
-
-        const fileUrl = serviceEndpoint + '/public/' + fileId
+        const fileUrl =
+            await uploadFileToCellNode(
+                ps, projectDid, selectedImg.type, selectedImg.uri)
 
         onChange(fileUrl)
 
@@ -225,8 +215,159 @@ const UploadImage = ({value, onChange, projectDid}) => {
     </View>
 }
 
-const UploadAudio = ({value, onChange}) =>
-    <Text children='upload audio' />
+const UploadAudio = ({value, onChange, projectDid}) => {
+    const
+        ps = useProjects(),
+        [audioFile, setAudioFile] = useState(),
+        [isRecording, toggleRecordingState] = useState(false),
+        [isPlaying, togglePlayingState] = useState(false),
+
+        recorderRef = useRef(),
+        playerRef = useRef(),
+
+        startRecording = useCallback(async () => {
+            if (
+                playerRef.current
+                && playerRef.current.state === MediaStates.PLAYING
+            )
+                playerRef.current.pause(err => {
+                    if (err) {
+                        alert('An error occurred, please try again later!')
+                        console.error(err)
+                        return
+                    }
+
+                    togglePlayingState(false)
+                })
+
+            recorderRef.current = new Recorder('recording.mp4')
+
+            if (
+                Platform.OS === 'android'
+                && !(await askForAndroidAudioPermission())
+            )
+                return
+
+            recorderRef.current.record(err => {
+                if (err) {
+                    alert('An error occurred! Please try again.')
+                    console.error(err)
+                } else {
+                    toggleRecordingState(true)
+                }
+            })
+        }),
+
+        stopRecording = useCallback(() =>
+            recorderRef.current.stop(err => {
+                if (err) {
+                    alert('An error occurred! Please try again.')
+                    console.error(err)
+                } else {
+                    toggleRecordingState(false)
+
+                    setAudioFile({
+                        uri: recorderRef.current.fsPath,
+                        type: 'audio/mp4',
+                    })
+
+                    playerRef.current = null
+                }
+            }),
+        ),
+
+        playRecord = useCallback(() => {
+            if (playerRef.current && playerRef.current.currentTime > -1) {
+                playerRef.current.play()// Without arguments it acts as "resume"
+                togglePlayingState(true)
+                return
+            }
+
+            playerRef.current = new Player(audioFile.uri)
+
+            if (Platform.OS === 'android')
+                playerRef.current.speed = 0.0
+                /* See https://github.com/react-native-audio-toolkit/react-native-audio-toolkit/issues/168 */// eslint-disable-line max-len
+
+            playerRef.current.on('ended', () => togglePlayingState(false))
+
+            playerRef.current.play(err => {
+                if (err) {
+                    alert('An error occurred, please try again later!')
+                    console.error(err)
+                    return
+                }
+
+                if (Platform.OS === 'android')
+                    playerRef.current.speed = 1.0
+
+                togglePlayingState(true)
+            })
+        }),
+
+        pauseRecord = useCallback(() => {
+            playerRef.current.pause(err => {
+                if (err) {
+                    alert('An error occurred, please try again later!')
+                    console.error(err)
+                    return
+                }
+
+                togglePlayingState(false)
+            })
+        }),
+
+        selectAudioFile = useCallback(async () => {
+            const audioFile = await selectFile('audio')
+
+            if (audioFile)
+                setAudioFile(audioFile)
+        }),
+
+        uploadAudio = useCallback(async () => {
+            const fileUrl =
+                await uploadFileToCellNode(
+                    ps, projectDid, audioFile.type, audioFile.uri)
+
+            onChange(fileUrl)
+
+            alert('Complete!')
+        })
+
+    return <View>
+        <Text children='upload audio' />
+
+        {isRecording && <Text>Now recording...</Text>}
+
+        {isPlaying && <Text>Now playing...</Text>}
+
+        {audioFile &&
+            <Button
+                type='contained'
+                text={(isPlaying ? 'Pause' : 'Play') + ' record'}
+                onPress={isPlaying ? pauseRecord : playRecord}
+            />}
+
+        <Button
+            type='contained'
+            text={isRecording ? 'Stop recording' : 'Record audio'}
+            onPress={isRecording ? stopRecording : startRecording}
+        />
+
+        <Button
+            type='contained'
+            text='Select audio file'
+            onPress={selectAudioFile}
+        />
+
+        {audioFile &&
+            <Button
+                type='contained'
+                text='Upload audio'
+                onPress={uploadAudio}
+            />}
+    </View>
+}
 
 const UploadDoc = ({value, onChange}) =>
     <Text children='upload doc' />
@@ -276,6 +417,41 @@ const selectFile = async (allowedTypes = ['allFiles'], {multi = false} = {}) =>{
         else
             throw err
     }
+}
+
+const askForAndroidAudioPermission = () =>
+    PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO, {
+        title: 'Microphone Permission',
+        message: 'ixo need microphone access so you can make a recording',
+    })
+        .then(result => result === PermissionsAndroid.RESULTS.GRANTED)
+
+const uploadFileToCellNode = async (
+    ps,
+    projectDid,
+    fileMimeType,
+    localFilePath,
+) => {
+    const
+        base64Content = await readFile(localFilePath, 'base64'),
+
+        serviceEndpoint =
+            dashedHostname(
+                ps.items[projectDid].data.nodes.items
+                    .find(i => i['@type'] === 'CellNode')
+                    .serviceEndpoint
+                    .replace(/\/$/, ''),
+            ),
+
+        fileId =
+            await ps.createFile(
+                serviceEndpoint,
+                'data:' + fileMimeType + ';base64,' + base64Content,
+            ),
+
+        fileUrl = serviceEndpoint + '/public/' + fileId
+
+    return fileUrl
 }
 
 const dashedHostname = urlStr =>
