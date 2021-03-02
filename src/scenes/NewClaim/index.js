@@ -9,7 +9,7 @@ const
     AssistantLayout = require('$/AssistantLayout'),
     {
         Heading, ButtonGroup, Button, TextInput, Select, AudioInput, ImageInput,
-        DocumentInput, QRCodeInput, DateInput, VideoInput, Modal,
+        DocumentInput, QRCodeInput, DateInput, VideoInput, LocationInput, Modal,
     } = require('$/lib/ui'),
     {selectFile} = require('$/lib/util'),
     catPic1 = require('./assets/cat1.jpg'),
@@ -91,6 +91,11 @@ const claimFormSteps = [
         props: {
             opts: [1, 2, 3, 4, 5],
         },
+    },
+    {
+        id: 'location',
+        title: 'Select a location',
+        comp: LocationInput,
     },
 ]
 

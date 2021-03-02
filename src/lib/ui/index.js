@@ -23,4 +23,5 @@ module.exports = {
     QRCodeInput: require('./QRCodeInput'),
     DateInput: require('./DateInput'),
     VideoInput: require('./VideoInput'),
+    LocationInput: require('./LocationInput'),
 }

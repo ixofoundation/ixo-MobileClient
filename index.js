@@ -12,6 +12,8 @@ AppRegistry.registerComponent('ixoWallet', () => App)
 
 LogBox.ignoreAllLogs()
 
+navigator.geolocation = require('react-native-geolocation-service')
+
 init(nav).catch(e => {
     alert(e)
     console.error(e)
