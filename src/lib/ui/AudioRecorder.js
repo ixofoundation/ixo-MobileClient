@@ -1,9 +1,9 @@
 const
     React = require('react'),
     {useState, useRef, useCallback} = React,
-    {Platform, PermissionsAndroid} = require('react-native'),
     {Recorder} = require('@react-native-community/audio-toolkit'),
     {noop} = require('lodash-es'),
+    {getAndroidPermission} = require('$/lib/util'),
     Button = require('./Button')
 
 
@@ -16,11 +16,14 @@ const AudioRecorder = ({onStart = noop, onStop = noop}) => {
         startRecording = useCallback(async () => {
             recorderRef.current = new Recorder('recording.mp4')
 
-            if (
-                Platform.OS === 'android'
-                && !(await askForAndroidAudioPermission())
-            )
+            try {
+                await getAndroidPermission('RECORD_AUDIO', {
+                    title: 'Microphone Permission',
+                    message: 'ixo need microphone access so you can make a recording', // eslint-disable-line max-len
+                })
+            } catch (e) {
                 return
+            }
 
             recorderRef.current.record(err => {
                 if (err) {
@@ -56,13 +59,6 @@ const AudioRecorder = ({onStart = noop, onStop = noop}) => {
         style={isRecording ? {backgroundColor: 'red'} : null}
     />
 }
-
-const askForAndroidAudioPermission = () =>
-    PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO, {
-        title: 'Microphone Permission',
-        message: 'ixo need microphone access so you can make a recording',
-    })
-        .then(result => result === PermissionsAndroid.RESULTS.GRANTED)
 
 
 module.exports = AudioRecorder

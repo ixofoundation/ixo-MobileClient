@@ -1,4 +1,6 @@
-const DocumentPicker = require('react-native-document-picker').default
+const
+    {Platform, PermissionsAndroid} = require('react-native'),
+    DocumentPicker = require('react-native-document-picker').default
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -27,7 +29,25 @@ const selectFile = async (allowedTypes = ['allFiles'], {multi = false} = {}) =>{
 }
 
 
+const getAndroidPermission = async (permName, opts) => {
+    if (Platform.OS !== 'android')
+        return
+
+    const result =
+        await PermissionsAndroid.request(
+            PermissionsAndroid.PERMISSIONS[permName],
+            opts,
+        )
+
+    if (result !== PermissionsAndroid.RESULTS.GRANTED)
+        throw null
+
+    return
+}
+
+
 module.exports = {
     sleep,
     selectFile,
+    getAndroidPermission,
 }
