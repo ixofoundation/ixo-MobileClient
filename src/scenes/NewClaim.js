@@ -11,6 +11,7 @@ const
     {Recorder, Player, MediaStates} =
         require('@react-native-community/audio-toolkit'),
     Video = require('react-native-video').default,
+    {noop} = require('lodash-es'),
     {useProjects} = require('$/stores'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
@@ -55,15 +56,13 @@ const NewClaim = ({projectDid, templateDid}) => {
             onRequestClose={() => toggleForm(false)}
             children={
                 <ClaimForm
-                    projectDid={projectDid}
-                    templateDid={templateDid}
                     onClose={() => toggleForm(false)}
                 />}
         />
     </AssistantLayout></MenuLayout>
 }
 
-const ClaimForm = ({projectDid, templateDid, onClose}) => {
+const ClaimForm = ({onClose = noop, onSubmit = noop}) => {
     const
         [currentStepIdx, setCurrentStep] = useState(0),
         currentStep = claimFormSteps[currentStepIdx],
@@ -76,8 +75,6 @@ const ClaimForm = ({projectDid, templateDid, onClose}) => {
         <Button type='contained' text='Close' onPress={onClose} />
 
         {createElement(currentStep.comp, {
-            projectDid,
-            templateDid,
             value: formState[currentStep.id],
             onChange: val =>
                 setFormState(fs => ({...fs, [currentStep.id]: val})),
@@ -132,11 +129,8 @@ const ChooseBetweenOptions = ({value, onChange}) => <>
     />
 </>
 
-const UploadImage = ({value, onChange, projectDid}) => {
-    const
-        ps = useProjects(),
-        [selectedImg, setSelectedImg] = useState({uri: value}),
-        [camShown, toggleCam] = useState(false)
+const UploadImage = ({value, onChange}) => {
+    const [camShown, toggleCam] = useState(false)
 
     const takePhoto = useCallback(async cam => {
         const
@@ -145,7 +139,7 @@ const UploadImage = ({value, onChange, projectDid}) => {
 
         data.type = 'image/jpeg'
 
-        setSelectedImg(data)
+        onChange(data)
         toggleCam(false)
     })
 
@@ -153,25 +147,15 @@ const UploadImage = ({value, onChange, projectDid}) => {
         const img = await selectFile('images')
 
         if (img)
-            setSelectedImg(img)
-    })
-
-    const uploadImage = useCallback(async () => {
-        const fileUrl =
-            await uploadFileToCellNode(
-                ps, projectDid, selectedImg.type, selectedImg.uri)
-
-        onChange(fileUrl)
-
-        alert('Complete!')
+            onChange(img)
     })
 
     return <View>
         <Text children='upload image' />
 
-        {selectedImg &&
+        {value &&
             <Image
-                source={{uri: selectedImg.uri}}
+                source={{uri: value.uri}}
                 style={{width: '60%', height: 200, alignSelf: 'center'}}
             />}
 
@@ -186,13 +170,6 @@ const UploadImage = ({value, onChange, projectDid}) => {
             text='Select Image'
             onPress={selectImage}
         />
-
-        {selectedImg &&
-            <Button
-                type='contained'
-                text='Upload Image'
-                onPress={uploadImage}
-            />}
 
         <Modal
             visible={camShown}
@@ -216,10 +193,8 @@ const UploadImage = ({value, onChange, projectDid}) => {
     </View>
 }
 
-const UploadAudio = ({value, onChange, projectDid}) => {
+const UploadAudio = ({value, onChange}) => {
     const
-        ps = useProjects(),
-        [audioFile, setAudioFile] = useState(),
         [isRecording, toggleRecordingState] = useState(false),
         [isPlaying, togglePlayingState] = useState(false),
 
@@ -267,7 +242,7 @@ const UploadAudio = ({value, onChange, projectDid}) => {
                 } else {
                     toggleRecordingState(false)
 
-                    setAudioFile({
+                    onChange({
                         uri: recorderRef.current.fsPath,
                         type: 'audio/mp4',
                     })
@@ -284,7 +259,7 @@ const UploadAudio = ({value, onChange, projectDid}) => {
                 return
             }
 
-            playerRef.current = new Player(audioFile.uri)
+            playerRef.current = new Player(value.uri)
 
             if (Platform.OS === 'android')
                 playerRef.current.speed = 0.0
@@ -322,17 +297,7 @@ const UploadAudio = ({value, onChange, projectDid}) => {
             const audioFile = await selectFile('audio')
 
             if (audioFile)
-                setAudioFile(audioFile)
-        }),
-
-        uploadAudio = useCallback(async () => {
-            const fileUrl =
-                await uploadFileToCellNode(
-                    ps, projectDid, audioFile.type, audioFile.uri)
-
-            onChange(fileUrl)
-
-            alert('Complete!')
+                onChange(audioFile)
         })
 
     return <View>
@@ -342,7 +307,7 @@ const UploadAudio = ({value, onChange, projectDid}) => {
 
         {isPlaying && <Text>Now playing...</Text>}
 
-        {audioFile &&
+        {value &&
             <Button
                 type='contained'
                 text={(isPlaying ? 'Pause' : 'Play') + ' record'}
@@ -360,13 +325,6 @@ const UploadAudio = ({value, onChange, projectDid}) => {
             text='Select audio file'
             onPress={selectAudioFile}
         />
-
-        {audioFile &&
-            <Button
-                type='contained'
-                text='Upload audio'
-                onPress={uploadAudio}
-            />}
     </View>
 }
 
@@ -379,14 +337,12 @@ const GiveDetailedAnswer = ({value, onChange}) =>
 const SelectImage = ({value, onChange}) =>
     <Text children='select image' />
 
-const UploadVideo = ({value, onChange, projectDid}) => {
+const UploadVideo = ({value, onChange}) => {
     const
-        ps = useProjects(),
         camRef = useRef(),
         playerRef = useRef(),
         [recorderOpen, toggleRecorder] = useState(false),
         [isRecording, toggleRecordingState] = useState(false),
-        [videoFile, setVideoFile] = useState(),
         [isPlaying, togglePlaying] = useState(false),
 
         startRecording = useCallback(async () => {
@@ -398,7 +354,7 @@ const UploadVideo = ({value, onChange, projectDid}) => {
 
             toggleRecordingState(false)
 
-            setVideoFile({uri: resp.uri, type: 'video/mp4'})
+            onChange({uri: resp.uri, type: 'video/mp4'})
         }),
 
         stopRecording = useCallback(async () => {
@@ -410,26 +366,16 @@ const UploadVideo = ({value, onChange, projectDid}) => {
             const vid = await selectFile('audio')
 
             if (vid)
-                setVideoFile(vid)
-        }),
-
-        uploadVideo = useCallback(async () => {
-            const fileUrl =
-                await uploadFileToCellNode(
-                    ps, projectDid, videoFile.type, videoFile.uri)
-
-            onChange(fileUrl)
-
-            alert('Complete!')
+                onChange(vid)
         })
 
     return <View>
         <Text children='upload video' />
 
-        {videoFile && <>
+        {value && <>
             <Video
                 ref={ref => playerRef.current = ref}
-                source={{uri: videoFile.uri}}
+                source={{uri: value.uri}}
                 paused={!isPlaying}
                 onEnd={() => {
                     togglePlaying(false)
@@ -459,13 +405,6 @@ const UploadVideo = ({value, onChange, projectDid}) => {
             text='Select video'
             onPress={selectVideo}
         />
-
-        {videoFile &&
-            <Button
-                type='contained'
-                text='Upload video'
-                onPress={uploadVideo}
-            />}
 
         <Modal
             visible={recorderOpen}
