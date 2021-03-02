@@ -84,6 +84,14 @@ const claimFormSteps = [
         title: 'Select a date',
         comp: DateInput,
     },
+    {
+        id: 'rating',
+        title: 'Give a rating',
+        comp: Select,
+        props: {
+            opts: [1, 2, 3, 4, 5],
+        },
+    },
 ]
 
 const NewClaim = ({projectDid, templateDid}) => {

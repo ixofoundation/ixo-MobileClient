@@ -14,14 +14,23 @@ const Select = ({
 
     return <View style={s.container}>
         {opts.map(opt => {
-            if (typeof opt === 'string')
+            if (typeof opt !== 'object')
                 opt = {value: opt}
 
-            const {value: optValue, title = capitalize(optValue)} = opt
             const isSelected = multiple ? 
-                value.includes(optValue) : value === optValue
+                value.includes(opt.value) : value === opt.value
+
+            let optChildren = opt.title || capitalize(String(opt.value))
+
+            if (typeof optChildren === 'string')
+                optChildren =
+                    <Text
+                        style={s.btnText(isSelected)}
+                        children={optChildren}
+                    />
+
             return <TouchableHighlight
-                key={optValue}
+                key={opt.value}
                 style={s.btn(isSelected)}
                 onPress={() => {
                     if (!multiple)
@@ -33,9 +42,8 @@ const Select = ({
                             : [...value, opt.value],
                     )
                 }}
-            >
-                <Text style={s.btnText(isSelected)} children={title} />
-            </TouchableHighlight>
+                children={optChildren}
+            />
         })}
     </View>
 }
