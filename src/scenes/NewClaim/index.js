@@ -148,7 +148,16 @@ const ClaimForm = ({onClose = noop, onSubmit = noop}) => {
     return <View>
         <Button type='contained' text='Close' onPress={onClose} />
 
-        <Text children={currentStep.title} style={{fontWeight: 'bold'}} />
+        <Text
+            children={
+                (currentStepIdx + 1)
+                + '/'
+                + (claimFormSteps.length)
+                + ': '
+                + currentStep.title
+            }
+            style={{fontWeight: 'bold'}}
+        />
 
         {createElement(currentStep.comp, {
             value: formState[currentStep.id],
@@ -162,30 +171,32 @@ const ClaimForm = ({onClose = noop, onSubmit = noop}) => {
         {formError === 'required' &&
             <Text children='Field is required' style={{color: 'red'}} />}
 
-        {currentStepIdx > 0 &&
-            <Button
-                text='Prev'
-                type='outlined'
-                onPress={() => {
-                    setFormError(null)
-                    setCurrentStep(s => s - 1)
-                }}
-            />}
+        <View style={{flexDirection: 'row', justifyContent: 'center'}}>
+            {currentStepIdx > 0 &&
+                <Button
+                    text='Prev'
+                    type='outlined'
+                    onPress={() => {
+                        setFormError(null)
+                        setCurrentStep(s => s - 1)
+                    }}
+                />}
 
-        {currentStepIdx < claimFormSteps.length - 1 &&
-            <Button
-                text='Next'
-                type='contained'
-                onPress={() => {
-                    const emptyVals = ['null', 'undefined', '']
+            {currentStepIdx < claimFormSteps.length - 1 &&
+                <Button
+                    text='Next'
+                    type='contained'
+                    onPress={() => {
+                        const emptyVals = ['null', 'undefined', '']
 
-                    if (emptyVals.includes(String(formState[currentStep.id])))
-                        return setFormError('required')
+                        if (emptyVals.includes(String(formState[currentStep.id])))
+                            return setFormError('required')
 
-                    setFormError(null)
-                    setCurrentStep(s => s + 1)
-                }}
-            />}
+                        setFormError(null)
+                        setCurrentStep(s => s + 1)
+                    }}
+                />}
+        </View>
     </View>
 }
 
