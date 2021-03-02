@@ -1,10 +1,11 @@
 const
     React = require('react'),
     {useState} = React,
-    {View, Modal} = require('react-native'),
+    {View} = require('react-native'),
     TextInput = require('./TextInput'),
     Button = require('./Button'),
-    DatePicker = require('./DatePicker')
+    DatePicker = require('./DatePicker'),
+    Modal = require('./Modal')
 
 
 const DateInput = ({value, onChange}) => {

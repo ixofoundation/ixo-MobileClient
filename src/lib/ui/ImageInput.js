@@ -1,10 +1,11 @@
 const
     React = require('react'),
     {useState, useCallback} = React,
-    {View, Image, Modal} = require('react-native'),
+    {View, Image} = require('react-native'),
     {RNCamera} = require('react-native-camera'),
     {selectFile} = require('$/lib/util'),
-    Button = require('./Button')
+    Button = require('./Button'),
+    Modal = require('./Modal')
 
 
 const ImageInput = ({value, onChange}) => {

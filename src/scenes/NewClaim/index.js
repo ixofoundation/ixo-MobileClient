@@ -1,7 +1,7 @@
 const
     React = require('react'),
     {createElement, useContext, useState} = React,
-    {View, ScrollView, Text, Modal, Image} = require('react-native'),
+    {View, ScrollView, Text, Image} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {readFile} = require('react-native-fs'),
     {noop} = require('lodash-es'),
@@ -9,7 +9,7 @@ const
     AssistantLayout = require('$/AssistantLayout'),
     {
         Heading, ButtonGroup, Button, TextInput, Select, AudioInput, ImageInput,
-        DocumentInput, QRCodeInput, DateInput, VideoInput,
+        DocumentInput, QRCodeInput, DateInput, VideoInput, Modal,
     } = require('$/lib/ui'),
     {selectFile} = require('$/lib/util'),
     catPic1 = require('./assets/cat1.jpg'),

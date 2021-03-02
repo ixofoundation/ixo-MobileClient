@@ -1,9 +1,10 @@
 const
     React = require('react'),
     {useState, useCallback} = React,
-    {View, Text, Modal} = require('react-native'),
+    {View, Text} = require('react-native'),
     Button = require('./Button'),
-    QRScanner = require('./QRScanner')
+    QRScanner = require('./QRScanner'),
+    Modal = require('./Modal')
 
 
 const QRCodeInput = ({value, onChange}) => {

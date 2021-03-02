@@ -1,11 +1,12 @@
 const
     React = require('react'),
     {useRef, useState, useCallback} = React,
-    {View, Modal} = require('react-native'),
+    {View} = require('react-native'),
     Video = require('react-native-video').default,
     {RNCamera} = require('react-native-camera'),
     {selectFile} = require('$/lib/util'),
-    Button = require('./Button')
+    Button = require('./Button'),
+    Modal = require('./Modal')
 
 
 const VideoInput = ({value, onChange}) => {
