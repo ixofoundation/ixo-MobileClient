@@ -360,7 +360,11 @@ const UploadDoc = ({value, onChange}) => {
 }
 
 const GiveDetailedAnswer = ({value, onChange}) =>
-    <Text children='give detailed answer' />
+    <TextInput
+        placeholder='Give detailed answer'
+        value={value}
+        onChangeText={onChange}
+    />
 
 const SelectImage = ({value, onChange}) => <>
     <Text children='select image' />
