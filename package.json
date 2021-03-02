@@ -31,6 +31,7 @@
     "react-native-calendar-picker": "^7.1.0",
     "react-native-camera": "^3.42.0",
     "react-native-document-picker": "^5.0.0",
+    "react-native-file-viewer": "^2.1.4",
     "react-native-fs": "^2.16.6",
     "react-native-gesture-handler": "^1.9.0",
     "react-native-keychain": "^6.2.0",

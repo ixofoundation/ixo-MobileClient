@@ -11,6 +11,7 @@ const
     {Recorder, Player, MediaStates} =
         require('@react-native-community/audio-toolkit'),
     Video = require('react-native-video').default,
+    FileViewer = require('react-native-file-viewer').default,
     {noop} = require('lodash-es'),
     {useProjects} = require('$/stores'),
     MenuLayout = require('$/MenuLayout'),
@@ -328,8 +329,31 @@ const UploadAudio = ({value, onChange}) => {
     </View>
 }
 
-const UploadDoc = ({value, onChange}) =>
-    <Text children='upload doc' />
+const UploadDoc = ({value, onChange}) => {
+    const selectImage = useCallback(async () => {
+        const file = await selectFile('allFiles')
+
+        if (file)
+            onChange(file)
+    })
+
+    return <View>
+        <Text children='upload document' />
+
+        {value &&
+            <Button
+                type='contained'
+                text={value.name + ': ' + value.type}
+                onPress={() => FileViewer.open(value.uri)}
+            />}
+
+        <Button
+            type='contained'
+            text='Select Document'
+            onPress={selectImage}
+        />
+    </View>
+}
 
 const GiveDetailedAnswer = ({value, onChange}) =>
     <Text children='give detailed answer' />
