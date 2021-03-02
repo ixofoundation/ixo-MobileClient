@@ -25,12 +25,12 @@ const Select = ({
                 style={s.btn(isSelected)}
                 onPress={() => {
                     if (!multiple)
-                        return onChange(optValue)
+                        return onChange(opt.value)
 
                     onChange(
-                        value.includes(optValue)
-                            ? without(value, optValue)
-                            : [...value, optValue],
+                        value.includes(opt.value)
+                            ? without(value, opt.value)
+                            : [...value, opt.value],
                     )
                 }}
             >

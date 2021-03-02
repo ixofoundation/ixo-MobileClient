@@ -16,7 +16,11 @@ const
     {useProjects} = require('$/stores'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
-    {Heading, ButtonGroup, Button, TextInput, Select} = require('$/lib/ui')
+    {Heading, ButtonGroup, Button, TextInput, Select} = require('$/lib/ui'),
+    catPic1 = require('./assets/cat1.jpg'),
+    catPic2 = require('./assets/cat2.jpg'),
+    catPic3 = require('./assets/cat3.jpg'),
+    catPic4 = require('./assets/cat4.jpg')
 
 
 const NewClaim = ({projectDid, templateDid}) => {
@@ -358,8 +362,27 @@ const UploadDoc = ({value, onChange}) => {
 const GiveDetailedAnswer = ({value, onChange}) =>
     <Text children='give detailed answer' />
 
-const SelectImage = ({value, onChange}) =>
+const SelectImage = ({value, onChange}) => <>
     <Text children='select image' />
+
+    <Select
+        opts={[{
+            value: 'cat1',
+            title: <Image source={catPic1} style={{width: 120}} />,
+        }, {
+            value: 'cat2',
+            title: <Image source={catPic2} style={{width: 120}} />,
+        }, {
+            value: 'cat3',
+            title: <Image source={catPic3} style={{width: 120}} />,
+        }, {
+            value: 'cat4',
+            title: <Image source={catPic4} style={{width: 120}} />,
+        }]}
+        value={value}
+        onChange={onChange}
+    />
+</>
 
 const UploadVideo = ({value, onChange}) => {
     const
