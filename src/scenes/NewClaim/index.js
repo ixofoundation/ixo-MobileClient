@@ -16,7 +16,8 @@ const
     {useProjects} = require('$/stores'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
-    {Heading, ButtonGroup, Button, TextInput, Select} = require('$/lib/ui'),
+    {Heading, ButtonGroup, Button, TextInput, Select, QRScanner} =
+        require('$/lib/ui'),
     catPic1 = require('./assets/cat1.jpg'),
     catPic2 = require('./assets/cat2.jpg'),
     catPic3 = require('./assets/cat3.jpg'),
@@ -484,8 +485,34 @@ const UploadVideo = ({value, onChange}) => {
     </View>
 }
 
-const ScanQRCode = ({value, onChange}) =>
-    <Text children='scan QR code' />
+const ScanQRCode = ({value, onChange}) => {
+    const
+        [camShown, toggleCam] = useState(false),
+
+        handleScan = useCallback(scanResp => {
+            onChange(scanResp.data)
+            toggleCam(false)
+        })
+
+    return <View>
+        <Text children='scan QR code' />
+
+        {value && <Text children={value} />}
+
+        <Button
+            type='contained'
+            text='Scan'
+            onPress={() => toggleCam(true)}
+        />
+
+        <Modal
+            visible={camShown}
+            onRequestClose={() => toggleCam(false)}
+        >
+            <QRScanner onScan={handleScan} />
+        </Modal>
+    </View>
+}
 
 const claimFormSteps = [
     {id: 'shortAnswer',  comp: FillInShortAnswer},
