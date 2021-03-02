@@ -16,8 +16,10 @@ const
     {useProjects} = require('$/stores'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
-    {Heading, ButtonGroup, Button, TextInput, Select, QRScanner} =
-        require('$/lib/ui'),
+    {
+        Heading, ButtonGroup, Button, TextInput, Select, QRScanner,
+        DatePicker,
+    } = require('$/lib/ui'),
     catPic1 = require('./assets/cat1.jpg'),
     catPic2 = require('./assets/cat2.jpg'),
     catPic3 = require('./assets/cat3.jpg'),
@@ -46,6 +48,7 @@ const NewClaim = ({projectDid, templateDid}) => {
         <Text children='Select an image' />
         <Text children='Upload video' />
         <Text children='Scan a QR code' />
+        <Text children='Select a date' />
 
         <ButtonGroup items={[{
             type: 'outlined',
@@ -514,6 +517,43 @@ const ScanQRCode = ({value, onChange}) => {
     </View>
 }
 
+const SelectDate = ({value, onChange}) => {
+    const
+        [pickerShown, togglePicker] = useState(false),
+        [pickerValue, setPickerValue] = useState(value)
+
+    return <View>
+        <Text children='Select a date' />
+
+        <TextInput value={value} onChange={onChange} />
+
+        <Button
+            type='contained'
+            text='Open date picker'
+            onPress={() => togglePicker(true)}
+        />
+
+        <Modal
+            visible={pickerShown}
+            onRequestClose={() => togglePicker(false)}
+        >
+            <DatePicker
+                value={pickerValue}
+                onChange={setPickerValue}
+            />
+
+            <Button
+                type='contained'
+                text='Apply'
+                onPress={() => {
+                    onChange(pickerValue)
+                    togglePicker(false)
+                }}
+            />
+        </Modal>
+    </View>
+}
+
 const claimFormSteps = [
     {id: 'shortAnswer',  comp: FillInShortAnswer},
     {id: 'chosenOption', comp: ChooseBetweenOptions},
@@ -524,6 +564,7 @@ const claimFormSteps = [
     {id: 'selectedImg',  comp: SelectImage},
     {id: 'video',        comp: UploadVideo},
     {id: 'qr',           comp: ScanQRCode},
+    {id: 'date',         comp: SelectDate},
 ]
 
 // @param allowedTypes: array of following values:
