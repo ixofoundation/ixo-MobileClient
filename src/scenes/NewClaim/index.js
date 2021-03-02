@@ -138,21 +138,43 @@ const NewClaim = ({projectDid, templateDid}) => {
 
 const ClaimForm = ({onClose = noop, onSubmit = noop}) => {
     const
-        [currentStepIdx, setCurrentStep] = useState(0),
-        currentStep = claimFormSteps[currentStepIdx],
         [formState, setFormState] = useState({}),
-        [formError, setFormError] = useState(null)
+        [currentStepIdx, setCurrentStep] = useState(0)
 
     console.log('form state', formState)
 
     return <View>
         <Button type='contained' text='Close' onPress={onClose} />
 
+        <ClaimFormSteps
+            value={formState}
+            onChange={setFormState}
+            currentStep={claimFormSteps[currentStepIdx]}
+            currentStepIdx={currentStepIdx}
+            totalSteps={claimFormSteps.length}
+            onPrev={() => setCurrentStep(s => s - 1)}
+            onNext={() => setCurrentStep(s => s + 1)}
+        />
+    </View>
+}
+
+const ClaimFormSteps = ({
+    value,
+    onChange,
+    currentStep,
+    currentStepIdx,
+    totalSteps,
+    onPrev,
+    onNext,
+}) => {
+    const [formError, setFormError] = useState(null)
+
+    return <View>
         <Text
             children={
                 (currentStepIdx + 1)
                 + '/'
-                + (claimFormSteps.length)
+                + (totalSteps)
                 + ': '
                 + currentStep.title
             }
@@ -160,10 +182,10 @@ const ClaimForm = ({onClose = noop, onSubmit = noop}) => {
         />
 
         {createElement(currentStep.comp, {
-            value: formState[currentStep.id],
+            value: value[currentStep.id],
 
             onChange: val =>
-                setFormState(fs => ({...fs, [currentStep.id]: val})),
+                onChange(fs => ({...fs, [currentStep.id]: val})),
 
             ...currentStep.props,
         })}
@@ -178,22 +200,22 @@ const ClaimForm = ({onClose = noop, onSubmit = noop}) => {
                     type='outlined'
                     onPress={() => {
                         setFormError(null)
-                        setCurrentStep(s => s - 1)
+                        onPrev()
                     }}
                 />}
 
-            {currentStepIdx < claimFormSteps.length - 1 &&
+            {currentStepIdx < totalSteps - 1 &&
                 <Button
                     text='Next'
                     type='contained'
                     onPress={() => {
                         const emptyVals = ['null', 'undefined', '']
 
-                        if (emptyVals.includes(String(formState[currentStep.id])))
+                        if (emptyVals.includes(String(value[currentStep.id])))
                             return setFormError('required')
 
                         setFormError(null)
-                        setCurrentStep(s => s + 1)
+                        onNext()
                     }}
                 />}
         </View>
