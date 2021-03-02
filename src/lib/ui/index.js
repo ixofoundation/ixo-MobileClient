@@ -15,4 +15,12 @@ module.exports = {
     EntityFilter: require('./EntityFilter'),
     Icon: require('./Icon'),
     ToggleView: require('./ToggleView'),
+    Audio: require('./Audio'),
+    AudioRecorder: require('./AudioRecorder'),
+    AudioInput: require('./AudioInput'),
+    ImageInput: require('./ImageInput'),
+    DocumentInput: require('./DocumentInput'),
+    QRCodeInput: require('./QRCodeInput'),
+    DateInput: require('./DateInput'),
+    VideoInput: require('./VideoInput'),
 }

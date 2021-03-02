@@ -103,7 +103,7 @@ const subScenes = {
                 <TextInput
                     placeholder='password'
                     secureTextEntry={true}
-                    onChangeText={setPwd}
+                    onChange={setPwd}
                 />
 
                 <Button
