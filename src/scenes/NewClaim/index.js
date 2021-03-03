@@ -18,7 +18,7 @@ const
     catPic4 = require('./assets/cat4.jpg')
 
 
-const claimFormSteps = [
+const formSpec = [
     {
         id: 'shortAnswer',
         title: 'Fill in a short answer',
@@ -112,7 +112,7 @@ const NewClaim = ({projectDid, templateDid}) => {
             the claims on this project you'll need to complete the following:
         </Text>
 
-        {claimFormSteps.map(({id, title}) =>
+        {formSpec.map(({id, title}) =>
             <Text key={id} children={'- ' + title} />)}
 
         <ButtonGroup items={[{
@@ -130,13 +130,14 @@ const NewClaim = ({projectDid, templateDid}) => {
             onRequestClose={() => toggleForm(false)}
             children={
                 <ClaimForm
+                    formSpec={formSpec}
                     onClose={() => toggleForm(false)}
                 />}
         />
     </AssistantLayout></MenuLayout>
 }
 
-const ClaimForm = ({onClose = noop, onSubmit = noop}) => {
+const ClaimForm = ({formSpec, onClose = noop, onSubmit = noop}) => {
     const
         [formState, setFormState] = useState({}),
         [currentStepIdx, setCurrentStep] = useState(0)
@@ -149,9 +150,9 @@ const ClaimForm = ({onClose = noop, onSubmit = noop}) => {
         <ClaimFormSteps
             value={formState}
             onChange={setFormState}
-            currentStep={claimFormSteps[currentStepIdx]}
+            currentStep={formSpec[currentStepIdx]}
             currentStepIdx={currentStepIdx}
-            totalSteps={claimFormSteps.length}
+            totalSteps={formSpec.length}
             onPrev={() => setCurrentStep(s => s - 1)}
             onNext={() => setCurrentStep(s => s + 1)}
         />
