@@ -43,13 +43,14 @@ const claimTemplateToFormSpec = claimTemplate =>
         .map(f => {
             const
                 id = keys(f.schema.properties)[0],
-                {title} = f.schema,
+                {title, description} = f.schema,
                 schema = values(f.schema.properties)[0],
                 uiSchema = values(f.uiSchema)[0]
 
             return {
                 id,
                 title,
+                description,
                 comp: formComponents[uiSchema['ui:widget']],
                 props: {
                     placeholder: uiSchema['ui:placeholder'],
@@ -178,6 +179,8 @@ const ClaimFormSteps = ({
             }
             style={{fontWeight: 'bold'}}
         />
+
+        <Text children={currentStep.description} />
 
         {createElement(currentStep.comp, {
             value: value[currentStep.id],
