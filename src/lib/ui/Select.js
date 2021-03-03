@@ -21,42 +21,42 @@ const Select = ({
                 editable
                 || (multiple
                     ? value.includes(opt.value)
-                    : value === opt.value)
+                    : value === opt.value),
             )
             .map(opt => {
-            if (typeof opt !== 'object')
-                opt = {value: opt}
+                if (typeof opt !== 'object')
+                    opt = {value: opt}
 
-            const isSelected = multiple ? 
-                value.includes(opt.value) : value === opt.value
+                const isSelected = multiple ? 
+                    value.includes(opt.value) : value === opt.value
 
-            let optChildren = opt.title || capitalize(String(opt.value))
+                let optChildren = opt.title || capitalize(String(opt.value))
 
-            if (typeof optChildren === 'string')
-                optChildren =
-                    <Text
-                        style={s.btnText(isSelected)}
-                        children={optChildren}
-                    />
+                if (typeof optChildren === 'string')
+                    optChildren =
+                        <Text
+                            style={s.btnText(isSelected)}
+                            children={optChildren}
+                        />
 
-            return <TouchableHighlight
-                key={opt.value}
-                style={s.btn(isSelected)}
-                onPress={() => {
-                    if (!editable)
-                        return
+                return <TouchableHighlight
+                    key={opt.value}
+                    style={s.btn(isSelected)}
+                    children={optChildren}
+                    onPress={() => {
+                        if (!editable)
+                            return
 
-                    if (!multiple)
-                        return onChange(opt.value)
+                        if (!multiple)
+                            return onChange(opt.value)
 
-                    onChange(
-                        value.includes(opt.value)
-                            ? without(value, opt.value)
-                            : [...value, opt.value],
-                    )
-                }}
-                children={optChildren}
-            />
+                        onChange(
+                            value.includes(opt.value)
+                                ? without(value, opt.value)
+                                : [...value, opt.value],
+                        )
+                    }}
+                />
             })
         }
     </View>
