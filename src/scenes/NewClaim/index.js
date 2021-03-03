@@ -1,6 +1,6 @@
 const
     React = require('react'),
-    {createElement, useContext, useState} = React,
+    {createElement, useContext, useState, Fragment} = React,
     {View, ScrollView, Text, Image} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {readFile} = require('react-native-fs'),
@@ -147,15 +147,24 @@ const ClaimForm = ({formSpec, onClose = noop, onSubmit = noop}) => {
     return <View>
         <Button type='contained' text='Close' onPress={onClose} />
 
-        <ClaimFormSteps
-            value={formState}
-            onChange={setFormState}
-            currentStep={formSpec[currentStepIdx]}
-            currentStepIdx={currentStepIdx}
-            totalSteps={formSpec.length}
-            onPrev={() => setCurrentStep(s => s - 1)}
-            onNext={() => setCurrentStep(s => s + 1)}
-        />
+        {currentStepIdx === formSpec.length
+
+            ? <ClaimFormSummary
+                formSpec={formSpec}
+                formState={formState}
+                onFocusItem={setCurrentStep}
+                onApprove={onSubmit}
+            />
+
+            : <ClaimFormSteps
+                value={formState}
+                onChange={setFormState}
+                currentStep={formSpec[currentStepIdx]}
+                currentStepIdx={currentStepIdx}
+                totalSteps={formSpec.length}
+                onPrev={() => setCurrentStep(s => s - 1)}
+                onNext={() => setCurrentStep(s => s + 1)}
+            />}
     </View>
 }
 
@@ -205,7 +214,7 @@ const ClaimFormSteps = ({
                     }}
                 />}
 
-            {currentStepIdx < totalSteps - 1 &&
+            {currentStepIdx < totalSteps &&
                 <Button
                     text='Next'
                     type='contained'
@@ -222,6 +231,51 @@ const ClaimFormSteps = ({
         </View>
     </View>
 }
+
+const ClaimFormSummary = ({formSpec, formState, onFocusItem, onApprove}) =>
+    <ScrollView style={{height: '100%'}}>
+        {formSpec.map(({id, title, comp, props}, itemIdx) =>
+            <Fragment key={id}>
+                <Text children={title} style={{fontWeight: 'bold'}} />
+
+                {[Select, ImageInput, AudioInput, VideoInput, DocumentInput]
+                    .includes(comp)
+
+                    ? createElement(comp, {
+                        ...props,
+                        value: formState[id],
+                        editable: false,
+                    })
+
+                    : <Text children={
+                        typeof formState[id] !== 'string'
+                            ? JSON.stringify(formState[id])
+                            : formState[id]} />
+                }
+
+                <Button
+                    type='outlined'
+                    text='Edit'
+                    onPress={() => onFocusItem(itemIdx)}
+                />
+            </Fragment>,
+        )}
+
+        <ButtonGroup items={[{
+            type: 'outlined',
+            text: 'Save',
+            onPress: () => alert('Not Implemented Yet'),
+        }, {
+            type: 'contained',
+            text: 'Submit claim',
+            onPress: () => alert('unimplemented'),
+        }]} />
+
+        <View style={{height: 50}} />
+        {/* In Android some space from the bottom is needed or else the buttons
+            above don't show up. Obviously this is an ugly hack waiting for a
+            proper fix */}
+    </ScrollView>
 
 const uploadFileToCellNode = async (
     ps,
