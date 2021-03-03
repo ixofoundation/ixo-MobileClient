@@ -1,10 +1,12 @@
 const
     React = require('react'),
     {createElement, useContext, useState, Fragment} = React,
-    {View, ScrollView, Text, Image} = require('react-native'),
+    {View, ScrollView, Text, Image, ActivityIndicator} =require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {readFile} = require('react-native-fs'),
+    {useQuery} = require('react-query'),
     {noop} = require('lodash-es'),
+    {useProjects} = require('$/stores'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
     {
@@ -12,12 +14,7 @@ const
         DocumentInput, QRCodeInput, DateInput, VideoInput, LocationInput, Modal,
         DateRangeInput,
     } = require('$/lib/ui'),
-    claimTemplate = require('./claimTemplate'),
     {selectFile} = require('$/lib/util'),
-    catPic1 = require('./assets/cat1.jpg'),
-    catPic2 = require('./assets/cat2.jpg'),
-    catPic3 = require('./assets/cat3.jpg'),
-    catPic4 = require('./assets/cat4.jpg'),
     {keys, values} = Object
 
 
@@ -37,7 +34,7 @@ const formComponents = {
     audioUpload: AudioInput,
 }
 
-const formSpec =
+const claimTemplateToFormSpec = claimTemplate =>
     claimTemplate.forms
 
         .filter(f =>
@@ -46,12 +43,13 @@ const formSpec =
         .map(f => {
             const
                 id = keys(f.schema.properties)[0],
+                {title} = f.schema,
                 schema = values(f.schema.properties)[0],
                 uiSchema = values(f.uiSchema)[0]
 
             return {
                 id,
-                title: schema.title,
+                title,
                 comp: formComponents[uiSchema['ui:widget']],
                 props: {
                     placeholder: uiSchema['ui:placeholder'],
@@ -74,38 +72,53 @@ const formSpec =
         })
 
 
-const NewClaim = ({projectDid, templateDid}) => {
+const NewClaim = ({templateDid}) => {
     const
+        {fetchTemplateContent} = useProjects(),
         {stateNavigator: nav} = useContext(NavigationContext),
-        [formShown, toggleForm] = useState(false)
+        [formShown, toggleForm] = useState(false),
+        formSpecQuery =
+            useQuery(['tpl', templateDid], () =>
+                fetchTemplateContent(templateDid).then(claimTemplateToFormSpec))
 
     return <MenuLayout><AssistantLayout>
         <Heading children='Submit a Claim' />
 
-        <Text>
-            Thank you for being interested in our project. In order to complete
-            the claims on this project you'll need to complete the following:
-        </Text>
+        {formSpecQuery.isLoading && <>
+            <ActivityIndicator color='#555555' size='large' />
+            <Text children='Preparing the claim form, please wait...' />
+        </>}
 
-        {formSpec.map(({id, title}) =>
-            <Text key={id} children={'- ' + title} />)}
+        {formSpecQuery.isError &&
+            <Text children='An error occurred, please try again later.' />}
 
-        <ButtonGroup items={[{
-            type: 'outlined',
-            text: 'Come back later',
-            onPress: () => nav.navigateBack(1),
-        }, {
-            type: 'contained',
-            text: 'Submit a Claim',
-            onPress: () => toggleForm(true),
-        }]} />
+        {formSpecQuery.data && <>
+            <Text>
+                Thank you for being interested in our project. In order to
+                complete the claims on this project you'll need to complete the
+                following:
+            </Text>
+
+            {formSpecQuery.data.map(({id, title}) =>
+                <Text key={id} children={'- ' + title} />)}
+
+            <ButtonGroup items={[{
+                type: 'outlined',
+                text: 'Come back later',
+                onPress: () => nav.navigateBack(1),
+            }, {
+                type: 'contained',
+                text: 'Submit a Claim',
+                onPress: () => toggleForm(true),
+            }]} />
+        </>}
 
         <Modal
             visible={formShown}
             onRequestClose={() => toggleForm(false)}
             children={
                 <ClaimForm
-                    formSpec={formSpec}
+                    formSpec={formSpecQuery.data}
                     onClose={() => toggleForm(false)}
                 />}
         />

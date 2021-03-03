@@ -70,7 +70,50 @@ const useProjects = makePersistentStore('projects', set => ({
     disconnect: projDid => set(({items}) => delete items[projDid]),
 
     createFile: ixoSDKInstances.client.createProjectFile,
+
+    fetchTemplateContent: async tplDid => {
+        const
+            tplDoc =
+                await ixoSDKInstances.client.getTemplate(tplDid),
+
+            serviceEndpoint = await projectTargetToDashedHostname(tplDoc),
+
+            {data: rawTplContent} =
+                await ixoSDKInstances.client.getProjectFile(
+                    serviceEndpoint,
+                    tplDoc.data.page.cid,
+                ),
+
+            decodedTplContent = Buffer.from(rawTplContent, 'base64').toString(),
+
+            parsedTplContent = JSON.parse(decodedTplContent)
+
+        return parsedTplContent
+
+    },
 }))
+
+const projectTargetToDashedHostname = async target => {
+    let project
+
+    if (typeof target === 'string')
+        project = await ixoSDKInstances.client.getProject(target)
+    else
+        project = target
+
+    return dashedHostname(
+        project.data.nodes.items
+            .find(i => i['@type'] === 'CellNode')
+            .serviceEndpoint
+            .replace(/\/$/, ''),
+    )
+}
+
+const dashedHostname = urlStr =>
+    urlStr.replace(
+        /^(https?:\/\/)([^/]+)(\/.*)?/,
+        (_, proto, host, path) => proto + host.replace('_', '-') + (path || ''),
+    )
 
 
 module.exports = {
