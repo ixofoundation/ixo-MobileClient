@@ -74,7 +74,7 @@ const LocationInput = ({value, onChange = noop}) => {
                     })
                 }}
                 query={{
-                    key: 'AIzaSyDg3kRLSWrAT3UFjVGgIL3H5wE6NdBIsiQ',
+                    key: process.env.GOOGLE_MAPS_PLACES_APIKEY,
                     language: 'en',
                 }}
                 enablePoweredByContainer={false}
