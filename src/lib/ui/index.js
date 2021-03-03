@@ -22,6 +22,7 @@ module.exports = {
     DocumentInput: require('./DocumentInput'),
     QRCodeInput: require('./QRCodeInput'),
     DateInput: require('./DateInput'),
+    DateRangeInput: require('./DateRangeInput'),
     VideoInput: require('./VideoInput'),
     LocationInput: require('./LocationInput'),
 }
