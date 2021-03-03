@@ -1,0 +1,430 @@
+{
+  "claimInfo": {
+    "type": "Outcome",
+    "title": "Test all controls",
+    "shortDescription": "Test claim template controls for mobile form"
+  },
+  "forms": [
+    {
+      "@type": "https://schema.org/test",
+      "schema": {
+        "title": "This is a short text question",
+        "description": "Not more than 128 characters",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "eb5f782a-5aec-494a-b8b5-d6eda0354b31": {
+            "type": "string",
+            "title": "Short Answer",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "uiSchema": {
+        "eb5f782a-5aec-494a-b8b5-d6eda0354b31": {
+          "ui:widget": "text",
+          "ui:placeholder": "Start Typing here",
+          "ui:options": {}
+        }
+      }
+    },
+    {
+      "@type": "https://schema.org/test",
+      "schema": {
+        "title": "This is a Long Answer",
+        "description": "CHeck that 1. the input box expands for large text inputs / 2. Pasting a large amount of text into the input does not crash the app / 3. Pasting or typing unusual non-ascii characters does not crash the app",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "df524096-4561-4648-9ca7-dffaa77e919e": {
+            "type": "string",
+            "title": "Long Answer",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "uiSchema": {
+        "df524096-4561-4648-9ca7-dffaa77e919e": {
+          "ui:widget": "textarea",
+          "ui:placeholder": "Start Typing here",
+          "ui:options": {}
+        }
+      }
+    },
+    {
+      "@type": "https://schema.org/test",
+      "schema": {
+        "title": "Check the multiple choice works",
+        "description": "Choose only one option",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "b8c2c9e1-c571-4aa8-881f-185bde444afb": {
+            "type": "array",
+            "title": "Select Options",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Option A",
+                "Option B",
+                "Option C"
+              ],
+              "enumNames": [
+                "Option A",
+                "Option B",
+                "Option C"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "maxItems": 1
+          }
+        }
+      },
+      "uiSchema": {
+        "b8c2c9e1-c571-4aa8-881f-185bde444afb": {
+          "ui:widget": "checkboxes",
+          "ui:options": {}
+        }
+      }
+    },
+    {
+      "@type": "https://schema.org/test",
+      "schema": {
+        "title": "Check the multiple choice works",
+        "description": "Choose 3 of 5 options",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "716c8bfc-9091-4040-8a3c-92e0bc18fa95": {
+            "type": "array",
+            "title": "Select 3 Options",
+            "items": {
+              "type": "string",
+              "enum": [
+                "Option 1",
+                "Option 2",
+                "Option 3",
+                "Option 4",
+                "Option 5"
+              ],
+              "enumNames": [
+                "Option 1",
+                "Option 2",
+                "Option 3",
+                "Option 4",
+                "Option 5"
+              ]
+            },
+            "uniqueItems": true,
+            "minItems": 1,
+            "maxItems": 1
+          }
+        }
+      },
+      "uiSchema": {
+        "716c8bfc-9091-4040-8a3c-92e0bc18fa95": {
+          "ui:widget": "checkboxes",
+          "ui:options": {}
+        }
+      }
+    },
+    {
+      "@type": "https://schema.org/test",
+      "schema": {
+        "title": "Test the rating",
+        "description": "Check if this generates a scale of 10 (does it include 0?)",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "bf555859-b115-4457-9035-38600f90c64a": {
+            "type": "string",
+            "title": "1 is Bad. 10 is Good",
+            "enum": [
+              "1",
+              "2",
+              "3",
+              "4",
+              "5",
+              "6",
+              "7",
+              "8",
+              "9",
+              "10"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "uiSchema": {
+        "bf555859-b115-4457-9035-38600f90c64a": {
+          "ui:widget": "radio",
+          "ui:options": {
+            "inline": true
+          }
+        }
+      }
+    },
+    {
+      "@type": "https://schema.org/test",
+      "schema": {
+        "title": "Single Date Selection",
+        "description": "Does date selection in the past work?",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "96c70d4f-37fb-447e-8243-04f22c4a723c": {
+            "type": "string",
+            "title": "Choose One Date",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "uiSchema": {
+        "96c70d4f-37fb-447e-8243-04f22c4a723c": {
+          "ui:widget": "singledateselector",
+          "ui:options": {}
+        }
+      }
+    },
+    {
+      "@type": "https://schema.org/test",
+      "schema": {
+        "title": "Select a range of dates",
+        "description": "Check if starting the range in the past works",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "0206b9e7-8e89-4bfd-9ff8-3e6f48b2b2ea": {
+            "type": "string",
+            "title": "Dates in a range",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "uiSchema": {
+        "0206b9e7-8e89-4bfd-9ff8-3e6f48b2b2ea": {
+          "ui:widget": "daterangeselector",
+          "ui:options": {}
+        }
+      }
+    },
+    {
+      "@type": "https://schema.org/test",
+      "schema": {
+        "title": "This generates a QR code",
+        "description": "Scan this code with another device to check if the URL works",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "5eb2a5bd-9718-4fb8-89ea-60c857d6c643": {
+            "type": "string",
+            "title": "QR Code Display",
+            "default": "https://app_uat.ixo.world/projects/did:ixo:WYTi7G6BVKAFoiPscgZS7E/overview",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "uiSchema": {
+        "5eb2a5bd-9718-4fb8-89ea-60c857d6c643": {
+          "ui:widget": "qrcode",
+          "ui:options": {}
+        }
+      }
+    },
+    {
+      "@type": "https://schema.org/test",
+      "schema": {
+        "title": "Scan a QR code to import the string",
+        "description": "Check various QR formats to make sure the app does not crash with different string formats (eg long vs short). Does this input allow for re-scan. Does this input show the scan result as a string?",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "a0c66956-f9d3-4b50-aafe-c5badaba2eaf": {
+            "type": "string",
+            "title": "Scan QR Code",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "uiSchema": {
+        "a0c66956-f9d3-4b50-aafe-c5badaba2eaf": {
+          "ui:widget": "qrcodescan",
+          "ui:placeholder": "Waiting for data...",
+          "ui:options": {}
+        }
+      }
+    },
+    {
+      "@type": "https://schema.org/test",
+      "schema": {
+        "title": "Select a location on the map",
+        "description": "Does the map show current location based on device GPS? Can the user move the location pin on the map? Dies the Google map search for the location input work?",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "34f4031c-8fb4-4cd4-9ce9-0dcea9f91e3d": {
+            "type": "string",
+            "title": "Location",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "uiSchema": {
+        "34f4031c-8fb4-4cd4-9ce9-0dcea9f91e3d": {
+          "ui:widget": "locationselector",
+          "ui:options": {}
+        }
+      }
+    },
+    {
+      "@type": "https://schema.org/test",
+      "schema": {
+        "title": "Upload an image",
+        "description": "Does this provide the options to either take a photo using the device, or upload an image/phopo file?",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "7a29111d-cdd9-407a-9c08-7d1f2cbe78d0": {
+            "type": "string",
+            "title": "Select Image to Upload",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "uiSchema": {
+        "7a29111d-cdd9-407a-9c08-7d1f2cbe78d0": {
+          "ui:widget": "imageupload",
+          "ui:options": {}
+        }
+      }
+    },
+    {
+      "@type": "https://schema.org/test",
+      "schema": {
+        "title": "Select your avatar",
+        "description": "Does cropping work?",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "bceeee52-7359-46f5-8619-0d7ccf609be4": {
+            "type": "string",
+            "title": "Select Avatar Image to Upload",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "uiSchema": {
+        "bceeee52-7359-46f5-8619-0d7ccf609be4": {
+          "ui:widget": "avatarupload",
+          "ui:options": {}
+        }
+      }
+    },
+    {
+      "@type": "https://schema.org/test",
+      "schema": {
+        "title": "Upload document",
+        "description": "Check all accepted formats of document work. Ensure large documents are uploaded successfully. Allow replace selected document.",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "59a68f23-7625-4df6-970c-044c2c5ce0fc": {
+            "type": "string",
+            "title": "Select Document to Upload",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "uiSchema": {
+        "59a68f23-7625-4df6-970c-044c2c5ce0fc": {
+          "ui:widget": "documentupload",
+          "ui:options": {}
+        }
+      }
+    },
+    {
+      "@type": "https://schema.org/test",
+      "schema": {
+        "title": "Video upload",
+        "description": "Check if live video from device works. Note currently this control only accepts very small video file size. Discuss further implementation requirements.",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "86836460-d45b-448f-ad7e-2aef10e28419": {
+            "type": "string",
+            "title": "Select Video to Upload",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "uiSchema": {
+        "86836460-d45b-448f-ad7e-2aef10e28419": {
+          "ui:widget": "videoupload",
+          "ui:options": {}
+        }
+      }
+    },
+    {
+      "@type": "https://schema.org/test",
+      "schema": {
+        "title": "Upload audio file",
+        "description": "Does this allow live recording on device as well as saved file upload? What are the limitations?",
+        "type": "object",
+        "required": [],
+        "properties": {
+          "af41e20d-f2b2-4da7-a7c3-8dccbf51c0c8": {
+            "type": "string",
+            "title": "Record or Upload and Audio Clip",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true
+          }
+        }
+      },
+      "uiSchema": {
+        "af41e20d-f2b2-4da7-a7c3-8dccbf51c0c8": {
+          "ui:widget": "audioupload",
+          "ui:options": {}
+        }
+      }
+    }
+  ]
+}

@@ -10,94 +10,69 @@ const
     {
         Heading, ButtonGroup, Button, TextInput, Select, AudioInput, ImageInput,
         DocumentInput, QRCodeInput, DateInput, VideoInput, LocationInput, Modal,
+        DateRangeInput,
     } = require('$/lib/ui'),
+    claimTemplate = require('./claimTemplate'),
     {selectFile} = require('$/lib/util'),
     catPic1 = require('./assets/cat1.jpg'),
     catPic2 = require('./assets/cat2.jpg'),
     catPic3 = require('./assets/cat3.jpg'),
-    catPic4 = require('./assets/cat4.jpg')
+    catPic4 = require('./assets/cat4.jpg'),
+    {keys, values} = Object
 
 
-const formSpec = [
-    {
-        id: 'shortAnswer',
-        title: 'Fill in a short answer',
-        comp: TextInput,
-    },
-    {
-        id: 'chosenOption',
-        title: 'Choose between options',
-        comp: Select,
-        props: {
-            multiple: true,
-            opts: ['lorem', 'ipsum', 'dolor'],
-        },
-    },
-    {
-        id: 'img',
-        title: 'Upload an image',
-        comp: ImageInput,
-    },
-    {
-        id: 'audio',
-        title: 'Upload an audio',
-        comp: AudioInput,
-    },
-    {
-        id: 'doc',
-        title: 'Upload a document',
-        comp: DocumentInput,
-    },
-    {
-        id: 'longAnswer',
-        title: 'Give a detailed answer',
-        comp: TextInput,
-    },
-    {
-        id: 'selectedImg',
-        title: 'Select an image',
-        comp: Select,
-        props: {
-            opts: [
-                ['cat1', catPic1],
-                ['cat2', catPic2],
-                ['cat3', catPic3],
-                ['cat4', catPic4],
-            ].map(([value, source]) => ({
-                value,
-                title: <Image source={source} style={{width: 120}} />,
-            })),
-        },
-    },
-    {
-        id: 'video',
-        title: 'Upload a Video',
-        comp: VideoInput,
-    },
-    {
-        id: 'qr',
-        title: 'Scan a QR Code',
-        comp: QRCodeInput,
-    },
-    {
-        id: 'date',
-        title: 'Select a date',
-        comp: DateInput,
-    },
-    {
-        id: 'rating',
-        title: 'Give a rating',
-        comp: Select,
-        props: {
-            opts: [1, 2, 3, 4, 5],
-        },
-    },
-    {
-        id: 'location',
-        title: 'Select a location',
-        comp: LocationInput,
-    },
-]
+const formComponents = {
+    text: TextInput,
+    textarea: p => <TextInput multiline numberOfLines={3} {...p} />,
+    checkboxes: Select,
+    radio: Select,
+    singledateselector: DateInput,
+    daterangeselector: DateRangeInput,
+    qrcodescan: QRCodeInput,
+    locationselector: LocationInput,
+    imageupload: ImageInput,
+    avatarupload: ImageInput,
+    documentupload: DocumentInput,
+    videoupload: VideoInput,
+    audioUpload: AudioInput,
+}
+
+const formSpec =
+    claimTemplate.forms
+
+        .filter(f =>
+            formComponents[values(f.uiSchema)[0]['ui:widget']])
+
+        .map(f => {
+            const
+                id = keys(f.schema.properties)[0],
+                schema = values(f.schema.properties)[0],
+                uiSchema = values(f.uiSchema)[0]
+
+            return {
+                id,
+                title: schema.title,
+                comp: formComponents[uiSchema['ui:widget']],
+                props: {
+                    placeholder: uiSchema['ui:placeholder'],
+
+                    ...((schema.items.enum || schema.enum) && {
+                        multiple: uiSchema['ui:widget'] === 'checkboxes',
+                        opts:
+                            (schema.items.enum || schema.enum)
+                                .map((value, idx) =>({
+                                    value,
+
+                                    title:
+                                        schema.items.enumNames
+                                            ? schema.items.enumNames[idx]
+                                            : value,
+                                })),
+                    }),
+                },
+            }
+        })
+
 
 const NewClaim = ({projectDid, templateDid}) => {
     const
