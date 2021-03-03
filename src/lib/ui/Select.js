@@ -15,7 +15,15 @@ const Select = ({
     value = value || (multiple ? [] : undefined)
 
     return <View style={s.container}>
-        {opts.map(opt => {
+        {opts
+            .map(opt => typeof opt === 'object' ? opt : {value: opt})
+            .filter(opt =>
+                editable
+                || (multiple
+                    ? value.includes(opt.value)
+                    : value === opt.value)
+            )
+            .map(opt => {
             if (typeof opt !== 'object')
                 opt = {value: opt}
 
@@ -49,7 +57,8 @@ const Select = ({
                 }}
                 children={optChildren}
             />
-        })}
+            })
+        }
     </View>
 }
 
