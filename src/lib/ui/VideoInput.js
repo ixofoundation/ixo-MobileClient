@@ -4,12 +4,13 @@ const
     {View} = require('react-native'),
     Video = require('react-native-video').default,
     {RNCamera} = require('react-native-camera'),
+    {noop} = require('lodash-es'),
     {selectFile} = require('$/lib/util'),
     Button = require('./Button'),
     Modal = require('./Modal')
 
 
-const VideoInput = ({value, onChange, editable = true}) => {
+const VideoInput = ({value, onChange = noop, editable = true}) => {
     const
         camRef = useRef(),
         playerRef = useRef(),

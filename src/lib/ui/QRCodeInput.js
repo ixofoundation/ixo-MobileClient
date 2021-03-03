@@ -2,12 +2,13 @@ const
     React = require('react'),
     {useState, useCallback} = React,
     {View, Text} = require('react-native'),
+    {noop} = require('lodash-es'),
     Button = require('./Button'),
     QRScanner = require('./QRScanner'),
     Modal = require('./Modal')
 
 
-const QRCodeInput = ({value, onChange, editable = true}) => {
+const QRCodeInput = ({value, onChange = noop, editable = true}) => {
     const
         [camShown, toggleCam] = useState(false),
 

@@ -4,6 +4,7 @@ const
     {without, capitalize, memoize, noop} = require('lodash-es'),
     theme = require('$/theme')
 
+
 const Select = ({
     opts = [],
     value,

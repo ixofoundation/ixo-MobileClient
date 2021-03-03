@@ -3,12 +3,13 @@ const
     {useState, useCallback} = React,
     {View, Image} = require('react-native'),
     {RNCamera} = require('react-native-camera'),
+    {noop} = require('lodash-es'),
     {selectFile} = require('$/lib/util'),
     Button = require('./Button'),
     Modal = require('./Modal')
 
 
-const ImageInput = ({value, onChange, editable = true}) => {
+const ImageInput = ({value, onChange = noop, editable = true}) => {
     const
         [camShown, toggleCam] = useState(false),
 

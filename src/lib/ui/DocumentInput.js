@@ -3,11 +3,12 @@ const
     {useCallback} = React,
     {View} = require('react-native'),
     FileViewer = require('react-native-file-viewer').default,
+    {noop} = require('lodash-es'),
     {selectFile} = require('$/lib/util'),
     Button = require('./Button')
 
 
-const DocumentInput = ({value, onChange, editable = true}) => {
+const DocumentInput = ({value, onChange = noop, editable = true}) => {
     const selectImage = useCallback(async () => {
         const file = await selectFile('allFiles')
 

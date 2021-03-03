@@ -2,13 +2,14 @@ const
     React = require('react'),
     {useState} = React,
     {View} = require('react-native'),
+    {noop} = require('lodash-es'),
     TextInput = require('./TextInput'),
     Button = require('./Button'),
     DatePicker = require('./DatePicker'),
     Modal = require('./Modal')
 
 
-const DateInput = ({value, onChange, editable = true}) => {
+const DateInput = ({value, onChange = noop, editable = true}) => {
     const
         [pickerShown, togglePicker] = useState(false),
         [pickerValue, setPickerValue] = useState(value)
