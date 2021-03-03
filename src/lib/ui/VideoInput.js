@@ -9,7 +9,7 @@ const
     Modal = require('./Modal')
 
 
-const VideoInput = ({value, onChange}) => {
+const VideoInput = ({value, onChange, editable = true}) => {
     const
         camRef = useRef(),
         playerRef = useRef(),
@@ -65,19 +65,21 @@ const VideoInput = ({value, onChange}) => {
             />
         </>}
 
-        <Button
-            type='contained'
-            text='Start recording'
-            onPress={() => toggleRecorder(true)}
-        />
-        <Button
-            type='contained'
-            text='Select video'
-            onPress={selectVideo}
-        />
+        {editable && <>
+            <Button
+                type='contained'
+                text='Start recording'
+                onPress={() => toggleRecorder(true)}
+            />
+            <Button
+                type='contained'
+                text='Select video'
+                onPress={selectVideo}
+            />
+        </>}
 
         <Modal
-            visible={recorderOpen}
+            visible={editable && recorderOpen}
             onRequestClose={() => {
                 if (isRecording)
                     stopRecording()

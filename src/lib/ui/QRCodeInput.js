@@ -7,7 +7,7 @@ const
     Modal = require('./Modal')
 
 
-const QRCodeInput = ({value, onChange}) => {
+const QRCodeInput = ({value, onChange, editable = true}) => {
     const
         [camShown, toggleCam] = useState(false),
 
@@ -19,14 +19,15 @@ const QRCodeInput = ({value, onChange}) => {
     return <View>
         {value && <Text children={value} />}
 
-        <Button
-            type='contained'
-            text='Scan'
-            onPress={() => toggleCam(true)}
-        />
+        {editable &&
+            <Button
+                type='contained'
+                text='Scan'
+                onPress={() => toggleCam(true)}
+            />}
 
         <Modal
-            visible={camShown}
+            visible={editable && camShown}
             onRequestClose={() => toggleCam(false)}
         >
             <QRScanner onScan={handleScan} />

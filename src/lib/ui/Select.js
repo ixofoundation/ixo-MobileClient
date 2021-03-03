@@ -9,6 +9,7 @@ const Select = ({
     value,
     onChange = noop,
     multiple = false,
+    editable = true,
 }) => {
     value = value || (multiple ? [] : undefined)
 
@@ -33,6 +34,9 @@ const Select = ({
                 key={opt.value}
                 style={s.btn(isSelected)}
                 onPress={() => {
+                    if (!editable)
+                        return
+
                     if (!multiple)
                         return onChange(opt.value)
 

@@ -8,22 +8,26 @@ const
     Modal = require('./Modal')
 
 
-const DateInput = ({value, onChange}) => {
+const DateInput = ({value, onChange, editable = true}) => {
     const
         [pickerShown, togglePicker] = useState(false),
         [pickerValue, setPickerValue] = useState(value)
 
     return <View>
-        <TextInput value={value} onChange={onChange} />
-
-        <Button
-            type='contained'
-            text='Open date picker'
-            onPress={() => togglePicker(true)}
+        <TextInput
+            value={value}
+            onChange={val => editable && onChange(val)}
         />
 
+        {editable &&
+            <Button
+                type='contained'
+                text='Open date picker'
+                onPress={() => togglePicker(true)}
+            />}
+
         <Modal
-            visible={pickerShown}
+            visible={editable && pickerShown}
             onRequestClose={() => togglePicker(false)}
         >
             <DatePicker

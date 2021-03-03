@@ -8,7 +8,7 @@ const
     Modal = require('./Modal')
 
 
-const ImageInput = ({value, onChange}) => {
+const ImageInput = ({value, onChange, editable = true}) => {
     const
         [camShown, toggleCam] = useState(false),
 
@@ -37,20 +37,22 @@ const ImageInput = ({value, onChange}) => {
                 style={{width: '100%', height: 200, alignSelf: 'center'}}
             />}
 
-        <Button
-            type='contained'
-            text='Take a Photo'
-            onPress={() => toggleCam(true)}
-        />
+        {editable && <>
+            <Button
+                type='contained'
+                text='Take a Photo'
+                onPress={() => toggleCam(true)}
+            />
 
-        <Button
-            type='contained'
-            text='Select Image'
-            onPress={selectImage}
-        />
+            <Button
+                type='contained'
+                text='Select Image'
+                onPress={selectImage}
+            />
+        </>}
 
         <Modal
-            visible={camShown}
+            visible={editable && camShown}
             onRequestClose={() => toggleCam(false)}
         >
             <RNCamera

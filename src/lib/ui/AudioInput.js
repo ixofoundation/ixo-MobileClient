@@ -9,7 +9,7 @@ const
     Button = require('./Button')
 
 
-const AudioInput = ({value, onChange = noop}) => {
+const AudioInput = ({value, onChange = noop, editable = true}) => {
     const
         [isPlaying, togglePlayingState] = useState(false),
 
@@ -30,16 +30,18 @@ const AudioInput = ({value, onChange = noop}) => {
                 onEnd={() => togglePlayingState(false)}
             />}
 
-        <AudioRecorder
-            onStart={() => togglePlayingState(false)}
-            onStop={onChange}
-        />
+        {editable && <>
+            <AudioRecorder
+                onStart={() => togglePlayingState(false)}
+                onStop={onChange}
+            />
 
-        <Button
-            type='contained'
-            text='Select file'
-            onPress={selectAudioFile}
-        />
+            <Button
+                type='contained'
+                text='Select file'
+                onPress={selectAudioFile}
+            />
+        </>}
     </View>
 }
 

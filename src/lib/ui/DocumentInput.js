@@ -7,7 +7,7 @@ const
     Button = require('./Button')
 
 
-const DocumentInput = ({value, onChange}) => {
+const DocumentInput = ({value, onChange, editable = true}) => {
     const selectImage = useCallback(async () => {
         const file = await selectFile('allFiles')
 
@@ -23,11 +23,12 @@ const DocumentInput = ({value, onChange}) => {
                 onPress={() => FileViewer.open(value.uri)}
             />}
 
-        <Button
-            type='contained'
-            text='Select Document'
-            onPress={selectImage}
-        />
+        {editable &&
+            <Button
+                type='contained'
+                text='Select Document'
+                onPress={selectImage}
+            />}
     </View>
 }
 

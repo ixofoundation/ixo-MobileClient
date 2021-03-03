@@ -12,7 +12,7 @@ const
     Modal = require('./Modal')
 
 
-const LocationInput = ({value, onChange = noop}) => {
+const LocationInput = ({value, onChange = noop, editable = true}) => {
     const
         [mapShown, toggleMap] = useState(false),
         [markerCoords, setMarkerCoords] = useState(value),
@@ -52,11 +52,11 @@ const LocationInput = ({value, onChange = noop}) => {
                 !value
                     ? 'Select Location'
                     : value.latitude + ', ' + value.longitude}
-            onPress={() => toggleMap(true)}
+            onPress={() => editable && toggleMap(true)}
         />
 
         <Modal
-            visible={mapShown}
+            visible={editable && mapShown}
             onRequestClose={() => toggleMap(false)}
         >
             <GooglePlacesAutocomplete
