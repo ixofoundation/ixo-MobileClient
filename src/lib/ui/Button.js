@@ -31,6 +31,7 @@ const Button = ({
     prefix,
     suffix,
     style: overrideStyles, 
+    textStyle,
     ...props
 }) => {
 
@@ -49,6 +50,7 @@ const Button = ({
             textStyles[sizes[size] || sizes.md],
             textStyles[type + '_' + color] || 
                 textStyles[colorTypes[color] || colorTypes.primary],
+            textStyle,
         ],
     )
     
