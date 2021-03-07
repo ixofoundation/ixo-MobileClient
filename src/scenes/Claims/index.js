@@ -1,18 +1,25 @@
 const React = require('react'),
+    {useState} = React,
     {View, Text, StyleSheet} = require('react-native'),
     Icon = require('$/lib/ui/Icon'),
     Tabs = require('$/lib/ui/Tabs'),
     Tab = require('$/lib/ui/Tabs/Tab'),
     Badge = require('$/lib/ui/Badge'),
+    Modal = require('$/lib/ui/Modal'),
+    Header = require('$/lib/ui/Header'),
     AssistantLayout = require('$/AssistantLayout'),
     Claim = require('./Claim'),
     ClaimListHeader = require('./ClaimListHeader'),
+    ClaimActivity = require('./ClaimActivity'),
+    ClaimActions = require('./ClaimActions'),
     {spacing, fontSizes} = require('$/theme')
 
 const Claims = () => {
     const claimItems = [1, 2, 3]
+    const [activeClaim, setActiveClaim] = useState(null)
+    const [claimActivity, setClaimActivity] = useState(null)
     return <AssistantLayout><View style={style.root}>
-        <View style={style.header}>
+        <Header>
             <Icon name='dotsVertical' width={24} fill='white'/>
             <Text 
                 style={style.title}
@@ -20,19 +27,21 @@ const Claims = () => {
                 Claims
             </Text>
             <Icon name='dotsVertical' width={24} fill='white'/>
-        </View>
+        </Header>
         <Tabs>
             <Tab title='New Claim'>
                 <ClaimListHeader
                     title='New Claims' 
                     onFilterPress={console.log}
                 />
-                {claimItems.map(() => 
+                {claimItems.map((i) => 
                     <Claim
+                        key={'claim-' + i}
                         name='Claim/Project Name'
                         did='did:sov:RFWuuFmLvNd8uq9x5sUYku'
                         savedAt={new Date()}
                         highlight='#85AD5C'
+                        onPress={() => setActiveClaim({})}
                     />,
                 )}
             </Tab>
@@ -50,21 +59,20 @@ const Claims = () => {
             <Tab title='Submitted'>
                 <Text>Tab 3</Text>
             </Tab>
-        </Tabs> 
+        </Tabs>
+        <Modal visible={!!activeClaim} transparent>
+            <ClaimActions 
+                onClose={() => setActiveClaim(null)}
+            />
+        </Modal>
+        <Modal visible={!!claimActivity} transparent>
+            <ClaimActivity onClose={() => setClaimActivity(null)}/>
+        </Modal>
     </View></AssistantLayout>
 }
 
-
-
 const style = StyleSheet.create({
     root: {flex: 1},
-    header: {
-        padding: spacing(2),
-        flexDirection: 'row',
-        backgroundColor: '#002233',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
     title: {
         color: 'white',
         fontSize: fontSizes.h5,

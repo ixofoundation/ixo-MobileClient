@@ -1,11 +1,12 @@
 const React = require('react'),
-    {View, Text, StyleSheet} = require('react-native'),
+    {Text, StyleSheet} = require('react-native'),
     Icon = require('$/lib/ui/Icon'),
     Button = require('$/lib/ui/Button'),
-    {spacing, fontSizes} = require('$/theme')
+    Header = require('$/lib/ui/Header'),
+    {fontSizes} = require('$/theme')
 
 const ClaimListHeader = ({title, onFilterPress}) => {
-    return <View style={style.root}>
+    return <Header style={style.root}>
         <Text style={style.title}>{title}</Text>
         <Button
             onPress={onFilterPress}
@@ -15,16 +16,11 @@ const ClaimListHeader = ({title, onFilterPress}) => {
             text='Filter'
             style={style.btn}
         />
-    </View>
+    </Header>
 }
 
 const style = StyleSheet.create({
-    root: {
-        flexDirection: 'row', 
-        justifyContent: 'space-between', 
-        alignItems: 'center',
-        marginBottom: spacing(2),
-    },
+    root: {backgroundColor: 'transparent'},
     title:{color: 'white', fontSize: fontSizes.h4},
     btn: {borderRadius: 24},
 })
