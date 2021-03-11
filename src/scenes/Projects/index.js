@@ -222,6 +222,7 @@ const style = StyleSheet.create({
         fontWeight: 'bold',
         marginTop: 10,
         borderTopWidth: 1,
+        marginBottom: theme.spacing(1),
     },
 })
 

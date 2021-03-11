@@ -1,6 +1,7 @@
 const React = require('react'),
-    {useState, Children, cloneElement} = React,
+    {useState, Children} = React,
     {View, StyleSheet} = require('react-native'),
+    ToggleView = require('$/lib/ui/ToggleView'),
     {spacing} = require('$/theme')
 
 const Tabs = ({children, initialState = 0}) => {
@@ -33,21 +34,5 @@ const style = StyleSheet.create({
         padding: spacing(3),
     },
 })
-
-
-// TODO: remove after the merge
-const ToggleView = ({
-    children,
-    opened = [],
-    onItemClick,
-}) => {
-    return Children.map(children, (child, index) => {
-        return cloneElement(child, {
-            ...child.props,
-            onPress: () => onItemClick(index),
-            open: opened.some(i => i === index),
-        })
-    })
-}
 
 module.exports = Tabs
