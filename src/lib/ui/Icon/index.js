@@ -21,6 +21,8 @@ const icons = {
     helpCircleOutline: require('./assets/helpCircleOutline.svg').default,
     wallet: require('./assets/wallet.svg').default,
     accountCircleOutline: require('./assets/accountCircleOutline.svg').default,
+    chevronRight: require('./assets/chevronRight.svg').default,
+    chevronLeft: require('./assets/chevronLeft.svg').default,
 }
 
 const Icon = ({name, ...props}) =>
