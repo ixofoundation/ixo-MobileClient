@@ -1,3 +1,6 @@
+const DateRangePicker = require('$/lib/ui/DateRangePicker')
+const Select = require('$/lib/ui/Select')
+
 const
     url = require('url'),
     React = require('react'),
@@ -18,35 +21,28 @@ const
     {Modal, Button, QRScanner, EntityFilter, Icon} = require('$/lib/ui'),
     theme = require('$/theme')
 
-
-const filterSpec = [{
-    type: 'option',
-    id: 'sortBy',
-    title: 'Sort by',
-    opts: [{
+const projectSortOptions = [
+    {
         value: 'data.startDate',
         title: 'Recently Added',
-    }, {
+    }, 
+    {
         value: 'data.claimStats.currentSuccessful',
         title: 'Most Active',
-    }, {
+    }, 
+    {
         value: 'data.name',
         title: 'Name',
-    }],
-}, {
-    type: 'option',
-    id: 'stage',
-    multiple: true,
-    opts: [
-        'Proposal', 'Planning', 'Delivery', 'Closing',
-        'Ended',
-    ],
-}, {
-    type: 'dateRange',
-    id: 'dateRange',
-    title: 'Date',
-}]
+    },
+]
 
+const projectStageOptions = [
+    'Proposal', 
+    'Planning', 
+    'Delivery', 
+    'Closing',
+    'Ended',
+]
 
 const Projects = () => {
     const
@@ -135,14 +131,22 @@ const Projects = () => {
                 onRequestClose={() => toggleFilter(false)}
                 children={
                     <EntityFilter
-                        spec={filterSpec}
                         onCancel={() => toggleFilter(false)}
                         onChange={filters => {
                             setFilters(filters)
                             toggleFilter(false)
                         }}
                         initialValue={filters}
-                    />
+                    >
+                        <FilterTitle title='Sort By'/>
+                        <Select id='sortBy' opts={projectSortOptions} />
+                        <FilterTitle title='Stage'/>
+                        <Select id='stage' multiple 
+                            opts={projectStageOptions} 
+                        />
+                        <FilterTitle title='Date'/>
+                        <DateRangePicker id='dateRange'/>
+                    </EntityFilter>
                 }
             />
 
@@ -173,6 +177,9 @@ const Projects = () => {
         </View>
     </AssistantLayout></MenuLayout>
 }
+
+const FilterTitle = ({title}) => 
+    <Text style={style.filterTitle} children={title} />
 
 const style = StyleSheet.create({
     root: {
@@ -210,6 +217,11 @@ const style = StyleSheet.create({
     projectsContainer: {flex: 1},
     filterBtn: {
         borderRadius: 24,
+    },
+    filterTitle: {
+        fontWeight: 'bold',
+        marginTop: 10,
+        borderTopWidth: 1,
     },
 })
 

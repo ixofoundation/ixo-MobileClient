@@ -15,6 +15,14 @@ const icons = {
     menu: require('./assets/menu.svg').default,
     scan: require('./assets/scan.svg').default,
     web: require('./assets/web.svg').default,
+    claim: require('./assets/claim.svg').default,
+    explore: require('./assets/explore.svg').default,
+    gear: require('./assets/gear.svg').default,
+    helpCircleOutline: require('./assets/helpCircleOutline.svg').default,
+    wallet: require('./assets/wallet.svg').default,
+    accountCircleOutline: require('./assets/accountCircleOutline.svg').default,
+    chevronRight: require('./assets/chevronRight.svg').default,
+    chevronLeft: require('./assets/chevronLeft.svg').default,
 }
 
 const Icon = ({name, ...props}) =>

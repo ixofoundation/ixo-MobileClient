@@ -1,30 +1,13 @@
 const
     React = require('react'),
     {Text, Pressable, StyleSheet, View} = require('react-native'),
+    {memoize} = require('lodash-es'),
     theme = require('$/theme')
 
 
-
-const colorTypes = {
-    primary: 'primary',
-    secondary: 'secondary',
-}
-
-const containerTypes = {
-    contained: 'contained',
-    outlined: 'outlined',
-    text: 'text',
-}
-
-const sizes = {
-    md: 'md',
-    sm: 'sm',
-    lg: 'lg',
-}
-
 const Button = ({
-    text, 
-    size = 'md', 
+    text,
+    size = 'md',
     color = 'primary',
     type = 'text',
     onPress,
@@ -34,33 +17,14 @@ const Button = ({
     textStyle,
     ...props
 }) => {
-
-    const btnStyle = StyleSheet.compose(
-        [
-            buttonStyles.root, 
-            buttonStyles[sizes[size] || sizes.md],
-            buttonStyles[colorTypes[color] || colorTypes.primary],
-            buttonStyles[containerTypes[type] || containerTypes.text],
-            overrideStyles,
-        ],
-    )
-    const txtStyle = StyleSheet.compose(
-        [
-            textStyles.root, 
-            textStyles[sizes[size] || sizes.md],
-            textStyles[type + '_' + color] || 
-                textStyles[colorTypes[color] || colorTypes.primary],
-            textStyle,
-        ],
-    )
-    
+    const s = style({size, type, color})
     return <Pressable
         onPress={onPress}
-        style={btnStyle}
+        style={StyleSheet.compose(s.button, overrideStyles)}
         children={
-            <View style={textStyles.content}>
+            <View style={s.textWrapper}>
                 {prefix}
-                <Text style={txtStyle} children={text} />
+                <Text style={StyleSheet.compose(s.text, textStyle)} children={text} />
                 {suffix}
             </View>
         }
@@ -68,71 +32,37 @@ const Button = ({
     />
 }
 
+const style = memoize(({size, type, color}) =>
+    StyleSheet.create({
+        button: {
+            borderWidth: {contained: 0, outlined: 1, text: 0}[type],
+            borderColor: {primary: '#83D9F2', secondary: '#002D42'}[color],
+            padding: theme.spacing({sm: .5, md: 1, lg: 1.5}[size]),
+            borderRadius: type === 'outlined' ? 8 : 4,
+            backgroundColor:
+                type !== 'contained'
+                    ? 'transparent'
+                    : {primary: '#83D9F2', secondary: '#002D42'}[color],
+        },
 
-const buttonStyles = StyleSheet.create({
-    root: {
-        borderRadius: 4,
-    },
-    sm: {
-        padding: theme.spacing(.5),
-    },
-    md: {
-        padding: theme.spacing(1),
-    },
-    lg: {
-        padding: theme.spacing(1.5),
-    },
-    contained: {
-        borderWidth: 0,
-    },
-    outlined: {
-        backgroundColor: 'transparent',
-        borderWidth: 1,
-        borderRadius: 8,
-    },
-    text: {
-        backgroundColor: 'transparent',
-        borderWidth: 0,
-    },
-    primary: {
-        backgroundColor: '#83D9F2',
-        borderColor: '#83D9F2',
-    },
-    secondary: {
-        backgroundColor: '#002D42',
-        borderColor: '#002D42',
-    },
-})
+        textWrapper: {
+            flexDirection: 'row',
+            alignItems: 'center',
+        },
 
-const textStyles = StyleSheet.create({
-    root: {
-        marginHorizontal: theme.spacing(1),
-    },
-    content: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    sm: {
-        fontSize: theme.fontSizes.button - 4,
-    },
-    md: {
-        fontSize: theme.fontSizes.button,
-    },
-    lg: {
-        fontSize: theme.fontSizes.button + 4,
-    },
-    primary: {
-        color: 'black',
-    },
-    secondary: {
-        color: 'white',
-    },
-    outlined_primary: {
-        color: '#83D9F2',
-    },
-    outlined_secondary: {
-        color: '#002D42',
-    },
-})
+        text: {
+            marginHorizontal: theme.spacing(1),
+            fontSize: theme.fontSizes.button + ({sm: -4, md: 0, lg: 4}[size]),
+            color: {
+                contained_primary: 'black',
+                contained_secondary: 'white',
+                text_primary: 'black',
+                text_secondary: 'white',
+                outlined_primary: '#83D9F2',
+                outlined_secondary: '#002D42',
+            }[type + '_' + color],
+        },
+    }),
+)
 
 module.exports = Button

@@ -1,13 +1,13 @@
 const
     React = require('react'),
     {View, Text, TouchableHighlight} = require('react-native'),
-    {without, capitalize, memoize} = require('lodash-es')
-
+    {without, capitalize, memoize, noop} = require('lodash-es'),
+    theme = require('$/theme')
 
 const Select = ({
     opts = [],
     value,
-    onChange = () => {},
+    onChange = noop,
     multiple = false,
 }) => {
     value = value || (multiple ? [] : undefined)
@@ -18,12 +18,11 @@ const Select = ({
                 opt = {value: opt}
 
             const {value: optValue, title = capitalize(optValue)} = opt
-
+            const isSelected = multiple ? 
+                value.includes(optValue) : value === optValue
             return <TouchableHighlight
                 key={optValue}
-                style={s.btn(
-                    multiple ? value.includes(optValue) : value === optValue)}
-                children={<Text children={title} />}
+                style={s.btn(isSelected)}
                 onPress={() => {
                     if (!multiple)
                         return onChange(optValue)
@@ -34,7 +33,9 @@ const Select = ({
                             : [...value, optValue],
                     )
                 }}
-            />
+            >
+                <Text style={s.btnText(isSelected)} children={title} />
+            </TouchableHighlight>
         })}
     </View>
 }
@@ -44,13 +45,18 @@ const s = {
         flexDirection: 'row',
         flexWrap: 'wrap',
     },
-
     btn: memoize(isSelected => ({
-        backgroundColor: isSelected ? 'lime' : 'transparent',
-        padding: 10,
-        margin: 5,
+        backgroundColor: isSelected ? '#00D2FF' : 'transparent',
+        padding: theme.spacing(1),
+        marginRight: theme.spacing(1),
+        marginBottom: theme.spacing(1),
         borderWidth: 1,
-        borderRadius: 10,
+        borderRadius: 24,
+        borderColor: '#00D2FF',
+    })),
+    btnText: memoize(isSelected => ({
+        color: isSelected ? 'white' : '#00D2FF',
+        fontSize: theme.fontSizes.button,
     })),
 }
 
