@@ -13,18 +13,18 @@ const Button = ({
     onPress,
     prefix,
     suffix,
-    style: overrideStyles,
+    style: overrideStyles, 
+    textStyle,
     ...props
 }) => {
     const s = style({size, type, color})
-
     return <Pressable
         onPress={onPress}
         style={StyleSheet.compose(s.button, overrideStyles)}
         children={
             <View style={s.textWrapper}>
                 {prefix}
-                <Text style={s.text} children={text} />
+                <Text style={StyleSheet.compose(s.text, textStyle)} children={text} />
                 {suffix}
             </View>
         }
