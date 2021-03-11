@@ -7,4 +7,5 @@ module.exports = {
     Credit: require('./Credit'),
     ClaimForms: require('./ClaimForms'),
     Claims: require('./Claims'),
+    ClaimActivity: require('./ClaimActivity'),
 }

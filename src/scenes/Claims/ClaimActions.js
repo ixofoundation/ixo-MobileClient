@@ -1,10 +1,13 @@
 const React = require('react'),
+    {useContext} = React,
     {View, Text, StyleSheet, Image} = require('react-native'),
     Icon = require('$/lib/ui/Icon'),
     Button = require('$/lib/ui/Button'),
-    {spacing, fontSizes} = require('$/theme')
-
+    {spacing, fontSizes} = require('$/theme'),
+    {NavigationContext} = require('navigation-react')
+    
 const ClaimActions = ({onClose}) => {
+    const {stateNavigator: nav} = useContext(NavigationContext)
     const logoUri = 'https://pds_pandora.ixo.world/public/bojrn1k1wokkxjlgzl'
     return <>
         <View 
@@ -35,6 +38,10 @@ const ClaimActions = ({onClose}) => {
                     text='Remove from My Claim Forms list'
                 />
                 <ActionButton 
+                    onPress={() => {
+                        nav.navigate('claimActivity')
+                        onClose()
+                    }}
                     icon={<Icon name='web' fill='white'/>}
                     text='Claim Activity'
                 />

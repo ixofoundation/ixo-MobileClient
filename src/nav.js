@@ -4,7 +4,7 @@ const
     {StateNavigator} = require('navigation'),
     {NavigationContext} = require('navigation-react'),
     {CreateId, Register, Projects, 
-        Credit, ClaimForms, Claims} = require('./scenes')
+        Credit, ClaimForms, Claims, ClaimActivity} = require('./scenes')
 
 
 
@@ -15,6 +15,7 @@ const routes = [
     ['credit', Credit],
     ['claim-forms', ClaimForms],
     ['claims', Claims],
+    ['claimActivity', ClaimActivity],
 ]
 
 

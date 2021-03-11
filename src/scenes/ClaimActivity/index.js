@@ -1,5 +1,6 @@
 const React = require('react'),
     {View, Text, StyleSheet, Pressable} = require('react-native'),
+    AssistantLayout = require('$/AssistantLayout'),
     Icon = require('$/lib/ui/Icon'),
     Button = require('$/lib/ui/Button'),
     Card = require('$/lib/ui/Card'),
@@ -8,11 +9,12 @@ const React = require('react'),
     Statistic = require('$/lib/ui/Statistic'),
     ClaimPayment = require('./ClaimPayment'),
     {spacing, fontSizes} = require('$/theme')
+const {ScrollView} = require('react-native-gesture-handler')
 
 
 const ClaimActivity = ({onClose, name}) => {
     const payments = [1, 2, 3]
-    return <View style={style.root}>
+    return <AssistantLayout><View style={style.root}>
         <Header>
             <Pressable onPress={onClose}>
                 <Icon name='close' width={24} fill='white'/>
@@ -70,16 +72,16 @@ const ClaimActivity = ({onClose, name}) => {
             <Text style={style.paymentTitle}>
                 My Claim Payments
             </Text>
-
-            {payments.map(() => <ClaimPayment 
-                count={10}
-                amount={230}
-                currency='eEUR'
-                status='pending'
-            />,
-            )}
+            <ScrollView>
+                {payments.map(() => <ClaimPayment 
+                    count={10}
+                    amount={230}
+                    currency='eEUR'
+                    status='pending'
+                />)}
+            </ScrollView>
         </View>
-    </View>
+    </View></AssistantLayout>
 }
 
 

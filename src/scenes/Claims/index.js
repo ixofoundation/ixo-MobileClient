@@ -10,7 +10,6 @@ const React = require('react'),
     AssistantLayout = require('$/AssistantLayout'),
     Claim = require('./Claim'),
     ClaimListHeader = require('./ClaimListHeader'),
-    ClaimActivity = require('./ClaimActivity'),
     ClaimActions = require('./ClaimActions'),
     {spacing, fontSizes} = require('$/theme')
 
@@ -64,9 +63,6 @@ const Claims = () => {
             <ClaimActions 
                 onClose={() => setActiveClaim(null)}
             />
-        </Modal>
-        <Modal visible={!!claimActivity} transparent>
-            <ClaimActivity onClose={() => setClaimActivity(null)}/>
         </Modal>
     </View></AssistantLayout>
 }
