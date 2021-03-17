@@ -93,7 +93,13 @@ const LocationInput = ({value, onChange = noop, editable = true}) => {
                 type='contained'
                 text='Done'
                 onPress={() => {
-                    onChange(markerCoords)
+                    onChange({
+                        latitude: markerCoords.latitude,
+                        longitude: markerCoords.longitude,
+                    })
+                    // We don't pass "markerCoords" directly as it's not a POJO
+                    // and makes use of getters. We want to return a POJO.
+
                     toggleMap(false)
                 }}
                 style={{
