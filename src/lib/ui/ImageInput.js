@@ -9,14 +9,24 @@ const
     Modal = require('./Modal')
 
 
-const ImageInput = ({value, onChange = noop, editable = true}) => {
+const defaultPhotoOptions = {
+    width: 640,
+    quality: 0.2,
+}
+
+const ImageInput = ({
+    value,
+    onChange = noop,
+    editable = true,
+    photoOptions = {},
+}) => {
     const
         [camShown, toggleCam] = useState(false),
 
+        finalPhotoOptions = {...defaultPhotoOptions, ...photoOptions},
+
         takePhoto = useCallback(async cam => {
-            const
-                options = {quality: 0.3},
-                data = await cam.takePictureAsync(options)
+            const data = await cam.takePictureAsync(finalPhotoOptions)
 
             data.type = 'image/jpeg'
 
