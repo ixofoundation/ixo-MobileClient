@@ -1,12 +1,13 @@
 const
+    debug = require('debug')('claims'),
     React = require('react'),
-    {createElement, useContext, useState, Fragment} = React,
-    {View, ScrollView, Text, Image, ActivityIndicator} =require('react-native'),
+    {createElement, useContext, useState, useCallback, Fragment} = React,
+    {View, ScrollView, Text, ActivityIndicator} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
-    {readFile} = require('react-native-fs'),
     {useQuery} = require('react-query'),
-    {noop} = require('lodash-es'),
+    {noop, keyBy} = require('lodash-es'),
     {useProjects} = require('$/stores'),
+    {fileToDataURL} = require('$/lib/util'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
     {
@@ -14,8 +15,7 @@ const
         DocumentInput, QRCodeInput, DateInput, VideoInput, LocationInput, Modal,
         DateRangeInput,
     } = require('$/lib/ui'),
-    {selectFile} = require('$/lib/util'),
-    {keys, values} = Object
+    {keys, values, entries} = Object
 
 
 const formComponents = {
@@ -43,6 +43,7 @@ const claimTemplateToFormSpec = claimTemplate =>
         .map(f => {
             const
                 id = keys(f.schema.properties)[0],
+                attribute = f['@type'],
                 {title, description} = f.schema,
                 schema = values(f.schema.properties)[0],
                 uiSchema = values(f.uiSchema)[0]
@@ -50,6 +51,7 @@ const claimTemplateToFormSpec = claimTemplate =>
             return {
                 id,
                 title,
+                attribute,
                 description,
                 comp: formComponents[uiSchema['ui:widget']],
                 props: {
@@ -73,14 +75,59 @@ const claimTemplateToFormSpec = claimTemplate =>
         })
 
 
-const NewClaim = ({templateDid}) => {
+const NewClaim = ({templateDid, projectDid}) => {
     const
-        {fetchTemplateContent} = useProjects(),
+        {getTemplate, uploadFile, createClaim} = useProjects(),
         {stateNavigator: nav} = useContext(NavigationContext),
         [formShown, toggleForm] = useState(false),
         formSpecQuery =
             useQuery(['tpl', templateDid], () =>
-                fetchTemplateContent(templateDid).then(claimTemplateToFormSpec))
+                getTemplate(templateDid)
+                    .then(tpl =>
+                        claimTemplateToFormSpec(tpl.data.page.content))),
+
+        submit = useCallback(async formState => {
+            const
+                formSpecById = keyBy(formSpecQuery.data, 'id'),
+
+                formEntries =
+                    await Promise.all(
+                        entries(formState).map(async ([id, value]) => {
+                            if (!value.uri)
+                                return [id, value]
+
+                            const dataURL =
+                                await fileToDataURL(value.uri, value.type)
+
+                            debug(
+                                'Uploading file',
+                                value.type,
+                                (dataURL.length / 1048576).toFixed(2) + 'MB',
+                                value.uri,
+                            )
+
+                            const remoteURL =
+                                await uploadFile(projectDid, dataURL)
+
+                            return [id, remoteURL]
+
+                        }),
+                    ),
+
+                claimItems =
+                    formEntries
+                        .map(([id, value]) => ({
+                            id,
+                            value,
+                            attribute: formSpecById[id].attribute,
+                        }))
+
+            const resp = await createClaim(projectDid, templateDid, claimItems)
+
+            console.log('create claim response', resp)
+
+            // We will save the resp to the claim store
+        })
 
     return <MenuLayout><AssistantLayout>
         <Heading children='Submit a Claim' />
@@ -93,7 +140,7 @@ const NewClaim = ({templateDid}) => {
         {formSpecQuery.isError &&
             <Text children='An error occurred, please try again later.' />}
 
-        {formSpecQuery.data && <>
+        {formSpecQuery.data && <ScrollView>
             <Text>
                 Thank you for being interested in our project. In order to
                 complete the claims on this project you'll need to complete the
@@ -111,8 +158,8 @@ const NewClaim = ({templateDid}) => {
                 type: 'contained',
                 text: 'Submit a Claim',
                 onPress: () => toggleForm(true),
-            }]} />
-        </>}
+            }]} style={{marginBottom: 100}} />
+        </ScrollView>}
 
         <Modal
             visible={formShown}
@@ -121,6 +168,7 @@ const NewClaim = ({templateDid}) => {
                 <ClaimForm
                     formSpec={formSpecQuery.data}
                     onClose={() => toggleForm(false)}
+                    onSubmit={submit}
                 />}
         />
     </AssistantLayout></MenuLayout>
@@ -131,8 +179,6 @@ const ClaimForm = ({formSpec, onClose = noop, onSubmit = noop}) => {
         [formState, setFormState] = useState({}),
         [currentStepIdx, setCurrentStep] = useState(0)
 
-    console.log('form state', formState)
-
     return <View>
         <Button type='contained' text='Close' onPress={onClose} />
 
@@ -142,7 +188,7 @@ const ClaimForm = ({formSpec, onClose = noop, onSubmit = noop}) => {
                 formSpec={formSpec}
                 formState={formState}
                 onFocusItem={setCurrentStep}
-                onApprove={onSubmit}
+                onApprove={() => onSubmit(formState)}
             />
 
             : <ClaimFormSteps
@@ -259,7 +305,7 @@ const ClaimFormSummary = ({formSpec, formState, onFocusItem, onApprove}) =>
         }, {
             type: 'contained',
             text: 'Submit claim',
-            onPress: () => alert('unimplemented'),
+            onPress: onApprove,
         }]} />
 
         <View style={{height: 50}} />
@@ -268,39 +314,6 @@ const ClaimFormSummary = ({formSpec, formState, onFocusItem, onApprove}) =>
             proper fix */}
     </ScrollView>
 
-const uploadFileToCellNode = async (
-    ps,
-    projectDid,
-    fileMimeType,
-    localFilePath,
-) => {
-    const
-        base64Content = await readFile(localFilePath, 'base64'),
-
-        serviceEndpoint =
-            dashedHostname(
-                ps.items[projectDid].data.nodes.items
-                    .find(i => i['@type'] === 'CellNode')
-                    .serviceEndpoint
-                    .replace(/\/$/, ''),
-            ),
-
-        fileId =
-            await ps.createFile(
-                serviceEndpoint,
-                'data:' + fileMimeType + ';base64,' + base64Content,
-            ),
-
-        fileUrl = serviceEndpoint + '/public/' + fileId
-
-    return fileUrl
-}
-
-const dashedHostname = urlStr =>
-    urlStr.replace(
-        /^(https?:\/\/)([^/]+)(\/.*)?/,
-        (_, proto, host, path) => proto + host.replace('_', '-') + (path || ''),
-    )
 
 
 module.exports = NewClaim

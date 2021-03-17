@@ -1,6 +1,7 @@
 const
     {Platform, PermissionsAndroid} = require('react-native'),
-    DocumentPicker = require('react-native-document-picker').default
+    DocumentPicker = require('react-native-document-picker').default,
+    {readFile} = require('react-native-fs')
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -46,8 +47,13 @@ const getAndroidPermission = async (permName, opts) => {
 }
 
 
+const fileToDataURL = async (uri, type) =>
+    'data:' + type + ';base64,' + (await readFile(uri, 'base64'))
+
+
 module.exports = {
     sleep,
     selectFile,
     getAndroidPermission,
+    fileToDataURL,
 }
