@@ -4,10 +4,15 @@ const
     {capitalize} = require('lodash-es')
 
 
-const ixoSDKInstances = {
-    wallet: null,
-    client: makeClient(),
-}
+const
+    ixoClientOpts = {
+        dashifyUrls: true,
+    },
+
+    ixoSDKInstances = {
+        wallet: null,
+        client: makeClient(null, ixoClientOpts),
+    }
 
 const useWallet = makeSecurePersistentStore('Wallet', set => ({
     secp: null,
@@ -15,7 +20,7 @@ const useWallet = makeSecurePersistentStore('Wallet', set => ({
 
     reset: () => {
         ixoSDKInstances.wallet = null
-        ixoSDKInstances.client = makeClient()
+        ixoSDKInstances.client = makeClient(null, ixoClientOpts)
 
         set({secp: null, agent: null})
     },
@@ -43,6 +48,7 @@ const useWallet = makeSecurePersistentStore('Wallet', set => ({
     getSecpAccount: () => ixoSDKInstances.client.getSecpAccount(),
     getAgentAccount: () => ixoSDKInstances.client.getAgentAccount(),
     register: () => ixoSDKInstances.client.register(),
+    // These has to be lazy, as ixoSDKInstances.client can be updated
 
 }), {
     onLoad: walletState =>
@@ -53,7 +59,7 @@ const makeWalletAndUpdateInstances = async walletSrc => {
     const wallet = await makeWallet(walletSrc)
 
     ixoSDKInstances.wallet = wallet
-    ixoSDKInstances.client = makeClient(wallet)
+    ixoSDKInstances.client = makeClient(wallet, ixoClientOpts)
 
     return wallet
 }
@@ -63,57 +69,17 @@ const useProjects = makePersistentStore('projects', set => ({
     items: {/* [projId]: projRecord, ... */},
 
     connect: async projDid => {
-        const projRec = await ixoSDKInstances.client.getEntity(projDid)
+        const projRec = await ixoSDKInstances.client.getProject(projDid)
         set(({items}) => { items[projDid] = projRec })
     },
 
     disconnect: projDid => set(({items}) => delete items[projDid]),
 
-    createFile: ixoSDKInstances.client.createProjectFile,
-
-    fetchTemplateContent: async tplDid => {
-        const
-            tplDoc =
-                await ixoSDKInstances.client.getTemplate(tplDid),
-
-            serviceEndpoint = await projectTargetToDashedHostname(tplDoc),
-
-            {data: rawTplContent} =
-                await ixoSDKInstances.client.getProjectFile(
-                    serviceEndpoint,
-                    tplDoc.data.page.cid,
-                ),
-
-            decodedTplContent = Buffer.from(rawTplContent, 'base64').toString(),
-
-            parsedTplContent = JSON.parse(decodedTplContent)
-
-        return parsedTplContent
-
-    },
+    uploadFile: (...args) => ixoSDKInstances.client.createEntityFile(...args),
+    getTemplate: (...args) => ixoSDKInstances.client.getTemplate(...args),
+    createClaim: (...args) => ixoSDKInstances.client.createClaim(...args),
+    // These has to be lazy, as ixoSDKInstances.client can be updated
 }))
-
-const projectTargetToDashedHostname = async target => {
-    let project
-
-    if (typeof target === 'string')
-        project = await ixoSDKInstances.client.getProject(target)
-    else
-        project = target
-
-    return dashedHostname(
-        project.data.nodes.items
-            .find(i => i['@type'] === 'CellNode')
-            .serviceEndpoint
-            .replace(/\/$/, ''),
-    )
-}
-
-const dashedHostname = urlStr =>
-    urlStr.replace(
-        /^(https?:\/\/)([^/]+)(\/.*)?/,
-        (_, proto, host, path) => proto + host.replace('_', '-') + (path || ''),
-    )
 
 
 module.exports = {
