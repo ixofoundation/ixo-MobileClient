@@ -10,20 +10,28 @@ const
     Modal = require('./Modal')
 
 
-const VideoInput = ({value, onChange = noop, editable = true}) => {
+const defaultRecordOptions = {
+    quality: RNCamera.Constants.VideoQuality['480p'],
+}
+
+const VideoInput = ({
+    value,
+    onChange = noop,
+    editable = true,
+    recordOptions = {},
+}) => {
     const
         camRef = useRef(),
         playerRef = useRef(),
         [recorderOpen, toggleRecorder] = useState(false),
         [isRecording, toggleRecordingState] = useState(false),
         [isPlaying, togglePlaying] = useState(false),
+        finalRecordOptions = {...defaultRecordOptions, ...recordOptions},
 
         startRecording = useCallback(async () => {
             toggleRecordingState(true)
 
-            const resp = await camRef.current.recordAsync({
-                quality: RNCamera.Constants.VideoQuality['288p'],
-            })
+            const resp = await camRef.current.recordAsync(finalRecordOptions)
 
             toggleRecordingState(false)
 
@@ -92,7 +100,6 @@ const VideoInput = ({value, onChange = noop, editable = true}) => {
                 ref={ref => camRef.current = ref}
                 type={RNCamera.Constants.Type.back}
                 flashMode={RNCamera.Constants.FlashMode.on}
-                defaultVideoQuality={RNCamera.Constants.VideoQuality['480p']}
                 captureAudio={true}
                 style={{height: '100%'}}
             >
