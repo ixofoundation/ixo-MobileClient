@@ -150,15 +150,18 @@ const NewClaim = ({templateDid, projectDid}) => {
             {formSpecQuery.data.map(({id, title}) =>
                 <Text key={id} children={'- ' + title} />)}
 
-            <ButtonGroup items={[{
-                type: 'outlined',
-                text: 'Come back later',
-                onPress: () => nav.navigateBack(1),
-            }, {
-                type: 'contained',
-                text: 'Submit a Claim',
-                onPress: () => toggleForm(true),
-            }]} style={{marginBottom: 100}} />
+            <ButtonGroup style={{marginBottom: 100}}>
+                <Button
+                    type='outlined'
+                    text='Come back later'
+                    onPress={() => nav.navigateBack(1)}
+                />
+                <Button
+                    type='contained'
+                    text='Submit a Claim'
+                    onPress={() => toggleForm(true)}
+                />
+            </ButtonGroup>
         </ScrollView>}
 
         <Modal
@@ -298,15 +301,18 @@ const ClaimFormSummary = ({formSpec, formState, onFocusItem, onApprove}) =>
             </Fragment>,
         )}
 
-        <ButtonGroup items={[{
-            type: 'outlined',
-            text: 'Save',
-            onPress: () => alert('Not Implemented Yet'),
-        }, {
-            type: 'contained',
-            text: 'Submit claim',
-            onPress: onApprove,
-        }]} />
+        <ButtonGroup>
+            <Button
+                type='outlined'
+                text='Save'
+                onPress={() => alert('Not Implemented Yet')}
+            />
+            <Button
+                type='contained'
+                text='Submit claim'
+                onPress={onApprove}
+            />
+        </ButtonGroup>
 
         <View style={{height: 50}} />
         {/* In Android some space from the bottom is needed or else the buttons
