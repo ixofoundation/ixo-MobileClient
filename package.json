@@ -30,7 +30,7 @@
     "react-native": "0.63.4",
     "react-native-calendar-picker": "^7.1.0",
     "react-native-camera": "^3.42.0",
-    "react-native-document-picker": "^5.0.0",
+    "react-native-document-picker": "^5.0.2",
     "react-native-file-viewer": "^2.1.4",
     "react-native-fs": "^2.16.6",
     "react-native-geolocation-service": "^5.2.0",
