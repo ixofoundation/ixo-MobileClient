@@ -150,18 +150,18 @@ const NewClaim = ({templateDid, projectDid}) => {
             {formSpecQuery.data.map(({id, title}) =>
                 <Text key={id} children={'- ' + title} />)}
 
-            <ButtonGroup style={{marginBottom: 100}}>
-                <Button
-                    type='outlined'
-                    text='Come back later'
-                    onPress={() => nav.navigateBack(1)}
-                />
-                <Button
-                    type='contained'
-                    text='Submit a Claim'
-                    onPress={() => toggleForm(true)}
-                />
-            </ButtonGroup>
+            <ButtonGroup
+                items={[{
+                    type: 'outlined',
+                    text: 'Come back later',
+                    onPress: () => nav.navigateBack(1),
+                }, {
+                    type: 'contained',
+                    text: 'Submit a Claim',
+                    onPress: () => toggleForm(true),
+                }]}
+                style={{marginBottom: 100}}
+            />
         </ScrollView>}
 
         <Modal
