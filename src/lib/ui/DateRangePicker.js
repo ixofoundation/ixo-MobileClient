@@ -39,7 +39,7 @@ const DateRangePicker = ({value = [], onChange, ...props}) =>
         dayLabelsWrapper={style.dayLabelsWrapper}
         selectedRangeEndStyle={style.selected}
         textStyle={style.mainText}
-        customDatesStyles={style.mainText}
+        customDateStyles={style.mainText}
         monthTitleStyle={style.boldText}
         nextComponent={
             <View style={style.monthBtn}>
