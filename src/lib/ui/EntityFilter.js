@@ -1,8 +1,8 @@
 const
     React = require('react'),
-    {useState, Children, cloneElement} = React,
+    {createElement, Fragment, useState} = React,
     {View, Text, Pressable, StyleSheet} = require('react-native'),
-    {noop} = require('lodash-es'),
+    {noop, capitalize} = require('lodash-es'),
     Button = require('./Button'),
     Select = require('./Select'),
     Switch = require('./Switch'),
@@ -11,21 +11,22 @@ const
     Icon = require('./Icon'),
     theme = require('$/theme')
 
-const filterComponents = [
-    Select,
-    Switch,
-    DatePicker,
-    DateRangePicker,
-]
+
+const filterComponents = {
+    option: Select,
+    switch: Switch,
+    date: DatePicker,
+    dateRange: DateRangePicker,
+}
 
 const EntityFilter = ({
-    children,
+    spec,
     initialValue = {},
     onChange = noop,
     onCancel = noop,
 }) => {
     const [value, setValue] = useState(initialValue)
-    const itemCount = Children.count(children)
+
     return <View style={s.root}>
         <View style={s.titleContainer}>
             <Text 
@@ -44,25 +45,19 @@ const EntityFilter = ({
             />
         </View>
 
-        {
-            Children.map(children, (child, index) => {
-                if (filterComponents.some(comp => comp === child.type)) {
-                    const {id} = child.props
-                    const filterItem = cloneElement(child, {
-                        ...child.props, 
-                        key: id,
-                        onChange: val =>
-                            setValue(prevValue => ({...prevValue, [id]: val})),
-                        value: value[id],
-                    })
-                    return <>
-                        {filterItem}
-                        {index !== itemCount - 1 && <Divider/>}
-                    </>
-                }
-                return child
-            })
-        }
+        {spec.map(({type, id, title = capitalize(id), ...props}, idx) =>
+            <Fragment key={id}>
+                <Text children={title} style={s.filterTitle} />
+
+                {createElement(filterComponents[type], {
+                    value: value[id],
+                    onChange: val => setValue(() => ({...value, [id]: val})),
+                    ...props,
+                })}
+
+                {idx < spec.length - 1 && <Divider />}
+            </Fragment>,
+        )}
 
         <Button 
             text='Apply' 
@@ -115,6 +110,12 @@ const s = StyleSheet.create({
     },
     applyBtn: {alignItems: 'center', marginTop: theme.spacing(1)},
     applyBtnText: {color: 'white'},
+    filterTitle: {
+        fontWeight: 'bold',
+        marginTop: 10,
+        borderTopWidth: 1,
+        marginBottom: theme.spacing(1),
+    },
 })
 
 module.exports = EntityFilter
