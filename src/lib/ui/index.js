@@ -1,6 +1,7 @@
 module.exports = {
     Modal: require('./Modal'),
     Heading: require('./Heading'),
+    Header: require('./Header'),
     Code: require('./Code'),
     Alert: require('./Alert'),
     Button: require('./Button'),
