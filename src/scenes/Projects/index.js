@@ -168,6 +168,7 @@ const Projects = () => {
                             ps.disconnect(focusedProjDid)
                         }}
                         onNavigate={(...args) => {
+                            setFocusedProj(null)
                             nav.navigate(...args)
                         }}
                     />}
