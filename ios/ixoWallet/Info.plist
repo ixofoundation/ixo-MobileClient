@@ -40,7 +40,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Camera access is needed for scanning identity or project barcodes, and taking claim photos.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>We optionally need your location to help you when making ixo claims that require a location.</string>
 	<key>NSCameraUsageDescription</key>
 	<string></string>
 	<key>NSMicrophoneUsageDescription</key>
