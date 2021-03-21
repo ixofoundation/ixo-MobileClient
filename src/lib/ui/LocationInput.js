@@ -1,7 +1,7 @@
 const
     React = require('react'),
     {useState, useEffect} = React,
-    {View} = require('react-native'),
+    {View, Platform} = require('react-native'),
     {default: MapView, Marker} = require('react-native-maps'),
     {GooglePlacesAutocomplete} =
         require('react-native-google-places-autocomplete'),
@@ -27,6 +27,10 @@ const LocationInput = ({value, onChange = noop, editable = true}) => {
     useEffect(() => { (async () => {
         await getAndroidPermission('ACCESS_FINE_LOCATION')
         await getAndroidPermission('ACCESS_COARSE_LOCATION')
+
+        if (Platform.OS === 'ios') {
+            await GeoLocation.requestAuthorization('WhenInUse')
+        }
 
         if (!value) {
             GeoLocation.getCurrentPosition(
