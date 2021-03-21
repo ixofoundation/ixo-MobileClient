@@ -8,6 +8,7 @@ const
         View, 
         StyleSheet, 
         Text,
+        Pressable,
     } = require('react-native'),
     {sortBy, filter} = require('lodash-es'),
     MenuLayout = require('$/MenuLayout'),
@@ -120,13 +121,10 @@ const Projects = () => {
                     />)}
             />
 
-            <Button
+            <Pressable
                 onPress={() => toggleScanner(true)}
-                color='primary'
-                type='contained'
-                size='lg'
-                text='Connect to a project'
-                style={{margin: theme.spacing(1)}}
+                style={style.connectBtn}
+                children={<Text children='+' style={style.connectBtnText} />}
             />
 
             <Modal
@@ -209,6 +207,21 @@ const style = StyleSheet.create({
     projectsContainer: {flex: 1},
     filterBtn: {
         borderRadius: 24,
+    },
+    connectBtn: {
+        position: 'absolute',
+        bottom: 20,
+        right: 20,
+        width: 50,
+        height: 50,
+        borderRadius: 50,
+        backgroundColor: '#a11c43',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    connectBtnText: {
+        color: 'white',
+        fontSize: 30,
     },
 })
 
