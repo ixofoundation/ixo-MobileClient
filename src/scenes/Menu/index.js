@@ -28,10 +28,10 @@ const Menu = () => {
                 <Icon name='close' fill='white'/>
             </Pressable>
             <View style={style.header}>
-                <Text 
+                {/*<Text 
                     children='Shaun' 
                     style={style.username}
-                />
+                />*/}
                 <Text
                     children={'did:ixo:' + ws.agent.did}
                     style={style.did}
