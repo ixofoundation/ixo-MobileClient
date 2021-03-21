@@ -1,8 +1,12 @@
+const StepForm = require('$/lib/ui/StepForm')
+const {spacing, fontSizes} = require('$/theme')
+
 const
     debug = require('debug')('claims'),
     React = require('react'),
     {createElement, useContext, useState, useCallback, Fragment} = React,
-    {View, ScrollView, Text, ActivityIndicator} = require('react-native'),
+    {View, ScrollView, Text, Pressable,
+        ActivityIndicator, StyleSheet} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {useQuery} = require('react-query'),
     {noop, keyBy} = require('lodash-es'),
@@ -11,9 +15,9 @@ const
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
     {
-        Heading, ButtonGroup, Button, TextInput, Select, AudioInput, ImageInput,
+        ButtonGroup, Button, TextInput, Select, AudioInput, ImageInput,
         DocumentInput, QRCodeInput, DateInput, VideoInput, LocationInput, Modal,
-        DateRangeInput,
+        DateRangeInput, Header, Icon,
     } = require('$/lib/ui'),
     {keys, values, entries} = Object
 
@@ -130,60 +134,99 @@ const NewClaim = ({templateDid, projectDid}) => {
         })
 
     return <MenuLayout><AssistantLayout>
-        <Heading children='Submit a Claim' />
+        <View style={newClaimStyle.root}>
+            <Text children='Submit a Claim' style={newClaimStyle.title}/>
 
-        {formSpecQuery.isLoading && <>
-            <ActivityIndicator color='#555555' size='large' />
-            <Text children='Preparing the claim form, please wait...' />
-        </>}
+            {formSpecQuery.isLoading && <>
+                <ActivityIndicator color='#555555' size='large' />
+                <Text children='Preparing the claim form, please wait...' />
+            </>}
 
-        {formSpecQuery.isError &&
+            {formSpecQuery.isError &&
             <Text children='An error occurred, please try again later.' />}
 
-        {formSpecQuery.data && <ScrollView>
-            <Text>
+
+            {formSpecQuery.data && <Text style={newClaimStyle.info}>
                 Thank you for being interested in our project. In order to
                 complete the claims on this project you'll need to complete the
                 following:
-            </Text>
+            </Text>}
 
-            {formSpecQuery.data.map(({id, title}) =>
-                <Text key={id} children={'- ' + title} />)}
+            {formSpecQuery.data && <ScrollView>
+                {formSpecQuery.data.map(({id, title}) =>
+                    <View key={id} style={newClaimStyle.formStepItem}>
+                        <Text children={'- ' + title} />
+                    </View>)}
+            </ScrollView>}
 
-            <ButtonGroup
-                items={[{
-                    type: 'outlined',
-                    text: 'Come back later',
-                    onPress: () => nav.navigateBack(1),
-                }, {
-                    type: 'contained',
-                    text: 'Submit a Claim',
-                    onPress: () => toggleForm(true),
-                }]}
-                style={{marginBottom: 100}}
+            {formSpecQuery.data && <View style={newClaimStyle.btnContainer}>
+                <Button type='outlined' text='Come back later' 
+                    onPress={() => nav.navigateBack(1)}/>
+                <Button type='contained' text='Submit a Claim' 
+                    onPress={() => toggleForm(true)}/>
+            </View>}
+
+            <Modal
+                visible={formShown}
+                onRequestClose={() => toggleForm(false)}
+                children={
+                    <ClaimForm
+                        formSpec={formSpecQuery.data}
+                        onClose={() => toggleForm(false)}
+                        onSubmit={submit}
+                    />}
             />
-        </ScrollView>}
-
-        <Modal
-            visible={formShown}
-            onRequestClose={() => toggleForm(false)}
-            children={
-                <ClaimForm
-                    formSpec={formSpecQuery.data}
-                    onClose={() => toggleForm(false)}
-                    onSubmit={submit}
-                />}
-        />
+        </View>
     </AssistantLayout></MenuLayout>
 }
+
+const newClaimStyle = StyleSheet.create({
+    root: {
+        flex: 1,
+        backgroundColor: '#F0F3F9',
+        paddingHorizontal: spacing(3),
+        paddingTop: spacing(3),
+    },
+    title: {
+        fontSize: fontSizes.h5,
+        color: '#333333',
+        fontWeight: 'bold',
+        marginBottom: spacing(1),
+    },
+    info: {
+        color: '#878F9F',
+        fontSize: fontSizes.p1,
+        marginBottom: spacing(2),
+    },
+    formStepItem: {
+        padding: spacing(1),
+        backgroundColor: '#FFFFFF',
+        borderRadius: 8,
+        marginBottom: spacing(1),
+    },
+    btnContainer: {
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        marginVertical: spacing(2),
+    },
+})
 
 const ClaimForm = ({formSpec, onClose = noop, onSubmit = noop}) => {
     const
         [formState, setFormState] = useState({}),
         [currentStepIdx, setCurrentStep] = useState(0)
 
-    return <View>
-        <Button type='contained' text='Close' onPress={onClose} />
+    return <View style={{flex: 1}}>
+        <Header>
+            <Pressable onPress={onClose}>
+                <Icon name='close' width={24} fill='white'/>
+            </Pressable>
+            <Text 
+                style={claimFormStyle.title}
+                children='New Claim'
+            />
+            <View style={{width: 24}}/>
+        </Header>
 
         {currentStepIdx === formSpec.length
 
@@ -206,6 +249,13 @@ const ClaimForm = ({formSpec, onClose = noop, onSubmit = noop}) => {
     </View>
 }
 
+const claimFormStyle = StyleSheet.create({
+    title: {
+        color: 'white',
+        fontSize: fontSizes.h5,
+    },
+})
+
 const ClaimFormSteps = ({
     value,
     onChange,
@@ -217,19 +267,46 @@ const ClaimFormSteps = ({
 }) => {
     const [formError, setFormError] = useState(null)
 
-    return <View>
+
+    return <StepForm 
+        current={currentStepIdx} 
+        total={totalSteps}
+        onNext={() => {
+            if (currentStepIdx > totalSteps)  {
+                return
+            }
+            const emptyVals = ['null', 'undefined', '']
+
+            if (emptyVals.includes(String(value[currentStep.id])))
+                return setFormError('required')
+
+            setFormError(null)
+            onNext()
+        }}
+        onPrev={() => {
+            if (currentStepIdx === 0) {
+                return
+            }
+            setFormError(null)
+            onPrev()
+        }}
+    >
         <Text
+            style={formStyles.stepText}
             children={
-                (currentStepIdx + 1)
+                'QUESTION '
+                + (currentStepIdx + 1)
                 + '/'
                 + (totalSteps)
-                + ': '
-                + currentStep.title
             }
-            style={{fontWeight: 'bold'}}
         />
 
-        <Text children={currentStep.description} />
+        <Text style={formStyles.title} children={currentStep.title}/>
+
+        <Text 
+            style={formStyles.description} 
+            children={currentStep.description} 
+        />
 
         {createElement(currentStep.comp, {
             value: value[currentStep.id],
@@ -242,35 +319,23 @@ const ClaimFormSteps = ({
 
         {formError === 'required' &&
             <Text children='Field is required' style={{color: 'red'}} />}
-
-        <View style={{flexDirection: 'row', justifyContent: 'center'}}>
-            {currentStepIdx > 0 &&
-                <Button
-                    text='Prev'
-                    type='outlined'
-                    onPress={() => {
-                        setFormError(null)
-                        onPrev()
-                    }}
-                />}
-
-            {currentStepIdx < totalSteps &&
-                <Button
-                    text='Next'
-                    type='contained'
-                    onPress={() => {
-                        const emptyVals = ['null', 'undefined', '']
-
-                        if (emptyVals.includes(String(value[currentStep.id])))
-                            return setFormError('required')
-
-                        setFormError(null)
-                        onNext()
-                    }}
-                />}
-        </View>
-    </View>
+    </StepForm>
 }
+
+const formStyles = StyleSheet.create({
+    stepText: {marginBottom: spacing(1)},
+    title: {
+        fontSize: fontSizes.h5, 
+        color: '#333333',
+        fontWeight: 'bold',
+        marginBottom: spacing(1),
+    },
+    description: {
+        color: '#878F9F',
+        fontSize: fontSizes.p1,
+        marginBottom: spacing(2),
+    },
+})
 
 const ClaimFormSummary = ({formSpec, formState, onFocusItem, onApprove}) =>
     <ScrollView style={{height: '100%'}}>

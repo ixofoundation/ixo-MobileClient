@@ -75,10 +75,13 @@ const s = {
         borderWidth: 1,
         borderRadius: 24,
         borderColor: '#00D2FF',
+        minWidth: 40,
+        minHeight: 40,
     })),
     btnText: memoize(isSelected => ({
         color: isSelected ? 'white' : '#00D2FF',
         fontSize: theme.fontSizes.button,
+        textAlign: 'center',
     })),
 }
 

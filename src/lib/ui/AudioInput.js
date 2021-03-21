@@ -1,7 +1,7 @@
 const
     React = require('react'),
     {useState, useCallback} = React,
-    {View} = require('react-native'),
+    {View, StyleSheet} = require('react-native'),
     {noop} = require('lodash-es'),
     {selectFile} = require('$/lib/util'),
     Audio = require('./Audio'),
@@ -20,7 +20,7 @@ const AudioInput = ({value, onChange = noop, editable = true}) => {
                 onChange(audioFile)
         })
 
-    return <View style={style}>
+    return <View style={style.root}>
         {value &&
             <Audio
                 source={value}
@@ -46,9 +46,10 @@ const AudioInput = ({value, onChange = noop, editable = true}) => {
 }
 
 
-const style = {
-    flexDirection: 'row',
-}
+
+const style = StyleSheet.create({
+    root: {flexDirection: 'row'},
+})
 
 
 module.exports = AudioInput
