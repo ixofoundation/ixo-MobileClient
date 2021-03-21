@@ -20,10 +20,7 @@ const ProjectDetail = ({project, onClose = noop, onDisconnect = noop}) => {
     <View style={style.root}>
         <View style={style.header}>
             <Image
-                source={{
-                    uri: project.data.image && 
-                                dashedHostname(project.data.image),
-                }}
+                source={{uri: project.data.image}}
                 style={style.image}
             />
 
@@ -126,12 +123,6 @@ const actionButtonStyles = StyleSheet.create({
         marginBottom: theme.spacing(1),
     },
 })
-
-const dashedHostname = urlStr =>
-    urlStr.replace(
-        /^(https?:\/\/)([^/]+)(\/.*)/,
-        (_, proto, host, path) => proto + host.replace('_', '-') + path,
-    )
 
 const getProjectURL = id => `https://app_uat.ixo.world/projects/${id}/overview`
 

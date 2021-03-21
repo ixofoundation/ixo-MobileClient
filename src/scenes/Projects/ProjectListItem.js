@@ -20,7 +20,7 @@ const ProjectListItem = ({project}) => {
 
     return <View style={style.root}>
         <Image
-            source={{uri: dashedHostname(imageUrl)}}
+            source={{uri: imageUrl}}
             style={style.coverImg}
         />
 
@@ -31,7 +31,7 @@ const ProjectListItem = ({project}) => {
 
                 <View style={style.logoContainer}>
                     <Image
-                        source={{uri: dashedHostname(logoUrl)}}
+                        source={{uri: logoUrl}}
                         style={style.logoImg}
                     />
                     <Pressable
@@ -124,11 +124,5 @@ const style = StyleSheet.create({
         alignItems: 'center',
     },
 })
-
-const dashedHostname = urlStr =>
-    urlStr.replace(
-        /^(https?:\/\/)([^/]+)(\/.*)/,
-        (_, proto, host, path) => proto + host.replace('_', '-') + path,
-    )
 
 module.exports = ProjectListItem
