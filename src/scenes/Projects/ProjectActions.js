@@ -45,7 +45,7 @@ const ProjectDetail = ({project, onClose = noop, onDisconnect = noop}) => {
             icon={<Icon name='linkOff' fill='white'/>}
             onPress={() => {
                 Alert.alert('You sure?', '', [{
-                    text: 'Yes, delete',
+                    text: 'Yes, disconnect',
                     onPress: onDisconnect,
                 }, {
                     text: 'Cancel',
