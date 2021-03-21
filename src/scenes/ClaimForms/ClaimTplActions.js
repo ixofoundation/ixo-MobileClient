@@ -1,14 +1,11 @@
 const React = require('react'),
-    {useContext} = React,
     {View, Text, StyleSheet, Image} = require('react-native'),
     Icon = require('$/lib/ui/Icon'),
     Button = require('$/lib/ui/Button'),
-    {spacing, fontSizes} = require('$/theme'),
-    {NavigationContext} = require('navigation-react')
+    {spacing, fontSizes} = require('$/theme')
 
 
-const ClaimTplActions = ({projectDid, claimTpl, onClose}) => {
-    const {stateNavigator: nav} = useContext(NavigationContext)
+const ClaimTplActions = ({projectDid, claimTpl, onClose, onNavigate}) => {
     const logoUri = 'https://pds_pandora.ixo.world/public/bojrn1k1wokkxjlgzl'
 
     return <>
@@ -40,10 +37,7 @@ const ClaimTplActions = ({projectDid, claimTpl, onClose}) => {
                     text='Remove from My Claim Forms list'
                 />*/}
                 <ActionButton
-                    onPress={() => {
-                        nav.navigate('claimActivity')
-                        onClose()
-                    }}
+                    onPress={() => onNavigate('claimActivity')}
                     icon={<Icon name='web' fill='white'/>}
                     text='Claim Activity'
                 />
@@ -63,7 +57,7 @@ const ClaimTplActions = ({projectDid, claimTpl, onClose}) => {
                     icon={<Icon name='web' fill='white'/>}
                     text='View Template / Submit a Claim'
                     onPress={() =>
-                        nav.navigate('new-claim', {
+                        onNavigate('new-claim', {
                             projectDid,
                             templateDid: claimTpl['@id'],
                         })

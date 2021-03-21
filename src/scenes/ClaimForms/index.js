@@ -88,6 +88,9 @@ const ClaimForms = ({projectDid}) => {
         <Modal visible={!!focusedTplDid} transparent>
             <ClaimTplActions
                 onClose={() => setFocusedTpl(null)}
+                onNavigate={(...args) => {
+                    nav.navigate(...args)
+                }}
                 projectDid={projectDid}
                 claimTpl={claimTemplatesByDid[focusedTplDid]}
             />
