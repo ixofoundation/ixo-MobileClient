@@ -35,10 +35,10 @@ const ClaimTplActions = ({projectDid, claimTpl, onClose}) => {
             </View>
 
             <View>
-                <ActionButton
+                {/*<ActionButton
                     icon={<Icon name='web' fill='white'/>}
                     text='Remove from My Claim Forms list'
-                />
+                />*/}
                 <ActionButton
                     onPress={() => {
                         nav.navigate('claimActivity')
@@ -47,7 +47,7 @@ const ClaimTplActions = ({projectDid, claimTpl, onClose}) => {
                     icon={<Icon name='web' fill='white'/>}
                     text='Claim Activity'
                 />
-                <ActionButton
+                {/*<ActionButton
                     icon={<Icon name='web' fill='white'/>}
                     text='Archive Claim Form'
                 />
@@ -58,10 +58,10 @@ const ClaimTplActions = ({projectDid, claimTpl, onClose}) => {
                 <ActionButton
                     icon={<Icon name='web' fill='white'/>}
                     text='View Claim Form Template'
-                />
+                />*/}
                 <ActionButton
                     icon={<Icon name='web' fill='white'/>}
-                    text='Submit a claim'
+                    text='View Template / Submit a Claim'
                     onPress={() =>
                         nav.navigate('new-claim', {
                             projectDid,
