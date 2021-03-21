@@ -89,6 +89,7 @@ const ClaimForms = ({projectDid}) => {
             <ClaimTplActions
                 onClose={() => setFocusedTpl(null)}
                 onNavigate={(...args) => {
+                    setFocusedTpl(null)
                     nav.navigate(...args)
                 }}
                 projectDid={projectDid}
