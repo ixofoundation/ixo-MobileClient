@@ -87,7 +87,7 @@ const Projects = () => {
 
     return <MenuLayout><AssistantLayout>
         <View style={style.root}>
-            <View style={style.appBar}>
+            {/*<View style={style.appBar}>
                 <Icon name='mainMenu' fill='white'/>
                 <View style={style.redBtn}>
                     <Text style={style.redBtnText}>
@@ -95,7 +95,7 @@ const Projects = () => {
                     </Text>
                     <Icon name='autoRenew' fill='white' />
                 </View>
-            </View>
+            </View>*/}
 
             <View style={style.header}>
                 <Text 
@@ -183,7 +183,7 @@ const style = StyleSheet.create({
         alignItems: 'center',
         padding: theme.spacing(1),
     },
-    redBtn: {
+    /*redBtn: {
         backgroundColor: '#A11C43', 
         borderRadius: 16, 
         flexDirection: 'row', 
@@ -193,7 +193,7 @@ const style = StyleSheet.create({
         color: 'white', 
         marginHorizontal: theme.spacing(1), 
         fontSize: theme.fontSizes.h6,
-    },
+    },*/
     header: {
         flexDirection: 'row', 
         justifyContent: 'space-between', 
