@@ -301,18 +301,15 @@ const ClaimFormSummary = ({formSpec, formState, onFocusItem, onApprove}) =>
             </Fragment>,
         )}
 
-        <ButtonGroup>
-            <Button
-                type='outlined'
-                text='Save'
-                onPress={() => alert('Not Implemented Yet')}
-            />
-            <Button
-                type='contained'
-                text='Submit claim'
-                onPress={onApprove}
-            />
-        </ButtonGroup>
+        <ButtonGroup items={[{
+            type: 'outlined',
+            text: 'Save',
+            onPress: () => alert('Not Implemented Yet'),
+        }, {
+            type: 'contained',
+            text: 'Submit a claim',
+            onPress: onApprove,
+        }]} />
 
         <View style={{height: 50}} />
         {/* In Android some space from the bottom is needed or else the buttons
