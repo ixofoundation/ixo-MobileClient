@@ -51,10 +51,10 @@ const ProjectActions = ({
                 }])
             }}
         />
-        <ProjectActionButton
+        {/*<ProjectActionButton
             text='Turn off Project Notifications'
             icon={<Icon name='bellOff' fill='white'/>}
-        />
+        />*/}
         <ProjectActionButton
             text='View the Project Page'
             icon={<Icon name='web' fill='white'/>}
