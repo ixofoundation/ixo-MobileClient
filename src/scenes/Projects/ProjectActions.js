@@ -13,7 +13,7 @@ const
     {Button, Icon} = require('$/lib/ui'),
     theme = require('$/theme')
 
-const ProjectDetail = ({project, onClose = noop, onDisconnect = noop}) => {
+const ProjectActions = ({project, onClose = noop, onDisconnect = noop}) => {
     const {stateNavigator: nav} = useContext(NavigationContext)
 
     return <>
@@ -126,4 +126,4 @@ const actionButtonStyles = StyleSheet.create({
 
 const getProjectURL = id => `https://app_uat.ixo.world/projects/${id}/overview`
 
-module.exports = ProjectDetail
+module.exports = ProjectActions
