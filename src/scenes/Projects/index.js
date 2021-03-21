@@ -1,7 +1,7 @@
 const
     url = require('url'),
     React = require('react'),
-    {useState} = React,
+    {useState, useContext} = React,
     {
         TouchableOpacity, 
         ScrollView, 
@@ -10,6 +10,7 @@ const
         Text,
         Pressable,
     } = require('react-native'),
+    {NavigationContext} = require('navigation-react'),
     {sortBy, filter} = require('lodash-es'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
@@ -50,6 +51,7 @@ const filterSpec = [{
 
 const Projects = () => {
     const
+        {stateNavigator: nav} = useContext(NavigationContext),
         ps = useProjects(),
         [scannerShown, toggleScanner] = useState(false),
         [filterShown, toggleFilter] = useState(false),
@@ -164,6 +166,9 @@ const Projects = () => {
                         onDisconnect={() => {
                             setFocusedProj(null)
                             ps.disconnect(focusedProjDid)
+                        }}
+                        onNavigate={(...args) => {
+                            nav.navigate(...args)
                         }}
                     />}
             />
