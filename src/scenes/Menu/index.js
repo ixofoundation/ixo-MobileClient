@@ -15,12 +15,12 @@ const Menu = () => {
         ws = useWallet(),
         {stateNavigator: nav} = useContext(NavigationContext)
 
-    if (!ws.secp)
-        return null
-    
     const [activeItems, setActiveItems] = useState([])
     const handleMenuItemClick = (index) => 
         setActiveItems(activeItems[0] === index ? [] : [index])
+
+    if (!ws.secp)
+        return null
 
     return <View style={style.root}>
         <View style={style.container}>
