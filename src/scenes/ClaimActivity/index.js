@@ -73,7 +73,8 @@ const ClaimActivity = ({onClose, name}) => {
                 My Claim Payments
             </Text>
             <ScrollView>
-                {payments.map(() => <ClaimPayment 
+                {payments.map(i => <ClaimPayment
+                    key={i}
                     count={10}
                     amount={230}
                     currency='eEUR'
