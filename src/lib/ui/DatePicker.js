@@ -6,7 +6,7 @@ const
     theme = require('$/theme')
 
 
-const DatePicker = ({value = [], onChange, ...props}) =>
+const DatePicker = ({value, onChange, ...props}) =>
     <CalendarPicker
         {...props}
         allowRangeSelection={props.allowRangeSelection}
