@@ -1,5 +1,5 @@
 const React = require('react'),
-    {useMemo} = React,
+    {Fragment, useMemo} = React,
     {View, Text, StyleSheet} = require('react-native'),
     {Icon, Button} = require('$/lib/ui'),
     {spacing} = require('$/theme')
@@ -100,7 +100,7 @@ const StepInfo = ({current, total}) => {
                 const notFirst = i !== 0 && k !== 0
                 const status = getStepStatus(i, current)
                 const s = stepItemStyle(status)
-                return <>
+                return <Fragment key={i}>
                     {notFirst && <View key={'divider-' + i} style={s.divider}/>}
                     <View key={'step-' + i} style={s.container}>
                         {i < current && <Icon name='check' 
@@ -108,7 +108,7 @@ const StepInfo = ({current, total}) => {
                         {i >= current && 
                             <Text style={s.text} children={i + 1}/>}
                     </View>
-                </>
+                </Fragment>
             })
         }
     </View>
