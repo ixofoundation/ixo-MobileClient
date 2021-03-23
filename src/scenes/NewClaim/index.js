@@ -4,14 +4,14 @@ const {spacing, fontSizes} = require('$/theme')
 const
     debug = require('debug')('claims'),
     React = require('react'),
-    {createElement, useContext, useState, useCallback, Fragment} = React,
+    {createElement, useContext, useState, Fragment} = React,
     {View, ScrollView, Text, Pressable,
         ActivityIndicator, StyleSheet} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {useQuery} = require('react-query'),
     {noop, keyBy} = require('lodash-es'),
     {useProjects} = require('$/stores'),
-    {fileToDataURL} = require('$/lib/util'),
+    {fileToDataURL, pollFor} = require('$/lib/util'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
     {
@@ -19,6 +19,7 @@ const
         DocumentInput, QRCodeInput, DateInput, VideoInput, LocationInput, Modal,
         DateRangeInput, Header, Icon,
     } = require('$/lib/ui'),
+    NewClaimResult = require('./NewClaimResult'),
     {keys, values, entries} = Object
 
 
@@ -174,54 +175,66 @@ const ClaimForm = ({
     projectDid,
     templateDid,
     onClose = noop,
-    onSubmit = noop,
 }) => {
     const
-        {uploadFile, createClaim} = useProjects(),
+        {uploadFile, createClaim, listClaims} = useProjects(),
         [formState, setFormState] = useState({}),
+        [isComplete, toggleComplete] = useState(false),
         [currentStepIdx, setCurrentStep] = useState(0),
 
-        submit = useCallback(async () => {
-            const
-                formSpecById = keyBy(formSpec, 'id'),
+        submitQuery = useQuery({
+            enabled: false,
+            queryKey: 'createClaim',
+            onSettled: () => toggleComplete(true),
+            queryFn: async () => {
+                const
+                    formSpecById = keyBy(formSpec, 'id'),
 
-                formEntries =
-                    await Promise.all(
-                        entries(formState).map(async ([id, value]) => {
-                            if (!value.uri)
-                                return [id, value]
+                    formEntries =
+                        await Promise.all(
+                            entries(formState).map(async ([id, value]) => {
+                                if (!value.uri)
+                                    return [id, value]
 
-                            const dataURL =
-                                await fileToDataURL(value.uri, value.type)
+                                const dataURL =
+                                    await fileToDataURL(value.uri, value.type)
 
-                            debug(
-                                'Uploading file',
-                                value.type,
-                                (dataURL.length / 1048576).toFixed(2) + 'MB',
-                                value.uri,
-                            )
+                                debug(
+                                    'Uploading file',
+                                    value.type,
+                                    (dataURL.length / 1048576).toFixed(2) +'MB',
+                                    value.uri,
+                                )
 
-                            const remoteURL =
-                                await uploadFile(projectDid, dataURL)
+                                const remoteURL =
+                                    await uploadFile(projectDid, dataURL)
 
-                            return [id, remoteURL]
+                                return [id, remoteURL]
 
-                        }),
-                    ),
+                            }),
+                        ),
 
-                claimItems =
-                    formEntries
-                        .map(([id, value]) => ({
-                            id,
-                            value,
-                            attribute: formSpecById[id].attribute,
-                        }))
+                    claimItems =
+                        formEntries
+                            .map(([id, value]) => ({
+                                id,
+                                value,
+                                attribute: formSpecById[id].attribute,
+                            })),
 
-            const resp = await createClaim(projectDid, templateDid, claimItems)
+                    claimTxHash =
+                        await createClaim(projectDid, templateDid, claimItems),
 
-            console.log('create claim response', resp)
+                    projectClaims = await pollFor({
+                        query: () => listClaims(projectDid),
+                        predicate:
+                            claims=> claims.find(c => c.txHash === claimTxHash),
+                    }),
 
-            // We will save the resp to the claim store
+                    claimRec = projectClaims.find(c => c.txHash === claimTxHash)
+
+                return claimRec
+            },
         })
 
     return <View style={{flex: 1}}>
@@ -236,24 +249,42 @@ const ClaimForm = ({
             <View style={{width: 24}}/>
         </Header>
 
-        {currentStepIdx === formSpec.length
+        {submitQuery.isFetching &&
+            <ActivityIndicator
+                color='#555555'
+                size='large'
+                style={claimFormStyle.activityIndicator}
+            />}
 
-            ? <ClaimFormSummary
-                formSpec={formSpec}
-                formState={formState}
-                onFocusItem={setCurrentStep}
-                onApprove={submit}
+        {isComplete
+            ? <NewClaimResult
+                type={{error: 'danger', success: 'success'}[submitQuery.status]}
+                onEdit={() => toggleComplete(false)}
+                onNew={() => {
+                    setFormState({})
+                    setCurrentStep(0)
+                    toggleComplete(false)
+                }}
             />
 
-            : <ClaimFormSteps
-                value={formState}
-                onChange={setFormState}
-                currentStep={formSpec[currentStepIdx]}
-                currentStepIdx={currentStepIdx}
-                totalSteps={formSpec.length}
-                onPrev={() => setCurrentStep(s => s - 1)}
-                onNext={() => setCurrentStep(s => s + 1)}
-            />}
+            : currentStepIdx === formSpec.length
+                ? <ClaimFormSummary
+                    formSpec={formSpec}
+                    formState={formState}
+                    onFocusItem={setCurrentStep}
+                    onApprove={() => submitQuery.refetch()}
+                />
+
+                : <ClaimFormSteps
+                    value={formState}
+                    onChange={setFormState}
+                    currentStep={formSpec[currentStepIdx]}
+                    currentStepIdx={currentStepIdx}
+                    totalSteps={formSpec.length}
+                    onPrev={() => setCurrentStep(s => s - 1)}
+                    onNext={() => setCurrentStep(s => s + 1)}
+                />
+        }
     </View>
 }
 
@@ -261,6 +292,12 @@ const claimFormStyle = StyleSheet.create({
     title: {
         color: 'white',
         fontSize: fontSizes.h5,
+    },
+    activityIndicator: {
+        position: 'absolute',
+        alignSelf: 'center',
+        top: '48%',
+        zIndex: 1,
     },
 })
 

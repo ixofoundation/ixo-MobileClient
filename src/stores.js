@@ -78,6 +78,7 @@ const useProjects = makePersistentStore('projects', set => ({
     uploadFile: (...args) => ixoSDKInstances.client.createEntityFile(...args),
     getTemplate: (...args) => ixoSDKInstances.client.getTemplate(...args),
     createClaim: (...args) => ixoSDKInstances.client.createClaim(...args),
+    listClaims: (...args) => ixoSDKInstances.client.listClaims(...args),
     // These has to be lazy, as ixoSDKInstances.client can be updated
 }))
 
