@@ -20,7 +20,7 @@ const DocumentInput = ({value, onChange = noop, editable = true}) => {
         {value &&
             <Button
                 type='contained'
-                text={value.name + ': ' + value.type}
+                text={value.name + '\n' + value.type}
                 onPress={() => FileViewer.open(value.uri)}
             />}
 

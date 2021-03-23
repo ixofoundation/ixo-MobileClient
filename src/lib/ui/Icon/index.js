@@ -24,6 +24,7 @@ const icons = {
     chevronRight: require('./assets/chevronRight.svg').default,
     chevronLeft: require('./assets/chevronLeft.svg').default,
     check: require('./assets/check.svg').default,
+    edit: require('./assets/edit.svg').default,
 }
 
 const Icon = ({name, ...props}) =>

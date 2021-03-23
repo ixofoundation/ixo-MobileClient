@@ -338,32 +338,41 @@ const formStyles = StyleSheet.create({
 })
 
 const ClaimFormSummary = ({formSpec, formState, onFocusItem, onApprove}) =>
-    <ScrollView style={{height: '100%'}}>
+    <ScrollView style={sumStyle.root}>
+        <Text children='Claim Summary' style={sumStyle.header} />
+
         {formSpec.map(({id, title, comp, props}, itemIdx) =>
-            <Fragment key={id}>
-                <Text children={title} style={{fontWeight: 'bold'}} />
-
-                {[Select, ImageInput, AudioInput, VideoInput, DocumentInput]
-                    .includes(comp)
-
-                    ? createElement(comp, {
-                        ...props,
-                        value: formState[id],
-                        editable: false,
-                    })
-
-                    : <Text children={
-                        typeof formState[id] !== 'string'
-                            ? JSON.stringify(formState[id])
-                            : formState[id]} />
-                }
-
-                <Button
-                    type='outlined'
-                    text='Edit'
-                    onPress={() => onFocusItem(itemIdx)}
+            <View key={id} style={sumStyle.itemBoxContainer}>
+                <ClaimFormSummaryVerticalProgressIndicator
+                    formSpec={formSpec}
+                    itemIdx={itemIdx}
                 />
-            </Fragment>,
+
+                <View style={sumStyle.itemBox}>
+                    <Text children={title} style={sumStyle.itemBoxTitle} />
+
+                    {[Select, ImageInput, AudioInput, VideoInput, DocumentInput]
+                        .includes(comp)
+
+                        ? createElement(comp, {
+                            ...props,
+                            value: formState[id],
+                            editable: false,
+                        })
+
+                        : <Text style={sumStyle.itemBoxText} children={
+                            typeof formState[id] !== 'string'
+                                ? JSON.stringify(formState[id], null, 4)
+                                : formState[id]} />
+                    }
+
+                    <Pressable
+                        onPress={() => onFocusItem(itemIdx)}
+                        children={<Icon name='edit' width={20} fill='#bbb' />}
+                        style={sumStyle.itemBoxEditBtn}
+                    />
+                </View>
+            </View>,
         )}
 
         <ButtonGroup items={[{
@@ -381,6 +390,79 @@ const ClaimFormSummary = ({formSpec, formState, onFocusItem, onApprove}) =>
             above don't show up. Obviously this is an ugly hack waiting for a
             proper fix */}
     </ScrollView>
+
+const ClaimFormSummaryVerticalProgressIndicator = ({formSpec, itemIdx}) => <>
+    <View style={{
+        width: 11,
+        borderRightWidth: 2,
+        borderColor:
+            itemIdx === formSpec.length - 1
+                ? 'transparent'
+                : '#007994',
+    }} />
+    <View style={{
+        position: 'relative',
+        left: -10,
+        top:
+            (itemIdx === formSpec.length - 1 || itemIdx === 0)
+                ? 0
+                : 20,
+        width: 18,
+        height: 18,
+        borderWidth: 2,
+        borderRadius: 9,
+        borderColor: '#007994',
+        backgroundColor: 'white',
+        justifyContent: 'center',
+    }}>
+        <View style={{
+            width: 9,
+            height: 9,
+            backgroundColor: '#007994',
+            borderRadius: 4,
+            alignSelf: 'center',
+        }} />
+    </View>
+</>
+
+const sumStyle = {
+    root: {
+        position: 'relative',
+        height: '100%',
+        backgroundColor: '#F0F3F9',
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+    },
+    header: {
+        fontSize: 25,
+        marginBottom: 20,
+    },
+    itemBoxContainer: {
+        flexDirection: 'row',
+    },
+    itemBox: {
+        flexGrow: 1,
+        backgroundColor: 'white',
+        padding: 10,
+        marginBottom: 10,
+        borderRadius: 10,
+        width: 200, /* TODO: Hack: If we don't have this, the box overgrows for some reason */// eslint-disable-line max-len
+    },
+    itemBoxTitle: {
+        fontSize: 15,
+        fontWeight: 'bold',
+        paddingBottom: 10,
+        color: '#333',
+    },
+    itemBoxText: {
+        color: '#555',
+    },
+    itemBoxEditBtn: {
+        position: 'absolute',
+        right: 10,
+        top: 10,
+    },
+}
 
 
 
