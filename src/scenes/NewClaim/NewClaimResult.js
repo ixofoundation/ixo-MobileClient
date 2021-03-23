@@ -9,7 +9,7 @@ const contents = {
     success: {
         message: 'Your claim has been successfully submitted',
         info: 'Your claim is awaiting evaluation. Please check back soon.',
-        icon: 'checkCircle',
+        icon: 'check',
         color: '#85AD5C',
     },
     warning: {
@@ -21,7 +21,7 @@ const contents = {
     danger: {
         message: 'There has been an error submitting your claim',
         info: 'Your claim submission appears to be invalid.',
-        icon: 'closeCircle',
+        icon: 'close',
         color: '#AD245C',
     },
 }
