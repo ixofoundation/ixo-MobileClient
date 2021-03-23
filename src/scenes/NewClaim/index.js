@@ -81,57 +81,14 @@ const claimTemplateToFormSpec = claimTemplate =>
 
 const NewClaim = ({templateDid, projectDid}) => {
     const
-        {getTemplate, uploadFile, createClaim} = useProjects(),
+        {getTemplate} = useProjects(),
         {stateNavigator: nav} = useContext(NavigationContext),
         [formShown, toggleForm] = useState(false),
         formSpecQuery =
             useQuery(['tpl', templateDid], () =>
                 getTemplate(templateDid)
                     .then(tpl =>
-                        claimTemplateToFormSpec(tpl.data.page.content))),
-
-        submit = useCallback(async formState => {
-            const
-                formSpecById = keyBy(formSpecQuery.data, 'id'),
-
-                formEntries =
-                    await Promise.all(
-                        entries(formState).map(async ([id, value]) => {
-                            if (!value.uri)
-                                return [id, value]
-
-                            const dataURL =
-                                await fileToDataURL(value.uri, value.type)
-
-                            debug(
-                                'Uploading file',
-                                value.type,
-                                (dataURL.length / 1048576).toFixed(2) + 'MB',
-                                value.uri,
-                            )
-
-                            const remoteURL =
-                                await uploadFile(projectDid, dataURL)
-
-                            return [id, remoteURL]
-
-                        }),
-                    ),
-
-                claimItems =
-                    formEntries
-                        .map(([id, value]) => ({
-                            id,
-                            value,
-                            attribute: formSpecById[id].attribute,
-                        }))
-
-            const resp = await createClaim(projectDid, templateDid, claimItems)
-
-            console.log('create claim response', resp)
-
-            // We will save the resp to the claim store
-        })
+                        claimTemplateToFormSpec(tpl.data.page.content)))
 
     return <MenuLayout><AssistantLayout>
         <View style={newClaimStyle.root}>
@@ -172,8 +129,9 @@ const NewClaim = ({templateDid, projectDid}) => {
                 children={
                     <ClaimForm
                         formSpec={formSpecQuery.data}
+                        projectDid={projectDid}
+                        templateDid={templateDid}
                         onClose={() => toggleForm(false)}
-                        onSubmit={submit}
                     />}
             />
         </View>
@@ -211,10 +169,60 @@ const newClaimStyle = StyleSheet.create({
     },
 })
 
-const ClaimForm = ({formSpec, onClose = noop, onSubmit = noop}) => {
+const ClaimForm = ({
+    formSpec,
+    projectDid,
+    templateDid,
+    onClose = noop,
+    onSubmit = noop,
+}) => {
     const
+        {uploadFile, createClaim} = useProjects(),
         [formState, setFormState] = useState({}),
-        [currentStepIdx, setCurrentStep] = useState(0)
+        [currentStepIdx, setCurrentStep] = useState(0),
+
+        submit = useCallback(async () => {
+            const
+                formSpecById = keyBy(formSpec, 'id'),
+
+                formEntries =
+                    await Promise.all(
+                        entries(formState).map(async ([id, value]) => {
+                            if (!value.uri)
+                                return [id, value]
+
+                            const dataURL =
+                                await fileToDataURL(value.uri, value.type)
+
+                            debug(
+                                'Uploading file',
+                                value.type,
+                                (dataURL.length / 1048576).toFixed(2) + 'MB',
+                                value.uri,
+                            )
+
+                            const remoteURL =
+                                await uploadFile(projectDid, dataURL)
+
+                            return [id, remoteURL]
+
+                        }),
+                    ),
+
+                claimItems =
+                    formEntries
+                        .map(([id, value]) => ({
+                            id,
+                            value,
+                            attribute: formSpecById[id].attribute,
+                        }))
+
+            const resp = await createClaim(projectDid, templateDid, claimItems)
+
+            console.log('create claim response', resp)
+
+            // We will save the resp to the claim store
+        })
 
     return <View style={{flex: 1}}>
         <Header>
@@ -234,7 +242,7 @@ const ClaimForm = ({formSpec, onClose = noop, onSubmit = noop}) => {
                 formSpec={formSpec}
                 formState={formState}
                 onFocusItem={setCurrentStep}
-                onApprove={() => onSubmit(formState)}
+                onApprove={submit}
             />
 
             : <ClaimFormSteps
