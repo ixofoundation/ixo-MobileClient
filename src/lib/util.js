@@ -1,7 +1,9 @@
 const
     {Platform, PermissionsAndroid} = require('react-native'),
     DocumentPicker = require('react-native-document-picker').default,
-    {readFile} = require('react-native-fs')
+    {readFile} = require('react-native-fs'),
+    ms = require('ms'),
+    retry = require('async-retry')
 
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms))
 
@@ -51,9 +53,25 @@ const fileToDataURL = async (uri, type) =>
     'data:' + type + ';base64,' + (await readFile(uri, 'base64'))
 
 
+const pollFor = ({interval = '1s', timeout = '10s', query, predicate}) =>
+    retry(async () => {
+        const resp = await query()
+
+        if (!predicate(resp))
+            throw resp
+
+        return resp
+    }, {
+        minTimeout: ms(interval),
+        factor: 1,
+        retries: Math.min(ms(timeout) / ms(interval)),
+    })
+
+
 module.exports = {
     sleep,
     selectFile,
     getAndroidPermission,
     fileToDataURL,
+    pollFor,
 }
