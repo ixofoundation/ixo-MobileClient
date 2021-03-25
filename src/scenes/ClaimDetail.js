@@ -33,10 +33,7 @@ const ClaimDetail = ({projectDid, claimId}) => {
                 formSpec={claimQuery.data.formSpec}
                 formState={fromEntries(
                     claimQuery.data.claim.items
-                        .map(({id, value}) => [
-                            id,
-                            value,
-                        ]),
+                        .map(({id, value}) => [id, value]),
                 )}
             />}
     </MenuLayout></AssistantLayout>
