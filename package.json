@@ -13,7 +13,7 @@
     "lint": "eslint src"
   },
   "dependencies": {
-    "@ixo/client-sdk": "^1.2.1",
+    "@ixo/client-sdk": "^1.2.2",
     "@react-native-async-storage/async-storage": "^1.13.2",
     "@react-native-community/audio-toolkit": "^2.0.3",
     "async-retry": "^1.3.1",
