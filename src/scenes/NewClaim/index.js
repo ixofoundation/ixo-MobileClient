@@ -430,10 +430,10 @@ const ClaimFormSummary = ({
 
         {editable &&
             <ButtonGroup items={[{
-                type: 'outlined',
-                text: 'Save',
-                onPress: () => alert('Not Implemented Yet'),
-            }, {
+            //     type: 'outlined',
+            //     text: 'Save',
+            //     onPress: () => alert('Not Implemented Yet'),
+            // }, {
                 type: 'contained',
                 text: 'Submit a claim',
                 onPress: onApprove,
