@@ -71,11 +71,12 @@ const ImageInput = ({
                 flashMode={RNCamera.Constants.FlashMode.on}
                 defaultVideoQuality={RNCamera.Constants.VideoQuality['480p']}
                 captureAudio={false}
-                style={{height: '100%'}}
+                style={{height: '100%', justifyContent: 'flex-end'}}
             >
                 {({camera}) =>
                     <Button
                         type='contained'
+                        size='lg'
                         text='Take Photo'
                         onPress={() => takePhoto(camera)}
                     />}

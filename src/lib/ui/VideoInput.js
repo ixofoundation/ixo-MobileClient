@@ -102,10 +102,11 @@ const VideoInput = ({
                 type={RNCamera.Constants.Type.back}
                 flashMode={RNCamera.Constants.FlashMode.on}
                 captureAudio={true}
-                style={{height: '100%'}}
+                style={{height: '100%', justifyContent: 'flex-end'}}
             >
                 <Button
                     type='contained'
+                    size='lg'
                     text={isRecording ? 'Stop' : 'Start'}
                     onPress={isRecording ? stopRecording : startRecording}
                 />
