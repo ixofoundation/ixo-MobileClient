@@ -4,6 +4,7 @@ const
     {View, Alert} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {useWallet} = require('$/stores'),
+    AssistantLayout = require('$/AssistantLayout'),
     {Heading, Button, Text, Code} = require('$/lib/ui')
 
 
@@ -37,16 +38,40 @@ const Register = () => {
     if (!ws.secp)
         return null
 
-    return <View>
-        <Heading children='Register' />
+    return <AssistantLayout>
+        <View style={{
+            backgroundColor: '#002B3F',
+            flex: 1,
+            padding: 10,
+        }}>
+            <Heading children='Register' />
 
-        <Text>You have already generated an identity:</Text>
-        <Code>did:ixo:{ws.agent.did}</Code>
-        <Text>Would you like to register now?</Text>
+            <Text
+                style={{color: 'white', marginBottom: 20}}
+                children='You have already generated an identity:'
+            />
 
-        <Button onPress={register} text='Sure' />
-        <Button onPress={createNewId} text='No, create a new id' />
-    </View>
+            <Code style={{marginBottom: 20}}>did:ixo:{ws.agent.did}</Code>
+
+            <Text
+                style={{color: 'white', marginBottom: 20}}
+                children='Would you like to register now?'
+            />
+
+            <Button
+                type='contained'
+                onPress={register}
+                text='Sure'
+                style={{marginBottom: 10}}
+            />
+
+            <Button
+                type='outlined'
+                onPress={createNewId}
+                text='No, create a new id'
+            />
+        </View>
+    </AssistantLayout>
 }
 
 

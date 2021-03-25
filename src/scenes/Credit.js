@@ -1,6 +1,7 @@
 const
     React = require('react'),
     {useContext} = React,
+    {View} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {Heading, Text, Button} = require('$/lib/ui'),
     AssistantLayout = require('$/AssistantLayout')
@@ -13,17 +14,25 @@ const Credit = () => {
         initMsg='I want to credit my account'
         autoOpen={true}
     >
-        <Heading children='Credit your account' />
+        <View style={{
+            backgroundColor: '#002B3F',
+            flex: 1,
+            padding: 10,
+        }}>
+            <Heading children='Credit your account' />
 
-        <Text>
-            If you are done crediting your account, please continue to
-            registration.
-        </Text>
+            <Text style={{color: 'white'}}>
+                If you are done crediting your account, please continue to
+                registration.
+            </Text>
 
-        <Button
-            text='Proceed to registration'
-            onPress={() => nav.navigate('register')}
-        />
+            <Button
+                type='contained'
+                text='Proceed to registration'
+                onPress={() => nav.navigate('register')}
+                style={{marginTop: 20}}
+            />
+        </View>
     </AssistantLayout>
 }
 

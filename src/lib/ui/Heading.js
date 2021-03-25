@@ -11,9 +11,10 @@ const Heading = ({style: overrideStyles, ...props}) =>
 
 const style = {
     fontWeight: 'bold',
-    fontSize: 36,
+    fontSize: 32,
     marginBottom: 10,
     textAlign: 'center',
+    color: 'white',
 }
 
 

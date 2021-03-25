@@ -11,9 +11,11 @@ const Code = ({style: overrideStyles, ...props}) =>
 
 const style = {
     fontFamily: 'monospace',
-    backgroundColor: '#eee',
+    backgroundColor: '#555',
+    color: 'white',
     fontSize: 18,
     padding: 5,
+    marginBottom: 10,
 }
 
 
