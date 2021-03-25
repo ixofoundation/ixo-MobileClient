@@ -96,7 +96,7 @@ const Claims = () => {
                                 name={
                                     c.projectName
                                     + ' / '
-                                    + moment(c.created).format('MMM D')
+                                    + moment(c._created).format('MMM D')
                                 }
                                 did={'did:ixo:' + ws.agent.did}
                                 savedAt={c.created}
