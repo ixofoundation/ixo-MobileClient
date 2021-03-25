@@ -73,7 +73,7 @@ const Claims = () => {
         </Header>
 
         {!claimQuery.isSuccess
-            ? <ActivityIndicator size='large' />
+            ? <ActivityIndicator size='large' color='black' />
 
             : <Tabs>
                 <Tab title='Activity'>
