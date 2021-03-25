@@ -5,8 +5,15 @@ const React = require('react'),
     {spacing, fontSizes} = require('$/theme'),
     moment = require('moment')
 
+const highlightByStatus = {
+    0: '#ED9526',
+    1: '#85AD5C',
+    2: '#AD245C',
+    3: '#E2223B',
+}
+
 const Claim = ({
-    highlight,
+    status,
     name, did, savedAt,
     onPress,
 }) => <Pressable onPress={onPress}>
@@ -25,13 +32,15 @@ const Claim = ({
             style={style.saved}
             children={`Saved ${moment(savedAt).format('dddd, MMMM Do YYYY')}`}
         />
-        {highlight && <Highlight color={highlight}/>}
+        {status && <Highlight color={highlightByStatus[status]}/>}
     </Card>
 </Pressable>
 
 const style = StyleSheet.create({
     root: {
         marginBottom: spacing(2),
+        marginLeft: spacing(2),
+        marginRight: spacing(2),
     },
     name: {
         color: 'white', 

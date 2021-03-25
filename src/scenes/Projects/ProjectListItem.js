@@ -13,7 +13,7 @@ const ProjectListItem = ({project}) => {
             logo: logoUrl,
             image: imageUrl,
             description,
-            claimStats,
+            claims: {length: claimCount},
             entityClaims: {items: [claimTpl]},
         }
     } = project
@@ -49,7 +49,7 @@ const ProjectListItem = ({project}) => {
             <View style={{flexDirection: 'row'}}>
                 <Text 
                     style={style.progressValueText} 
-                    children={claimStats.currentSuccessful}
+                    children={claimCount}
                 />
                 <Text 
                     style={style.progressText} 

@@ -37,7 +37,12 @@ const ClaimTplActions = ({projectDid, claimTpl, onClose, onNavigate}) => {
                     text='Remove from My Claim Forms list'
                 />*/}
                 <ActionButton
-                    onPress={() => onNavigate('claimActivity')}
+                    onPress={() =>
+                        onNavigate('project-claim-activity', {
+                            projectDid,
+                            templateDid: claimTpl['@id'],
+                        })
+                    }
                     icon={<Icon name='web' fill='white'/>}
                     text='Claim Activity'
                 />

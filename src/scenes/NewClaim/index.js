@@ -382,7 +382,13 @@ const formStyles = StyleSheet.create({
     },
 })
 
-const ClaimFormSummary = ({formSpec, formState, onFocusItem, onApprove}) =>
+const ClaimFormSummary = ({
+    formSpec,
+    formState,
+    editable = true,
+    onFocusItem,
+    onApprove,
+}) =>
     <ScrollView style={sumStyle.root}>
         <Text children='Claim Summary' style={sumStyle.header} />
 
@@ -411,24 +417,27 @@ const ClaimFormSummary = ({formSpec, formState, onFocusItem, onApprove}) =>
                                 : formState[id]} />
                     }
 
-                    <Pressable
-                        onPress={() => onFocusItem(itemIdx)}
-                        children={<Icon name='edit' width={20} fill='#bbb' />}
-                        style={sumStyle.itemBoxEditBtn}
-                    />
+                    {editable &&
+                        <Pressable
+                            onPress={() => onFocusItem(itemIdx)}
+                            children={
+                                <Icon name='edit' width={20} fill='#bbb' />}
+                            style={sumStyle.itemBoxEditBtn}
+                        />}
                 </View>
             </View>,
         )}
 
-        <ButtonGroup items={[{
-            type: 'outlined',
-            text: 'Save',
-            onPress: () => alert('Not Implemented Yet'),
-        }, {
-            type: 'contained',
-            text: 'Submit a claim',
-            onPress: onApprove,
-        }]} />
+        {editable &&
+            <ButtonGroup items={[{
+                type: 'outlined',
+                text: 'Save',
+                onPress: () => alert('Not Implemented Yet'),
+            }, {
+                type: 'contained',
+                text: 'Submit a claim',
+                onPress: onApprove,
+            }]} />}
 
         <View style={{height: 50}} />
         {/* In Android some space from the bottom is needed or else the buttons
@@ -510,5 +519,7 @@ const sumStyle = {
 }
 
 
+NewClaim.ClaimFormSummary = ClaimFormSummary
+NewClaim.claimTemplateToFormSpec = claimTemplateToFormSpec 
 
 module.exports = NewClaim

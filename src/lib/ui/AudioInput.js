@@ -23,7 +23,7 @@ const AudioInput = ({value, onChange = noop, editable = true}) => {
     return <View style={style.root}>
         {value &&
             <Audio
-                source={value}
+                source={typeof value === 'string' ? {uri: value} : value}
                 paused={!isPlaying}
                 onPlay={() => togglePlayingState(true)}
                 onPause={() => togglePlayingState(false)}

@@ -10,7 +10,7 @@ const shadow = () => ({
     },
     shadowOpacity: 0.4,
     shadowRadius: 15,
-    elevation: 1,
+    elevation: 10,
 })
 
 const colors = {

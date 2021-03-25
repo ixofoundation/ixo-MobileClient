@@ -44,7 +44,7 @@ const ImageInput = ({
     return <View style={style}>
         {value &&
             <Image
-                source={{uri: value.uri}}
+                source={{uri: value.uri || value}}
                 style={{width: '100%', height: 200, alignSelf: 'center'}}
             />}
 

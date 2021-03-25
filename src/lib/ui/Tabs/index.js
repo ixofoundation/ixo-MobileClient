@@ -31,7 +31,6 @@ const style = StyleSheet.create({
     body: {
         flex: 1, 
         backgroundColor: '#002B3F', 
-        padding: spacing(3),
     },
 })
 

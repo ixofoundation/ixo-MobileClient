@@ -3,8 +3,8 @@ const
     {SafeAreaView} = require('react-native'),
     {StateNavigator} = require('navigation'),
     {NavigationContext} = require('navigation-react'),
-    {CreateId, Register, Projects, Credit,
-        ClaimForms, Claims, ClaimActivity, NewClaim} = require('./scenes')
+    {CreateId, Register, Projects, Credit, ClaimForms, Claims,
+        ProjectClaimActivity, NewClaim, ClaimDetail} = require('./scenes')
 
 
 
@@ -15,8 +15,9 @@ const routes = [
     ['credit', Credit],
     ['claim-forms', ClaimForms],
     ['claims', Claims],
-    ['claimActivity', ClaimActivity],
     ['new-claim', NewClaim],
+    ['claim-detail', ClaimDetail],
+    ['project-claim-activity', ProjectClaimActivity],
 ]
 
 

@@ -1,6 +1,5 @@
 const React = require('react'),
-    {View, Text, StyleSheet, Pressable} = require('react-native'),
-    AssistantLayout = require('$/AssistantLayout'),
+    {View, ScrollView, Text, StyleSheet, Pressable} = require('react-native'),
     Icon = require('$/lib/ui/Icon'),
     Button = require('$/lib/ui/Button'),
     Card = require('$/lib/ui/Card'),
@@ -9,80 +8,80 @@ const React = require('react'),
     Statistic = require('$/lib/ui/Statistic'),
     ClaimPayment = require('./ClaimPayment'),
     {spacing, fontSizes} = require('$/theme')
-const {ScrollView} = require('react-native-gesture-handler')
 
 
-const ClaimActivity = ({onClose, name}) => {
+const ClaimActivity = ({
+    onClose,
+    dateRange,
+    submitted = 0,
+    total,
+    approved = 0,
+    pending = 0,
+    disputed = 0,
+    rejected = 0,
+}) => {
     const payments = [1, 2, 3]
-    return <AssistantLayout><View style={style.root}>
-        <Header>
-            <Pressable onPress={onClose}>
-                <Icon name='close' width={24} fill='white'/>
-            </Pressable>
-            <Text 
-                style={style.name}
-                children={name}
-            />
-            <Button 
-                text='5'
-                type='contained'
-                suffix={<Icon name='autoRenew' fill='white'/>}
-                style={style.redBtn}
-                textStyle={style.redBtnText}
-            />
-        </Header>
+
+    return <ScrollView style={style.root}>
         <View style={style.content}>
-            <View 
-                style={style.titleContainer}
-            >
+            <View style={style.titleContainer}>
                 <View style={style.title}>
                     <Text style={style.titleText}>
                         Claim Activity
                     </Text>
-                    <Text style={style.dateRange}>
-                        12/10/2020 - 31/12/2020
-                    </Text>
+
+                    {dateRange &&
+                        <Text
+                            style={style.dateRange}
+                            children={dateRange}
+                        />}
                 </View>
-                <View style={style.icons}>
+
+                {/*<View style={style.icons}>
                     <Icon name='web' fill='#00D2FF' />
                     <Space />
                     <Icon name='web' fill='#00D2FF'/>
-                </View>
+                </View>*/}
             </View>
 
             <Card style={style.statsContainer}>
                 <Highlight color='#00D2FF'/>
                 <View style={style.progressData}>
-                    <Text style={style.progress}>43</Text>
-                    <Text style={style.target}>/300</Text>
+                    <Text style={style.progress}>{submitted}</Text>
+
+                    {total && <Text style={style.target}>/{total}</Text>}
                 </View>
+
                 <Text style={style.submitted}>Submitted</Text>
             </Card>
+
             <View style={style.statRow}>
-                <Statistic label='Approved' value={40} highlight='#85AD5C'/>
+                <Statistic label='Approved' value={approved} highlight='#85AD5C'/>
                 <Space />
-                <Statistic label='Pending' value={23} highlight='#ED9526'/>
-            </View>
-            <View style={style.statRow}>
-                <Statistic label='Disputed' value={0} highlight='#AD245C'/>
-                <Space />
-                <Statistic label='Rejected' value={10} highlight='#E2223B'/>
+                <Statistic label='Pending' value={pending} highlight='#ED9526'/>
             </View>
 
-            <Text style={style.paymentTitle}>
-                My Claim Payments
-            </Text>
-            <ScrollView>
-                {payments.map(i => <ClaimPayment
+            <View style={style.statRow}>
+                <Statistic label='Disputed' value={disputed} highlight='#AD245C'/>
+                <Space />
+                <Statistic label='Rejected' value={rejected} highlight='#E2223B'/>
+            </View>
+
+            {/*
+            <Text children='My Claim Payments' style={style.paymentTitle} />
+
+            <View>{payments.map(i =>
+                <ClaimPayment
                     key={i}
                     count={10}
                     amount={230}
                     currency='eEUR'
                     status='pending'
-                />)}
-            </ScrollView>
+                />
+            )}</View>
+            */}
         </View>
-    </View></AssistantLayout>
+    </ScrollView>
 }
 
 

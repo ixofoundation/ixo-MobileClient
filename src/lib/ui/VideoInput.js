@@ -54,7 +54,7 @@ const VideoInput = ({
         {value && <>
             <Video
                 ref={ref => playerRef.current = ref}
-                source={{uri: value.uri}}
+                source={{uri: value.uri || value}}
                 paused={!isPlaying}
                 onEnd={() => {
                     togglePlaying(false)

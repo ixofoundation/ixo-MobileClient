@@ -1,7 +1,7 @@
 const
     React = require('react'),
     {useCallback} = React,
-    {View} = require('react-native'),
+    {View, Linking} = require('react-native'),
     FileViewer = require('react-native-file-viewer').default,
     {noop} = require('lodash-es'),
     {selectFile} = require('$/lib/util'),
@@ -20,8 +20,16 @@ const DocumentInput = ({value, onChange = noop, editable = true}) => {
         {value &&
             <Button
                 type='contained'
-                text={value.name + '\n' + value.type}
-                onPress={() => FileViewer.open(value.uri)}
+                text={
+                    typeof value === 'string'
+                        ? value
+                        : (value.name + '\n' + value.type)
+                }
+                onPress={() =>
+                    typeof value === 'string'
+                        ? Linking.openURL(value)
+                        : FileViewer.open(value.uri)
+                }
             />}
 
         {editable &&

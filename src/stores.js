@@ -79,6 +79,7 @@ const useProjects = makePersistentStore('projects', set => ({
     getTemplate: (...args) => ixoSDKInstances.client.getTemplate(...args),
     createClaim: (...args) => ixoSDKInstances.client.createClaim(...args),
     listClaims: (...args) => ixoSDKInstances.client.listClaims(...args),
+    getProject: (...args) => ixoSDKInstances.client.getProject(...args),
     // These has to be lazy, as ixoSDKInstances.client can be updated
 }))
 

@@ -43,11 +43,18 @@ const Menu = () => {
                 onItemClick={handleMenuItemClick}
             >
                 <MenuItem
+                    title='My Projects'
+                    icon={<Icon name='claim' width={24} fill='white'/>}
+                    to='projects'
+                />
+
+                <MenuItem
                     title='My Claims'
                     icon={<Icon name='claim' width={24} fill='white'/>}
-                    to=''
+                    to='claims'
                 />
-                    
+
+                {/*
                 <MenuItem 
                     icon={<Icon name='wallet' width={24} fill='white'/>}
                     title='My Account'
@@ -87,6 +94,7 @@ const Menu = () => {
                     icon={<Icon name='helpCircleOutline' fill='white'/>}
                     to=''
                 />
+                */}
             </ToggleView>
         </View>
 

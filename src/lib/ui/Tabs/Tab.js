@@ -28,7 +28,6 @@ const style = memoize(open => StyleSheet.create({
         borderBottomWidth: open ? 2 : 0,
         borderColor: '#00D2FF',
         padding: spacing(1),
-        marginHorizontal: spacing(2),
     },
     text:{
         color: open ? '#00D2FF' : 'white',
