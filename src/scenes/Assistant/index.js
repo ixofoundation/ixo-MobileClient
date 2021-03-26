@@ -111,7 +111,7 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
                 <TextInput
                     value={userText}
                     placeholder={'type here...'}
-                    onChange={setUserText}
+                    onChangeText={setUserText}
                     ref={onInputRef}
                     style={s.msgInput}
                 />
