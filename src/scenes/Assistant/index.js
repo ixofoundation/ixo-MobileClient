@@ -21,7 +21,10 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
                 sockUrl: process.env.RASA_SOCKET_URL,
                 sockOpts: {transports: ['websocket']},
                 initMsg,
-                onError: e => console.error('assistant error', e),
+                onError: e => {
+                    console.error('assistant error', e)
+                    alert('Failed to make socket connection!')
+                },
                 onUtter: msg =>
                     msg.action &&
                         handleCustomAssistantResponse(msg, botUtter),
@@ -89,7 +92,6 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
                     </View>
 
                 if (m.component) {
-                    console.log(m)
                     return <MessageBubble direction={m.direction}> 
                         {e(m.component, {
                             key: m.ts + '-comp',
@@ -97,7 +99,6 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
                         })}
                     </MessageBubble>
                 }
-                    
             })}
 
         </ScrollView>
