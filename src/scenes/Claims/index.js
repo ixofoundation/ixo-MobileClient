@@ -26,7 +26,6 @@ const Claims = () => {
 
         claimQuery = useQuery({
             queryKey: 'claimData',
-            enabled: keys(projectsById).length > 0,
             queryFn: async () => {
                 const
                     projectList =
