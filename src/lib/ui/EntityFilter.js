@@ -9,6 +9,7 @@ const
     DatePicker = require('./DatePicker'),
     DateRangePicker = require('./DateRangePicker'),
     Icon = require('./Icon'),
+    Divider = require('./Divider'),
     theme = require('$/theme')
 
 
@@ -70,7 +71,6 @@ const EntityFilter = ({
     </View>
 }
 
-const Divider = () => <View style={s.divider}/>
 
 const s = StyleSheet.create({
     root: {
@@ -91,12 +91,6 @@ const s = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
         marginVertical: theme.spacing(2),
-    },
-    divider: {
-        borderBottomWidth: 1,
-        borderColor: '#023851',
-        width: '100%',
-        marginVertical: theme.spacing(1),
     },
     refreshBtn: {
         flexDirection: 'row', 
