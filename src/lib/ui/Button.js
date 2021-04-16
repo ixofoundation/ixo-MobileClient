@@ -15,6 +15,7 @@ const Button = ({
     suffix,
     style: overrideStyles, 
     textStyle,
+    children,
     ...props
 }) => {
     const s = style({size, type, color})
@@ -24,7 +25,12 @@ const Button = ({
         children={
             <View style={s.textWrapper}>
                 {prefix}
-                <Text style={StyleSheet.compose(s.text, textStyle)} children={text} />
+                {text && <Text 
+                    style={StyleSheet.compose(s.text, textStyle)} 
+                    children={text} 
+                />
+                }
+                {children}
                 {suffix}
             </View>
         }
