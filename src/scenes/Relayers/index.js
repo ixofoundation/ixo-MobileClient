@@ -1,32 +1,38 @@
 const React = require('react'),
-    {View, Text, StyleSheet, 
-        TextInput, FlatList, Pressable} = require('react-native'),
+    {
+        View,
+        Text,
+        StyleSheet,
+        TextInput,
+        FlatList,
+        Pressable,
+    } = require('react-native'),
     {spacing, fontSizes} = require('$/theme'),
     Avatar = require('$/lib/ui/Avatar'),
-    ButtonGroup = require('$/lib/ui/ButtonGroup'),
     Header = require('$/lib/ui/Header'),
-    Icon = require('$/lib/ui/Icon')
+    RadioButton = require('$/lib/ui/RadioButton'),
+    MenuLayout = require('$/MenuLayout'),
+    AssistantLayout = require('$/AssistantLayout'),
+    Icon = require('$/lib/ui/Icon'),
+    {useNav} = require('$/lib/util'),
+    {useStaking} = require('$/stores'),
+    {useEffect, useState} = require('react')
 const HeaderTitle = require('./HeaderTitle')
 
-
-const RelayerItem = ({
-    id, name, avatar, commission,
-    onPress,
-}) => {
-    return <Pressable 
-        style={itemStyles.root}
-        onPress={onPress}
-    >
-        <View style={itemStyles.nameContainer}>
-            <Text style={itemStyles.id} children={id}/>
-            <Avatar uri={avatar} size={5}/>
-            <Text style={itemStyles.name} children={name}/>
-        </View>
-        <Text 
-            style={itemStyles.commission} 
-            children={commission.toFixed(2) + '%'}
-        />
-    </Pressable>
+const RelayerItem = ({id, name, avatar, commission, onPress}) => {
+    return (
+        <Pressable style={itemStyles.root} onPress={onPress}>
+            <View style={itemStyles.nameContainer}>
+                <Text style={itemStyles.id} children={id} />
+                <Avatar uri={avatar} size={5} />
+                <Text style={itemStyles.name} children={name} />
+            </View>
+            <Text
+                style={itemStyles.commission}
+                children={commission.toFixed(2) + '%'}
+            />
+        </Pressable>
+    )
 }
 
 const itemStyles = StyleSheet.create({
@@ -61,76 +67,104 @@ const itemStyles = StyleSheet.create({
         fontSize: fontSizes.p1,
         marginRight: spacing(2),
     },
-    
 })
 
-const data = [
-    {
-        id: 1,
-        name: 'stake.zone',
-        commission: 0.7,
-        avatar: 'https://picsum.photos/200/300',
-    },
-    {
-        id: 2, 
-        name: 'IZO',
-        commission: 0.85,
-        avatar: 'https://picsum.photos/200/300',
-    },
+const statusFilterOptions = [
+    {label: 'All', value: 'all'},
+    {label: 'Open', value: 'open'},
 ]
 
 const Relayers = () => {
-    return <View style={styles.root}>
-        <Header style={styles.header}>
-            <Icon name='chevronLeft' fill='white'/>
-            <View style={{flexDirection: 'row', alignItems: 'center'}}>
-                <Icon name='explore' fill='white'/>
-                <HeaderTitle text='impact relayers'/>
-            </View>
-            <View width={24}/>
-        </Header>
+    const {validators, listValidators} = useStaking()
+    const [search, setSearch] = useState('')
+    const nav = useNav()
+    const [activityFilter, setActivityFilter] = useState(statusFilterOptions[0])
 
-        <View style={styles.listContainer}>
-            <View style={styles.filterContainer}>
-                <TextInput 
-                    style={styles.searchInput}
-                    placeholder='Search...'
-                    placeholderTextColor='#5A879D'
-                />
-                <ButtonGroup 
-                    type='contained'
-                    color='secondary'
-                    items={[{text: 'All'}, {text: 'Active'}]}
-                />
-            </View>
+    useEffect(() => {
+        listValidators().catch(console.error)
+    }, [])
 
-            <View style={styles.listHeader}>
-                <Text style={styles.listHeaderText} children='# Name'/>
-                <Text style={styles.listHeaderText} children='Commission'/>
-            </View>
+    const data = Object.entries(validators)
+        .map(([id, v]) => ({...v, id}))
+        .filter(({description: {moniker}}) =>
+            moniker.toLowerCase().startsWith(search.toLowerCase().trim()),
+        )
 
-            <FlatList 
-                data={data} 
-                renderItem={({
-                    item: {name, commission, avatar, id}, 
-                }) => {
-                    return <RelayerItem 
-                        id={id}
-                        name={name}
-                        commission={commission}
-                        avatar={avatar}
-                        onPress={() => 
-                            console.log('redirect to relayer detail scene')
-                        }
-                    />
-                }}
-            />
+    return (
+        <MenuLayout>
+            <AssistantLayout>
+                <View style={styles.root}>
+                    <Header style={styles.header}>
+                        <Pressable onPress={() => nav.navigateBack(1)}>
+                            <Icon name="chevronLeft" fill="white" />
+                        </Pressable>
+                        <View
+                            style={{flexDirection: 'row', alignItems: 'center'}}
+                        >
+                            <Icon name="explore" fill="white" />
+                            <HeaderTitle text="impact relayers" />
+                        </View>
+                        <View width={24} />
+                    </Header>
 
-        </View>
+                    <View style={styles.listContainer}>
+                        <View style={styles.filterContainer}>
+                            <TextInput
+                                style={styles.searchInput}
+                                placeholder="Search..."
+                                placeholderTextColor="#5A879D"
+                                value={search}
+                                onChangeText={setSearch}
+                            />
+                            <RadioButton
+                                value={activityFilter}
+                                onChange={setActivityFilter}
+                                options={statusFilterOptions}
+                            />
+                        </View>
 
+                        <View style={styles.listHeader}>
+                            <Text
+                                style={styles.listHeaderText}
+                                children="# Name"
+                            />
+                            <Text
+                                style={styles.listHeaderText}
+                                children="Commission"
+                            />
+                        </View>
 
-        
-    </View>
+                        <FlatList
+                            data={data}
+                            renderItem={({
+                                item: {
+                                    id,
+                                    description: {moniker},
+                                    commission: {
+                                        commission_rates: {rate},
+                                    },
+                                },
+                            }) => {
+                                return (
+                                    <RelayerItem
+                                        id={Number(id) + 1}
+                                        name={moniker}
+                                        commission={Number(rate)}
+                                        avatar={'https://picsum.photos/200/300'}
+                                        onPress={() =>
+                                            nav.navigate('relayer-detail', {
+                                                relayerId: id,
+                                            })
+                                        }
+                                    />
+                                )
+                            }}
+                        />
+                    </View>
+                </View>
+            </AssistantLayout>
+        </MenuLayout>
+    )
 }
 
 const styles = StyleSheet.create({

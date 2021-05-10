@@ -1,13 +1,14 @@
-
 const React = require('react'),
-    {View, Text, StyleSheet} = require('react-native'),
+    {View, Text, StyleSheet, Pressable} = require('react-native'),
     {spacing, fontSizes} = require('$/theme'),
     Avatar = require('$/lib/ui/Avatar'),
     Header = require('$/lib/ui/Header'),
     Icon = require('$/lib/ui/Icon'),
     HeaderTitle = require('./HeaderTitle'),
-    {memoize} = require('lodash')
-
+    {memoize} = require('lodash'),
+    {useNav} = require('$/lib/util'),
+    {useStaking} = require('$/stores'),
+    AssistantLayout = require('$/AssistantLayout')
 
 const statuses = {
     active: {
@@ -19,14 +20,13 @@ const statuses = {
 const StatusBadge = ({status}) => {
     const style = badgeStyles(status)
     const {text} = statuses[status]
-    return <View style={style.container}>
-        <View style={style.root}>
-            <Text 
-                style={style.text} 
-                children={text}
-            />
+    return (
+        <View style={style.container}>
+            <View style={style.root}>
+                <Text style={style.text} children={text} />
+            </View>
         </View>
-    </View>
+    )
 }
 
 const badgeStyles = memoize((status) => {
@@ -34,7 +34,7 @@ const badgeStyles = memoize((status) => {
         root: {
             backgroundColor: statuses[status].color,
             borderRadius: 4,
-            padding: spacing(.5),
+            padding: spacing(0.5),
         },
         container: {flexDirection: 'row'},
         text: {
@@ -45,15 +45,16 @@ const badgeStyles = memoize((status) => {
     })
 })
 
-
 const StakeInfoTitle = ({name, amount, currency}) => {
-    return <View style={stakeInfoTitleStyles.root}>
-        <Text style={stakeInfoTitleStyles.name} children={name}/>
-        <Text 
-            style={stakeInfoTitleStyles.amount} 
-            children={amount + ' ' + currency}
-        />
-    </View>
+    return (
+        <View style={stakeInfoTitleStyles.root}>
+            <Text style={stakeInfoTitleStyles.name} children={name} />
+            <Text
+                style={stakeInfoTitleStyles.amount}
+                children={amount + ' ' + currency}
+            />
+        </View>
+    )
 }
 
 const stakeInfoTitleStyles = StyleSheet.create({
@@ -69,16 +70,16 @@ const stakeInfoTitleStyles = StyleSheet.create({
     amount: {
         color: 'white',
         fontSize: fontSizes.p1,
-
     },
 })
 
-
 const StakeInfo = ({label, info}) => {
-    return <View style={stakeInfoStyles.root}>
-        <Text style={stakeInfoStyles.label} children={label}/>
-        <Text style={stakeInfoStyles.info} children={info}/>
-    </View>
+    return (
+        <View style={stakeInfoStyles.root}>
+            <Text style={stakeInfoStyles.label} children={label} />
+            <Text style={stakeInfoStyles.info} children={info} />
+        </View>
+    )
 }
 
 const stakeInfoStyles = StyleSheet.create({
@@ -97,27 +98,29 @@ const stakeInfoStyles = StyleSheet.create({
     },
 })
 
-
 const RelayerInfo = ({label, info, icon}) => {
-    return <View style={relayerInfoStyles.root}>
-        <Text style={relayerInfoStyles.label} children={label}/>
-        <View style={relayerInfoStyles.container}>
-            <Text style={relayerInfoStyles.info} children={info}/>
-            {icon && <View style={relayerInfoStyles.spacing}/>}
-            {icon}
+    return (
+        <View style={relayerInfoStyles.root}>
+            <Text style={relayerInfoStyles.label} children={label} />
+            <View style={relayerInfoStyles.container}>
+                <Text style={relayerInfoStyles.info} children={info} />
+                {icon && <View style={relayerInfoStyles.spacing} />}
+                {icon}
+            </View>
         </View>
-    </View>
+    )
 }
 
 const relayerInfoStyles = StyleSheet.create({
     root: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: spacing(2),
     },
     container: {
         flexDirection: 'row',
         alignItems: 'center',
-
     },
     spacing: {
         width: spacing(2),
@@ -132,57 +135,91 @@ const relayerInfoStyles = StyleSheet.create({
     },
 })
 
-const RelayerDetail = () => {
-    const name = 'stake.zone'
-    return <> 
-        <Header style={styles.header}>
-            <Icon name='chevronLeft' fill='white'/>
-            <HeaderTitle text={name}/>
-            <View width={24}/>
-        </Header>
-        <View style={styles.root}>
-        
-            <View style={styles.headerContainer}>
-                <Avatar 
-                    uri={'https://picsum.photos/200/300'} 
-                    size={8}
-                />
-                <View style={styles.titleContainer}>
-                    <Text style={styles.title} children={name}/>
-                    <StatusBadge status='active' />
-                </View>
-            </View>
-            <View style={styles.stakeContainer}>
-                <StakeInfoTitle name='My Stake' amount={25000} currency='IXO'/>
-                <View style={styles.stakeInfoContainer}>
-                    <StakeInfo label='Available' info='5302.002'/>
-                    <StakeInfo label='Delegated' info='23,302.002'/>
-                    <StakeInfo label='Unbonding' info='0'/>
-                    <StakeInfo label='Reward' info='10.32'/>
-                </View>
-            </View>
-            <View style={styles.relayerInfoContainer}>
-                <RelayerInfo label='Validator Node Operator' info='ixo.world' />
-                <RelayerInfo label='Website' info='ixo.world' 
-                    icon={<Icon name='web' fill='#03D0FB'/>}
-                />
-                <RelayerInfo label='Relayer ID' info='did:ixo:dsdjr0wern0e99' 
-                    icon={<Icon name='eye' fill='#03D0FB'/>}
-                />
-                <RelayerInfo label='Staking Yield (ARR)' info='9.95%'/>
-                <RelayerInfo 
-                    label='Voting Power / Total Stake' 
-                    info='0.02% / 33.535'
-                />
-                <RelayerInfo 
-                    label='Own Stake' 
-                    info='3.790 / 11.34%'
-                />
-            </View>
-        </View>
-    </>
-}    
+const statusMap = {2: 'active'}
 
+const formatAddress = (addr) =>
+    addr.length > 20 ? addr.slice(0, 20) + '...' : addr
+
+const RelayerDetail = ({relayerId}) => {
+    const nav = useNav()
+    const {getValidatorById} = useStaking()
+    const validator = getValidatorById(relayerId)
+    const {
+        description: {moniker: name, details: description, website},
+        operator_address,
+        status,
+    } = validator
+    return (
+        <AssistantLayout>
+            <Header style={styles.header}>
+                <Pressable onPress={() => nav.navigateBack(1)}>
+                    <Icon name="chevronLeft" fill="white" />
+                </Pressable>
+                <HeaderTitle text={name} />
+                <View width={24} />
+            </Header>
+            <View style={styles.root}>
+                <View style={styles.headerContainer}>
+                    <Avatar uri={'https://picsum.photos/200/300'} size={8} />
+                    <View style={styles.titleContainer}>
+                        <Text style={styles.title} children={name} />
+                        <StatusBadge status={statusMap[status]} />
+                    </View>
+                </View>
+                <View style={styles.stakeContainer}>
+                    <StakeInfoTitle
+                        name="My Stake"
+                        amount={25000}
+                        currency="IXO"
+                    />
+                    <View style={styles.stakeInfoContainer}>
+                        <StakeInfo label="Available" info="5302.002" />
+                        <StakeInfo label="Delegated" info="23,302.002" />
+                        <StakeInfo label="Unbonding" info="0" />
+                        <StakeInfo label="Reward" info="10.32" />
+                    </View>
+                </View>
+
+                <View style={styles.relayerInfoContainer}>
+                    <RelayerInfo
+                        label="Validator Operator Node"
+                        info={'ixo.world'}
+                    />
+
+                    <RelayerInfo label="Description" info={description} />
+
+                    <RelayerInfo
+                        label="Website"
+                        info={website}
+                        icon={<Icon name="web" fill="#03D0FB" />}
+                    />
+                    <RelayerInfo
+                        label="Relayer ID"
+                        info={formatAddress(operator_address)}
+                        icon={
+                            <Pressable
+                                onPress={() =>
+                                    console.log(
+                                        'copy to clipboard',
+                                        operator_address,
+                                    )
+                                }
+                            >
+                                <Icon name="eye" fill="#03D0FB" />
+                            </Pressable>
+                        }
+                    />
+                    <RelayerInfo label="Staking Yield (ARR)" info="0.02%" />
+                    <RelayerInfo
+                        label="Voting Power / Total Stake"
+                        info="0.02% / 33.535"
+                    />
+                    <RelayerInfo label="Own Stake" info="3.790 / 11.34%" />
+                </View>
+            </View>
+        </AssistantLayout>
+    )
+}
 
 const styles = StyleSheet.create({
     root: {

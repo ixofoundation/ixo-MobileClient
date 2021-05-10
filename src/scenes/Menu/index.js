@@ -1,5 +1,4 @@
-const
-    React = require('react'),
+const React = require('react'),
     {useContext, useState} = React,
     {View, Text, Pressable} = require('react-native'),
     {useWallet} = require('$/stores'),
@@ -9,61 +8,58 @@ const
     SubMenuItem = require('./SubMenuItem'),
     {spacing, fontSizes} = require('$/theme')
 
-
 const Menu = () => {
-    const
-        ws = useWallet(),
+    const ws = useWallet(),
         {stateNavigator: nav} = useContext(NavigationContext)
 
     const [activeItems, setActiveItems] = useState([])
-    const handleMenuItemClick = (index) => 
+    const handleMenuItemClick = (index) =>
         setActiveItems(activeItems[0] === index ? [] : [index])
 
-    if (!ws.secp)
-        return null
+    if (!ws.secp) return null
 
-    return <View style={style.root}>
-        <View style={style.container}>
-            <Pressable>
-                <Icon name='close' fill='white'/>
-            </Pressable>
-            <View style={style.header}>
-                {/*<Text 
+    return (
+        <View style={style.root}>
+            <View style={style.container}>
+                <Pressable>
+                    <Icon name="close" fill="white" />
+                </Pressable>
+                <View style={style.header}>
+                    {/*<Text 
                     children='Shaun' 
                     style={style.username}
                 />*/}
-                <Text
-                    children={'did:ixo:' + ws.agent.did}
-                    style={style.did}
-                />
-            </View>
+                    <Text
+                        children={'did:ixo:' + ws.agent.did}
+                        style={style.did}
+                    />
+                </View>
 
-            <ToggleView 
-                opened={activeItems} 
-                onItemClick={handleMenuItemClick}
-            >
-                <MenuItem
-                    title='My Projects'
-                    icon={<Icon name='claim' width={24} fill='white'/>}
-                    to='projects'
-                />
-
-                <MenuItem
-                    title='My Claims'
-                    icon={<Icon name='claim' width={24} fill='white'/>}
-                    to='claims'
-                />
-
-                {/*
-                <MenuItem 
-                    icon={<Icon name='wallet' width={24} fill='white'/>}
-                    title='My Account'
+                <ToggleView
+                    opened={activeItems}
+                    onItemClick={handleMenuItemClick}
                 >
-                    <SubMenuItem title='Wallet' to=''/>
-                    <SubMenuItem title='Portfolio' to=''/>
-                    <SubMenuItem title='Staking' to=''/>
-                </MenuItem>
+                    <MenuItem
+                        title="My Projects"
+                        icon={<Icon name="claim" width={24} fill="white" />}
+                        to="projects"
+                    />
 
+                    <MenuItem
+                        title="My Claims"
+                        icon={<Icon name="claim" width={24} fill="white" />}
+                        to="claims"
+                    />
+
+                    <MenuItem
+                        icon={<Icon name="wallet" width={24} fill="white" />}
+                        title="My Account"
+                    >
+                        <SubMenuItem title="Wallet" to="wallet" />
+                        <SubMenuItem title="Portfolio" to="portfolio" />
+                        <SubMenuItem title="Staking" to="relayers" />
+                    </MenuItem>
+                    {/*
                 <MenuItem 
                     icon={<Icon name='explore' width={24} fill='white'/>}
                     title='Explorer'
@@ -95,38 +91,39 @@ const Menu = () => {
                     to=''
                 />
                 */}
-            </ToggleView>
-        </View>
+                </ToggleView>
+            </View>
 
-        <Button
-            text='Log out'
-            color='secondary'
-            size='lg'
-            onPress={() => {
-                nav.navigate('createId')
-                ws.reset()
-            }}
-        />
-    </View>
+            <Button
+                text="Log out"
+                color="secondary"
+                size="lg"
+                onPress={() => {
+                    nav.navigate('createId')
+                    ws.reset()
+                }}
+            />
+        </View>
+    )
 }
 
 const style = {
     root: {
-        flexGrow: 1, 
-        backgroundColor: '#01273A', 
+        flexGrow: 1,
+        backgroundColor: '#01273A',
         justifyContent: 'space-between',
-        paddingVertical: spacing(4), 
+        paddingVertical: spacing(4),
     },
     container: {
-        paddingLeft: spacing(2), 
+        paddingLeft: spacing(2),
     },
     header: {marginVertical: spacing(2)},
     username: {
-        color: 'white', 
+        color: 'white',
         fontSize: fontSizes.h4,
         marginBottom: spacing(1),
     },
-    did:{
+    did: {
         color: '#5A879D',
     },
 }
