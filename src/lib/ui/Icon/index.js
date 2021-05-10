@@ -1,5 +1,4 @@
-const
-    React = require('react'),
+const React = require('react'),
     {createElement} = React
 
 const icons = {
@@ -27,10 +26,9 @@ const icons = {
     check: require('./assets/check.svg').default,
     edit: require('./assets/edit.svg').default,
     eye: require('./assets/eye.svg').default,
+    clipboard: require('./assets/clipboard.svg').default,
 }
 
-const Icon = ({name, ...props}) =>
-    createElement(icons[name], props)
-
+const Icon = ({name, ...props}) => createElement(icons[name], props)
 
 module.exports = Icon

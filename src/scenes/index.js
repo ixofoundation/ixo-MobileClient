@@ -10,4 +10,8 @@ module.exports = {
     NewClaim: require('./NewClaim'),
     ClaimDetail: require('./ClaimDetail'),
     ProjectClaimActivity: require('./ProjectClaimActivity'),
+    Relayers: require('./Relayers'),
+    RelayerDetail: require('./Relayers/RelayerDetail'),
+    Wallet: require('./Wallet'),
+    // TODO: Portfolio
 }
