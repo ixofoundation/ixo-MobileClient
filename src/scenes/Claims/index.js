@@ -4,7 +4,7 @@ const React = require('react'),
         Text, StyleSheet, ActivityIndicator} = require('react-native'),
     {useQuery} = require('react-query'),
     {NavigationContext} = require('navigation-react'),
-    {keyBy, countBy} = require('lodash-es'),
+    {keyBy, countBy, sortBy} = require('lodash-es'),
     moment = require('moment'),
     {useWallet, useProjects} = require('$/stores'),
     {Tabs, Tab, Header, P} = require('$/lib/ui'),
@@ -57,9 +57,15 @@ const Claims = () => {
                             }))
                         }),
 
+                    claimsSorted = sortBy(claims, '-datetime'),
+
                     claimCountsByStatus = countBy(claims, 'status')
 
-                return {claimTemplates, claims, claimCountsByStatus}
+                return {
+                    claimTemplates,
+                    claims: claimsSorted,
+                    claimCountsByStatus,
+                }
             },
         })
 
