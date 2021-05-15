@@ -98,7 +98,7 @@ const Claims = () => {
                                     + moment(c._created).format('MMM D')
                                 }
                                 did={'did:ixo:' + ws.agent.did}
-                                savedAt={c.created}
+                                savedAt={c._created}
                                 status={c.status}
                                 onPress={() => nav.navigate('claim-detail', {
                                     projectDid: c.projectDid,
