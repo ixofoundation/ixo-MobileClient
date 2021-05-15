@@ -78,12 +78,12 @@ const VideoInput = ({
         {editable && <>
             <Button
                 type='contained'
-                text='Start recording'
+                text='Record'
                 onPress={() => toggleRecorder(true)}
             />
             <Button
                 type='contained'
-                text='Select video'
+                text='Select'
                 onPress={selectVideo}
             />
         </>}
