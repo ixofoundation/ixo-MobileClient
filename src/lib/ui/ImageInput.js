@@ -1,7 +1,7 @@
 const
     React = require('react'),
     {useState, useCallback} = React,
-    {View, Image} = require('react-native'),
+    {View, Image, Pressable, Text} = require('react-native'),
     {RNCamera} = require('react-native-camera'),
     {noop} = require('lodash-es'),
     {selectFile} = require('$/lib/util'),
@@ -73,23 +73,44 @@ const ImageInput = ({
                 captureAudio={false}
                 style={{height: '100%', justifyContent: 'flex-end'}}
             >
-                {({camera}) =>
+                {({camera}) => <>
+                    <Pressable
+                        onPress={() => toggleCam(false)}
+                        style={backStyle}
+                        children={
+                            <Text style={backTextStyle} children='Back' />}
+                    />
+
                     <Button
                         type='contained'
                         size='lg'
                         text='Take Photo'
                         onPress={() => takePhoto(camera)}
-                    />}
+                    />
+                </>}
             </RNCamera>
         </Modal>
     </View>
 }
 
-const style = {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-}
+const
+    style = {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+    },
+
+    backStyle = {
+        position: 'absolute',
+        top: 5,
+        backgroundColor: '#012D42',
+        padding: 5,
+    },
+
+    backTextStyle = {
+        color: 'white',
+        textDecorationLine: 'underline',
+    }
 
 
 module.exports = ImageInput
