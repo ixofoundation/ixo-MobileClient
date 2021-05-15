@@ -5,8 +5,8 @@ const
     debug = require('debug')('claims'),
     React = require('react'),
     {createElement, useContext, useState, Fragment} = React,
-    {View, ScrollView, Text, Pressable,
-        ActivityIndicator, StyleSheet} = require('react-native'),
+    {View, ScrollView, Text, Pressable, TouchableWithoutFeedback,
+        ActivityIndicator, StyleSheet, Keyboard} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {useQuery} = require('react-query'),
     {noop, keyBy} = require('lodash-es'),
@@ -336,34 +336,36 @@ const ClaimFormSteps = ({
             onPrev()
         }}
     >
-        <Text
-            style={formStyles.stepText}
-            children={
-                'QUESTION '
-                + (currentStepIdx + 1)
-                + '/'
-                + (totalSteps)
-            }
-        />
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}><View>
+            <Text
+                style={formStyles.stepText}
+                children={
+                    'QUESTION '
+                    + (currentStepIdx + 1)
+                    + '/'
+                    + (totalSteps)
+                }
+            />
 
-        <Text style={formStyles.title} children={currentStep.title}/>
+            <Text style={formStyles.title} children={currentStep.title}/>
 
-        <Text 
-            style={formStyles.description} 
-            children={currentStep.description} 
-        />
+            <Text 
+                style={formStyles.description} 
+                children={currentStep.description} 
+            />
 
-        {createElement(currentStep.comp, {
-            value: value[currentStep.id],
+            {createElement(currentStep.comp, {
+                value: value[currentStep.id],
 
-            onChange: val =>
-                onChange(fs => ({...fs, [currentStep.id]: val})),
+                onChange: val =>
+                    onChange(fs => ({...fs, [currentStep.id]: val})),
 
-            ...currentStep.props,
-        })}
+                ...currentStep.props,
+            })}
 
-        {formError === 'required' &&
-            <Text children='Field is required' style={{color: 'red'}} />}
+            {formError === 'required' &&
+                <Text children='Field is required' style={{color: 'red'}} />}
+        </View></TouchableWithoutFeedback>
     </StepForm>
 }
 
