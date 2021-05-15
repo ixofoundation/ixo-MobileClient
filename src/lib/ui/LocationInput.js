@@ -86,7 +86,7 @@ const LocationInput = ({value, onChange = noop, editable = true}) => {
                     container: {
                         position: 'absolute',
                         zIndex: 2,
-                        top: 5,
+                        top: Platform.OS === 'ios' ? 50 : 5,
                         left: 5,
                         right: 5,
                     },
