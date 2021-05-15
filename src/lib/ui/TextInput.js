@@ -17,5 +17,7 @@ const inputStyle = {
     fontSize: 20,
     backgroundColor: '#ddd',
     margin: 5,
+    paddingVertical: 10,
+    paddingHorizontal: 5,
     borderRadius: 10,
 }
