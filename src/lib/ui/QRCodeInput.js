@@ -31,7 +31,10 @@ const QRCodeInput = ({value, onChange = noop, editable = true}) => {
             visible={editable && camShown}
             onRequestClose={() => toggleCam(false)}
         >
-            <QRScanner onScan={handleScan} />
+            <QRScanner
+                onScan={handleScan}
+                onClose={() => toggleCam(false)}
+            />
         </Modal>
     </View>
 }
