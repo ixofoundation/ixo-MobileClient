@@ -49,7 +49,7 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
                 style={s.headerBtn}
                 onPress={onClose}
             >
-                <Icon name='close' />
+                <Icon name='close-white' />
             </Pressable>
         </View>
 
