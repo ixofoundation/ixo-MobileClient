@@ -1,7 +1,7 @@
 const
     React = require('react'),
     {useRef, useState, useCallback} = React,
-    {View} = require('react-native'),
+    {View, Pressable, Text} = require('react-native'),
     Video = require('react-native-video').default,
     {RNCamera} = require('react-native-camera'),
     {noop} = require('lodash-es'),
@@ -104,6 +104,18 @@ const VideoInput = ({
                 captureAudio={true}
                 style={{height: '100%', justifyContent: 'flex-end'}}
             >
+                <Pressable
+                    onPress={() => {
+                        if (isRecording)
+                            stopRecording()
+
+                        toggleRecorder(false)
+                    }}
+                    style={backStyle}
+                    children={
+                        <Text style={backTextStyle} children='Back' />}
+                />
+
                 <Button
                     type='contained'
                     size='lg'
@@ -115,11 +127,24 @@ const VideoInput = ({
     </View>
 }
 
-const style = {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
-}
+const
+    style = {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+    },
+
+    backStyle = {
+        position: 'absolute',
+        top: 5,
+        backgroundColor: '#012D42',
+        padding: 5,
+    },
+
+    backTextStyle = {
+        color: 'white',
+        textDecorationLine: 'underline',
+    }
 
 
 module.exports = VideoInput
