@@ -152,6 +152,7 @@ const Projects = () => {
                 <QRScanner
                     text='Scan project QR code'
                     onScan={handleScan}
+                    onClose={() => toggleScanner(false)}
                 />
             </Modal>
 
