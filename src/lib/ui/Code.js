@@ -1,6 +1,6 @@
 const
     React = require('react'),
-    {Text} = require('react-native')
+    {Text, Platform} = require('react-native')
 
 
 const Code = ({style: overrideStyles, ...props}) =>
@@ -10,7 +10,10 @@ const Code = ({style: overrideStyles, ...props}) =>
     />
 
 const style = {
-    fontFamily: 'monospace',
+    fontFamily: {
+        ios: 'Courier New',
+        android: 'monospace'
+    }[Platform.OS],
     backgroundColor: '#555',
     color: 'white',
     fontSize: 18,
