@@ -1,12 +1,15 @@
-
 const React = require('react'),
+    {useCallback} = React,
     {View, Text, StyleSheet} = require('react-native'),
     {spacing, fontSizes} = require('$/theme'),
     ExchangeRateText = require('./ExchangeRateText'),
     WalletChart = require('./WalletChart'),
+    AssistantLayout = require('$/AssistantLayout'),
+    Loadable = require('$/lib/ui/Loadable'),
+    {useAsyncData} = require('$/lib/util'),
+    {useStaking} = require('$/stores'),
     WalletList = require('./WalletList')
 
- 
 const walletAccountItems = [
     {
         assetName: 'IXO',
@@ -38,24 +41,58 @@ const walletAccountItems = [
 ]
 
 const Wallet = () => {
-    return (
-        <View style={styles.root}>
-            <View style={styles.headerContainer}>
-                <Text style={styles.title} children='ACCOUNT VALUE'/>
-                
-                <View style={styles.headerInfoSection}>
-                    <Text style={styles.dollarText} children='$'/>
-                    <Text style={styles.dollarAmount} children='6,00'/>
-                </View>
+    const {myDelegations} = useStaking()
+    const loadData = useCallback(async () => {
+        const delegetions = await myDelegations()
 
-                <ExchangeRateText change={0.12}/>
-            </View>
-            <WalletChart/>
-            <View style={styles.listContainer}>
-                <WalletList items={walletAccountItems} title='Accounts'/>
-                <WalletList items={walletAccountItems} title='Portfolio'/>
-            </View>
-        </View>
+        return {delegetions}
+    }, [])
+    const {data, error, loading} = useAsyncData(loadData)
+
+    return (
+        <AssistantLayout>
+            <Loadable
+                data={data}
+                error={error}
+                loading={loading}
+                render={({delegetions}) => {
+                    console.log(delegetions)
+                    return (
+                        <View style={styles.root}>
+                            <View style={styles.headerContainer}>
+                                <Text
+                                    style={styles.title}
+                                    children="ACCOUNT VALUE"
+                                />
+
+                                <View style={styles.headerInfoSection}>
+                                    <Text
+                                        style={styles.dollarText}
+                                        children="$"
+                                    />
+                                    <Text
+                                        style={styles.dollarAmount}
+                                        children="6,00"
+                                    />
+                                </View>
+                                <ExchangeRateText change={0.12} />
+                            </View>
+                            <WalletChart />
+                            <View style={styles.listContainer}>
+                                <WalletList
+                                    items={walletAccountItems}
+                                    title="Accounts"
+                                />
+                                <WalletList
+                                    items={walletAccountItems}
+                                    title="Portfolio"
+                                />
+                            </View>
+                        </View>
+                    )
+                }}
+            />
+        </AssistantLayout>
     )
 }
 

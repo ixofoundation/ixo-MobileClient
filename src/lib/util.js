@@ -1,4 +1,4 @@
-const {useContext} = require('react'),
+const {useContext, useState, useEffect, useCallback} = require('react'),
     {Platform, PermissionsAndroid} = require('react-native'),
     DocumentPicker = require('react-native-document-picker').default,
     {readFile} = require('react-native-fs'),
@@ -67,6 +67,37 @@ const useNav = () => {
     return nav
 }
 
+const useAsyncData = (method, lazy = false) => {
+    const [error, setError] = useState(null)
+    const [loading, setLoading] = useState(!lazy)
+    const [data, setData] = useState(null)
+
+    useEffect(() => {
+        if (lazy) return
+        method()
+            .then(setData)
+            .catch(setError)
+            .finally(() => setLoading(false))
+    }, [method])
+
+    const load = useCallback(() => {
+        setLoading(true)
+        const result = method()
+        result
+            .then(setData)
+            .catch(setError)
+            .finally(() => setLoading(false))
+        return result
+    }, [method])
+
+    return {
+        error,
+        data,
+        loading,
+        load,
+    }
+}
+
 module.exports = {
     sleep,
     selectFile,
@@ -74,4 +105,5 @@ module.exports = {
     fileToDataURL,
     pollFor,
     useNav,
+    useAsyncData,
 }

@@ -87,8 +87,55 @@ const useProjects = makePersistentStore('projects', (set) => ({
 
 const useStaking = makePersistentStore('staking', (set, get) => ({
     validators: {},
+    getValidatorDetail: async (addr) => {
+        const {staking} = ixoSDKInstances.client
+        const [
+            {result: validator},
+            {result: pool},
+            {
+                body: {result: distribution},
+            },
+            {
+                body: {result: availabeStake},
+            },
+        ] = await Promise.all([
+            staking.getValidator(addr),
+            staking.pool(),
+            staking.validatorDistrubution(addr),
+            staking.availableStake(),
+        ])
 
-    getValidatorById: (id) => get().validators[id],
+        const [
+            {result: delegation},
+            {
+                body: {result: rewards},
+            },
+            {result: delegations},
+            {result: unboundingDelegations},
+        ] = await Promise.all([
+            staking.delegation(distribution.operator_address, addr),
+            staking.delegetorRewards(distribution.operator_address),
+            staking.delegatorDelegations(distribution.operator_address),
+            staking.delegatorUnboundingDelegations(
+                distribution.operator_address,
+            ),
+        ])
+
+        const avatarUrl = await staking.validatorAvatarUrl(
+            validator.description.identity,
+        )
+
+        return {
+            validator,
+            pool,
+            delegation,
+            rewards,
+            delegations,
+            unboundingDelegations,
+            availabeStake,
+            avatarUrl,
+        }
+    },
 
     listValidators: async (...args) => {
         const response = await ixoSDKInstances.client.staking.listValidators(
@@ -99,6 +146,8 @@ const useStaking = makePersistentStore('staking', (set, get) => ({
             return s
         })
     },
+
+    myDelegations: () => ixoSDKInstances.client.staking.myDelegations(),
 }))
 
 module.exports = {

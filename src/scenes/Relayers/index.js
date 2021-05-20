@@ -96,12 +96,12 @@ const Relayers = () => {
                 <View style={styles.root}>
                     <Header style={styles.header}>
                         <Pressable onPress={() => nav.navigateBack(1)}>
-                            <Icon name="chevronLeft" fill="white" />
+                            <Icon name="chevronLeft" fill="#FFFFFE" />
                         </Pressable>
                         <View
                             style={{flexDirection: 'row', alignItems: 'center'}}
                         >
-                            <Icon name="explore" fill="white" />
+                            <Icon name="explore" fill="#FFFFFE" />
                             <HeaderTitle text="impact relayers" />
                         </View>
                         <View width={24} />
@@ -139,6 +139,7 @@ const Relayers = () => {
                             renderItem={({
                                 item: {
                                     id,
+                                    operator_address,
                                     description: {moniker},
                                     commission: {
                                         commission_rates: {rate},
@@ -153,7 +154,7 @@ const Relayers = () => {
                                         avatar={'https://picsum.photos/200/300'}
                                         onPress={() =>
                                             nav.navigate('relayer-detail', {
-                                                relayerId: id,
+                                                relayerAddr: operator_address,
                                             })
                                         }
                                     />
