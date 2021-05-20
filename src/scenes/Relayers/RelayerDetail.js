@@ -1,4 +1,5 @@
 const React = require('react'),
+    {useCallback} = React,
     {View, Text, StyleSheet, Pressable} = require('react-native'),
     {spacing, fontSizes} = require('$/theme'),
     Avatar = require('$/lib/ui/Avatar'),
@@ -6,9 +7,10 @@ const React = require('react'),
     Icon = require('$/lib/ui/Icon'),
     HeaderTitle = require('./HeaderTitle'),
     {memoize} = require('lodash'),
-    {useNav} = require('$/lib/util'),
+    {useNav, useAsyncData} = require('$/lib/util'),
     {useStaking} = require('$/stores'),
-    AssistantLayout = require('$/AssistantLayout')
+    AssistantLayout = require('$/AssistantLayout'),
+    Loadable = require('$/lib/ui/Loadable')
 
 const statuses = {
     active: {
@@ -140,82 +142,176 @@ const statusMap = {2: 'active'}
 const formatAddress = (addr) =>
     addr.length > 20 ? addr.slice(0, 20) + '...' : addr
 
-const RelayerDetail = ({relayerId}) => {
+const RelayerDetail = ({relayerAddr}) => {
     const nav = useNav()
-    const {getValidatorById} = useStaking()
-    const validator = getValidatorById(relayerId)
-    const {
-        description: {moniker: name, details: description, website},
-        operator_address,
-        status,
-    } = validator
+
+    const {getValidatorDetail} = useStaking()
+    const loadRelayerDetail = useCallback(
+        () => getValidatorDetail(relayerAddr),
+        [relayerAddr],
+    )
+    const {data, error, loading} = useAsyncData(loadRelayerDetail)
+
     return (
         <AssistantLayout>
             <Header style={styles.header}>
                 <Pressable onPress={() => nav.navigateBack(1)}>
-                    <Icon name="chevronLeft" fill="white" />
+                    <Icon name="chevronLeft" fill="#FFFFFE" />
                 </Pressable>
-                <HeaderTitle text={name} />
+                <HeaderTitle
+                    text={data && data.validator.description.moniker}
+                />
                 <View width={24} />
             </Header>
             <View style={styles.root}>
-                <View style={styles.headerContainer}>
-                    <Avatar uri={'https://picsum.photos/200/300'} size={8} />
-                    <View style={styles.titleContainer}>
-                        <Text style={styles.title} children={name} />
-                        <StatusBadge status={statusMap[status]} />
-                    </View>
-                </View>
-                <View style={styles.stakeContainer}>
-                    <StakeInfoTitle
-                        name="My Stake"
-                        amount={25000}
-                        currency="IXO"
-                    />
-                    <View style={styles.stakeInfoContainer}>
-                        <StakeInfo label="Available" info="5302.002" />
-                        <StakeInfo label="Delegated" info="23,302.002" />
-                        <StakeInfo label="Unbonding" info="0" />
-                        <StakeInfo label="Reward" info="10.32" />
-                    </View>
-                </View>
+                <Loadable
+                    data={data}
+                    error={error}
+                    loading={loading}
+                    render={({
+                        validator,
+                        pool,
+                        delegation,
+                        delegations,
+                        unboundingDelegations,
+                        rewards,
+                        availabeStake: {
+                            value: {coins: availabeStakeCoins},
+                        },
+                        avatarUrl,
+                    }) => {
+                        const {
+                            description: {
+                                moniker: name,
+                                details: description,
+                                website,
+                            },
+                            operator_address,
+                            status,
+                            tokens,
+                        } = validator
 
-                <View style={styles.relayerInfoContainer}>
-                    <RelayerInfo
-                        label="Validator Operator Node"
-                        info={'ixo.world'}
-                    />
+                        const votingPower = Number(tokens) / Math.pow(10, 6)
+                        const totalStake = Number(pool.bonded_tokens)
+                        const ownStake = Number(delegation.shares)
+                        const delegated =
+                            delegations.reduce(
+                                (acc, {balance: {amount}}) =>
+                                    acc + Number(amount),
+                                0,
+                            ) / Math.pow(10, 6)
 
-                    <RelayerInfo label="Description" info={description} />
+                        const unbounding =
+                            unboundingDelegations.reduce(
+                                (acc, {balance}) => acc + Number(balance),
+                                0,
+                            ) / Math.pow(10, 6)
 
-                    <RelayerInfo
-                        label="Website"
-                        info={website}
-                        icon={<Icon name="web" fill="#03D0FB" />}
-                    />
-                    <RelayerInfo
-                        label="Relayer ID"
-                        info={formatAddress(operator_address)}
-                        icon={
-                            <Pressable
-                                onPress={() =>
-                                    console.log(
-                                        'copy to clipboard',
-                                        operator_address,
-                                    )
-                                }
-                            >
-                                <Icon name="eye" fill="#03D0FB" />
-                            </Pressable>
-                        }
-                    />
-                    <RelayerInfo label="Staking Yield (ARR)" info="0.02%" />
-                    <RelayerInfo
-                        label="Voting Power / Total Stake"
-                        info="0.02% / 33.535"
-                    />
-                    <RelayerInfo label="Own Stake" info="3.790 / 11.34%" />
-                </View>
+                        const reward =
+                            Number(rewards.total[0].amount) / Math.pow(10, 6)
+                        const availabeStakeTotal = availabeStakeCoins.reduce(
+                            (acc, {amount}) => acc + Number(amount),
+                            0,
+                        )
+                        return (
+                            <>
+                                <View style={styles.headerContainer}>
+                                    <Avatar uri={avatarUrl} size={8} />
+                                    <View style={styles.titleContainer}>
+                                        <Text
+                                            style={styles.title}
+                                            children={name}
+                                        />
+                                        <StatusBadge
+                                            status={statusMap[status]}
+                                        />
+                                    </View>
+                                </View>
+                                <View style={styles.stakeContainer}>
+                                    <StakeInfoTitle
+                                        name="My Stake"
+                                        amount={25000}
+                                        currency="IXO"
+                                    />
+                                    <View style={styles.stakeInfoContainer}>
+                                        <StakeInfo
+                                            label="Available"
+                                            info={availabeStakeTotal.toFixed(2)}
+                                        />
+                                        <StakeInfo
+                                            label="Delegated"
+                                            info={delegated.toFixed(2)}
+                                        />
+                                        <StakeInfo
+                                            label="Unbonding"
+                                            info={unbounding.toFixed(2)}
+                                        />
+                                        <StakeInfo
+                                            label="Reward"
+                                            info={reward.toFixed(2)}
+                                        />
+                                    </View>
+                                </View>
+
+                                <View style={styles.relayerInfoContainer}>
+                                    <RelayerInfo
+                                        label="Validator Operator Node"
+                                        info={'ixo.world'}
+                                    />
+
+                                    <RelayerInfo
+                                        label="Description"
+                                        info={description}
+                                    />
+
+                                    <RelayerInfo
+                                        label="Website"
+                                        info={website}
+                                        icon={
+                                            <Icon name="web" fill="#03D0FB" />
+                                        }
+                                    />
+                                    <RelayerInfo
+                                        label="Relayer ID"
+                                        info={formatAddress(operator_address)}
+                                        icon={
+                                            <Pressable
+                                                onPress={() =>
+                                                    console.log(
+                                                        'copy to clipboard',
+                                                        operator_address,
+                                                    )
+                                                }
+                                            >
+                                                <Icon
+                                                    name="eye"
+                                                    fill="#03D0FB"
+                                                />
+                                            </Pressable>
+                                        }
+                                    />
+                                    <RelayerInfo
+                                        label="Staking Yield (ARR)"
+                                        info="0.02%"
+                                    />
+                                    <RelayerInfo
+                                        label="Voting Power / Total Stake"
+                                        info={`${votingPower.toFixed(
+                                            2,
+                                        )}% / ${totalStake}`}
+                                    />
+                                    <RelayerInfo
+                                        label="Own Stake"
+                                        info={`${ownStake.toFixed(2)} / ${(
+                                            (ownStake / totalStake) *
+                                            100
+                                        ).toFixed(2)}%`}
+                                    />
+                                </View>
+                            </>
+                        )
+                    }}
+                />
             </View>
         </AssistantLayout>
     )
