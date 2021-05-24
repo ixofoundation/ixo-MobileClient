@@ -19,12 +19,11 @@ const React = require('react'),
     {useEffect, useState} = require('react')
 const HeaderTitle = require('./HeaderTitle')
 
-const RelayerItem = ({id, name, avatar, commission, onPress}) => {
+const RelayerItem = ({id, name, commission, onPress}) => {
     return (
         <Pressable style={itemStyles.root} onPress={onPress}>
             <View style={itemStyles.nameContainer}>
                 <Text style={itemStyles.id} children={id} />
-                <Avatar uri={avatar} size={5} />
                 <Text style={itemStyles.name} children={name} />
             </View>
             <Text
@@ -151,7 +150,6 @@ const Relayers = () => {
                                         id={Number(id) + 1}
                                         name={moniker}
                                         commission={Number(rate)}
-                                        avatar={'https://picsum.photos/200/300'}
                                         onPress={() =>
                                             nav.navigate('relayer-detail', {
                                                 relayerAddr: operator_address,

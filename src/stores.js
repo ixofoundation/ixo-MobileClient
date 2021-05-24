@@ -1,6 +1,6 @@
 const {makeSecurePersistentStore, makePersistentStore} = require('$/lib/store'),
     {makeWallet, makeClient} = require('@ixo/client-sdk'),
-    {capitalize} = require('lodash-es')
+    {sum, sumBy} = require('lodash-es')
 
 const ixoClientOpts = {
         dashifyUrls: true,
@@ -44,6 +44,100 @@ const useWallet = makeSecurePersistentStore(
         getSecpAccount: () => ixoSDKInstances.client.getSecpAccount(),
         getAgentAccount: () => ixoSDKInstances.client.getAgentAccount(),
         register: () => ixoSDKInstances.client.register(),
+
+        getWallet: async () => {
+            const {client} = ixoSDKInstances
+            const {staking} = client
+            const [
+                secpAccount,
+                agentAccount,
+                {result: validators},
+                {result: delegations},
+                {
+                    body: {result: bonds},
+                },
+            ] = await Promise.all([
+                client.getSecpAccount(),
+                client.getAgentAccount(),
+                staking.listValidators(),
+                staking.myDelegations(),
+                client.bonds.list(),
+            ])
+
+            // Account
+            const account = []
+            const ixo =
+                sum(
+                    secpAccount.balance
+                        .filter(({denom}) => denom === 'uixo')
+                        .map(({amount}) => amount),
+                ) /
+                10 ** 6
+            account.push({
+                asset: 'uixo',
+                amount: ixo,
+                name: 'IXO',
+                icon: 'ixo',
+            })
+            // TODO: other assets be in here added (BTC, $, € etc.)
+
+            // Portfolio
+            const bondsMap = Object.fromEntries(
+                bonds.map((bond) => {
+                    const {
+                        supply: {denom},
+                    } = bond
+                    return [denom, bond]
+                }),
+            )
+            const portfolioPromise = agentAccount.balance
+                .filter(({denom}) => !!bondsMap[denom])
+                .map(async ({amount, denom}) => {
+                    const {
+                        body: {result: bond},
+                    } = await client.bonds.byId(bondsMap[denom].did)
+                    return {bond, amount, denom}
+                })
+
+            // Stakes
+            const validatorMap = Object.fromEntries(
+                validators.map((data) => [data.operator_address, data]),
+            )
+            const stakesPromise = delegations.map(
+                async ({validator_address, ...rest}) => {
+                    const validator = validatorMap[validator_address]
+                    validator.image_url = await staking.validatorAvatarUrl(
+                        validator.description.identity,
+                    )
+                    return {validator, ...rest}
+                },
+            )
+
+            const [portfolio, stakes] = await Promise.all([
+                Promise.all(portfolioPromise),
+                Promise.all(stakesPromise),
+            ])
+
+            const accountTotal = sumBy(account, ({amount}) => Number(amount))
+            const portfolioTotal = sumBy(portfolio, ({amount}) =>
+                Number(amount),
+            )
+            const stakesTotal = sumBy(stakes, ({balance: {amount}}) =>
+                Number(amount),
+            )
+            const total = Number(accountTotal + portfolioTotal + stakesTotal)
+
+            return {
+                account,
+                portfolio,
+                stakes,
+                accountTotal,
+                portfolioTotal,
+                stakesTotal,
+                total,
+            }
+        },
+
         // These has to be lazy, as ixoSDKInstances.client can be updated
     }),
     {
@@ -147,7 +241,10 @@ const useStaking = makePersistentStore('staking', (set, get) => ({
         })
     },
 
-    myDelegations: () => ixoSDKInstances.client.staking.myDelegations(),
+    myDelegations: () =>
+        ixoSDKInstances.client.staking
+            .myDelegations()
+            .then(({result}) => result),
 }))
 
 module.exports = {
