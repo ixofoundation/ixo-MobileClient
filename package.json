@@ -10,7 +10,8 @@
     "ios": "env `cat .env` react-native run-ios",
     "start": "env `cat .env` FORCE_COLOR=1 react-native start | grep -vf .metroWarningIgnore",
     "start-nocache": "env `cat .env` FORCE_COLOR=1 react-native start --reset-cache | grep -vf .metroWarningIgnore",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "deploy:beta": "cd ./ios && bundle exec fastlane beta --env development"
   },
   "dependencies": {
     "@ixo/client-sdk": "^1.2.2",
