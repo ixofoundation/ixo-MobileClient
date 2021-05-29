@@ -1,0 +1,9 @@
+app_identifier("org.reactjs.native.example.ixoWallet") # The bundle identifier of your app
+apple_id("tashamzali@yandex.com") # Your Apple email address
+
+itc_team_id("119368260") # App Store Connect Team ID
+itc_team_id("119368260") # App Store Connect Team ID
+team_id("22SU8P8XG8") # Developer Portal Team ID
+
+# For more information about the Appfile, see:
+#     https://docs.fastlane.tools/advanced/#appfile
