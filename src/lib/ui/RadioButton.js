@@ -20,6 +20,7 @@ const RadioButton = ({options = [], value, onChange}) => {
             >
                 {options.map((o, i) => (
                     <RadioButtonItem
+                        key={o.value + i}
                         option={o}
                         start={i === 0}
                         end={i === options.length - 1}
