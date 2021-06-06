@@ -1,27 +1,28 @@
-const
-    React = require('react'),
-    {useContext}= React,
-    {Text} = require('react-native'),
-    {spacing, fontSizes} = require('$/theme'),    
+const React = require('react'),
+    {useContext} = React,
+    {Text, StyleSheet, Pressable} = require('react-native'),
+    {spacing, fontSizes} = require('$/theme'),
     {NavigationContext} = require('navigation-react')
 
 const SubMenuItem = ({title, to, data}) => {
     const {stateNavigator: nav} = useContext(NavigationContext)
-    return <Text
-        children={title}
-        onPress={() => nav.navigate(to, data)}
-        style={style.subItem}
-    />
+    return (
+        <Pressable style={style.subItem} onPress={() => nav.navigate(to, data)}>
+            <Text children={title} style={style.subItemText} />
+        </Pressable>
+    )
 }
 
-const style = {
+const style = StyleSheet.create({
     subItem: {
-        backgroundColor: 'transparent', 
-        color: '#8BAABA', 
-        fontSize: fontSizes.h6,
-        marginVertical: spacing(1),
-        marginLeft: spacing(1),
+        backgroundColor: 'transparent',
+        paddingVertical: spacing(1),
+        paddingLeft: spacing(1),
     },
-}
+    subItemText: {
+        color: '#8BAABA',
+        fontSize: fontSizes.h6,
+    },
+})
 
 module.exports = SubMenuItem
