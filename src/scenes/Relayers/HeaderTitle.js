@@ -2,9 +2,7 @@ const React = require('react'),
     {Text, StyleSheet} = require('react-native'),
     {spacing, fontSizes} = require('$/theme')
 
-
-const HeaderTitle = ({text}) => <Text style={styles.root} children={text}/>
-
+const HeaderTitle = ({text}) => <Text style={styles.root} children={text} />
 
 const styles = StyleSheet.create({
     root: {
@@ -13,7 +11,6 @@ const styles = StyleSheet.create({
         marginLeft: spacing(1),
         fontWeight: 'bold',
     },
-    
 })
 
 module.exports = HeaderTitle

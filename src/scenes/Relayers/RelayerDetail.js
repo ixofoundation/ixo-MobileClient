@@ -1,21 +1,35 @@
 const React = require('react'),
     {useCallback} = React,
-    {View, Text, StyleSheet, Pressable} = require('react-native'),
+    {
+        View,
+        Text,
+        StyleSheet,
+        Pressable,
+        Linking,
+        Alert,
+    } = require('react-native'),
     {spacing, fontSizes} = require('$/theme'),
     Avatar = require('$/lib/ui/Avatar'),
-    Header = require('$/lib/ui/Header'),
     Icon = require('$/lib/ui/Icon'),
-    HeaderTitle = require('./HeaderTitle'),
     {memoize} = require('lodash'),
-    {useNav, useAsyncData} = require('$/lib/util'),
+    {useAsyncData} = require('$/lib/util'),
     {useStaking} = require('$/stores'),
     AssistantLayout = require('$/AssistantLayout'),
-    Loadable = require('$/lib/ui/Loadable')
+    Loadable = require('$/lib/ui/Loadable'),
+    Clipboard = require('@react-native-clipboard/clipboard').default
 
 const statuses = {
-    active: {
+    bonded: {
         color: '#85AD5C',
         text: 'ACTIVE',
+    },
+    unbonding: {
+        color: '#ED9526',
+        text: 'UNBONDING',
+    },
+    unbonded: {
+        color: '#AD245C',
+        text: 'UNBONDED',
     },
 }
 
@@ -137,14 +151,12 @@ const relayerInfoStyles = StyleSheet.create({
     },
 })
 
-const statusMap = {2: 'active'}
+const statusMap = {2: 'bonded', 1: 'unbonding', 0: 'unbonded'}
 
 const formatAddress = (addr) =>
     addr.length > 20 ? addr.slice(0, 20) + '...' : addr
 
 const RelayerDetail = ({relayerAddr}) => {
-    const nav = useNav()
-
     const {getValidatorDetail} = useStaking()
     const loadRelayerDetail = useCallback(
         () => getValidatorDetail(relayerAddr),
@@ -154,15 +166,6 @@ const RelayerDetail = ({relayerAddr}) => {
 
     return (
         <AssistantLayout>
-            <Header style={styles.header}>
-                <Pressable onPress={() => nav.navigateBack(1)}>
-                    <Icon name="chevronLeft" fill="#FFFFFE" />
-                </Pressable>
-                <HeaderTitle
-                    text={data && data.validator.description.moniker}
-                />
-                <View width={24} />
-            </Header>
             <View style={styles.root}>
                 <Loadable
                     data={data}
@@ -213,6 +216,23 @@ const RelayerDetail = ({relayerAddr}) => {
                             (acc, {amount}) => acc + Number(amount),
                             0,
                         )
+
+                        const handleWebClick = useCallback(async () => {
+                            const supported = await Linking.canOpenURL(website)
+                            if (!supported) {
+                                return
+                            }
+                            Linking.openURL(website)
+                        }, [website])
+
+                        const handleAddressClick = useCallback(() => {
+                            Clipboard.setString(operator_address)
+                            Alert.alert(
+                                'Operator Address Copied!',
+                                operator_address,
+                            )
+                        }, [operator_address])
+
                         return (
                             <>
                                 <View style={styles.headerContainer}>
@@ -268,7 +288,12 @@ const RelayerDetail = ({relayerAddr}) => {
                                         label="Website"
                                         info={website}
                                         icon={
-                                            <Icon name="web" fill="#03D0FB" />
+                                            <Pressable onPress={handleWebClick}>
+                                                <Icon
+                                                    name="web"
+                                                    fill="#03D0FB"
+                                                />
+                                            </Pressable>
                                         }
                                     />
                                     <RelayerInfo
@@ -276,12 +301,7 @@ const RelayerDetail = ({relayerAddr}) => {
                                         info={formatAddress(operator_address)}
                                         icon={
                                             <Pressable
-                                                onPress={() =>
-                                                    console.log(
-                                                        'copy to clipboard',
-                                                        operator_address,
-                                                    )
-                                                }
+                                                onPress={handleAddressClick}
                                             >
                                                 <Icon
                                                     name="eye"

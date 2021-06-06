@@ -70,7 +70,7 @@ const itemStyles = StyleSheet.create({
 
 const statusFilterOptions = [
     {label: 'All', value: 'all'},
-    {label: 'Open', value: 'open'},
+    {label: 'Open', value: 2},
 ]
 
 const Relayers = () => {
@@ -85,25 +85,25 @@ const Relayers = () => {
 
     const data = Object.entries(validators)
         .map(([id, v]) => ({...v, id}))
-        .filter(({description: {moniker}}) =>
-            moniker.toLowerCase().startsWith(search.toLowerCase().trim()),
-        )
+        .filter(({description: {moniker}, status}) => {
+            if (
+                activityFilter.value !== 'all' &&
+                status !== activityFilter.value
+            ) {
+                return false
+            }
+            return moniker.toLowerCase().startsWith(search.toLowerCase().trim())
+        })
 
     return (
         <MenuLayout>
             <AssistantLayout>
                 <View style={styles.root}>
-                    <Header style={styles.header}>
-                        <Pressable onPress={() => nav.navigateBack(1)}>
-                            <Icon name="chevronLeft" fill="#FFFFFE" />
-                        </Pressable>
-                        <View
-                            style={{flexDirection: 'row', alignItems: 'center'}}
-                        >
+                    <Header>
+                        <View style={styles.title}>
                             <Icon name="explore" fill="#FFFFFE" />
                             <HeaderTitle text="impact relayers" />
                         </View>
-                        <View width={24} />
                     </Header>
 
                     <View style={styles.listContainer}>
@@ -171,7 +171,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#002233',
     },
-    header: {justifyContent: 'space-between'},
+    title: {flexDirection: 'row', alignItems: 'center'},
     listContainer: {
         flex: 1,
         paddingHorizontal: spacing(2),
