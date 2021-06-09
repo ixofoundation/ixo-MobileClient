@@ -1,8 +1,14 @@
-const
-    React = require('react'),
+const MessageText = require('./MessageText')
+
+const React = require('react'),
     {useState, useRef, useCallback, createElement: e} = React,
     {
-        View, ScrollView, StyleSheet, TextInput, Pressable,
+        View,
+        ScrollView,
+        StyleSheet,
+        TextInput,
+        Pressable,
+        SafeAreaView,
     } = require('react-native'),
     useBot = require('react-rasa-assistant'),
     {Modal, Text, QRScanner, Icon} = require('$/lib/ui'),
@@ -10,131 +16,127 @@ const
     theme = require('$/theme'),
     MessageBubble = require('./MessageBubble')
 
-
 const Assistant = ({initMsg, onClose = () => {}}) => {
-    const
-        {
-            msgHistory, onInputRef, userText, setUserText, sendUserText,
-            selectOption, botUtter, restartSession,
-        } =
-            useBot({
-                sockUrl: process.env.RASA_SOCKET_URL,
-                sockOpts: {transports: ['websocket']},
-                initMsg,
-                onError: e => {
-                    console.error('assistant error', e)
-                    alert('Failed to make socket connection!')
-                },
-                onUtter: msg =>
-                    msg.action &&
-                        handleCustomAssistantResponse(msg, botUtter),
-            }),
-
+    const {
+            msgHistory,
+            onInputRef,
+            userText,
+            setUserText,
+            sendUserText,
+            selectOption,
+            botUtter,
+            restartSession,
+        } = useBot({
+            sockUrl: process.env.RASA_SOCKET_URL,
+            sockOpts: {transports: ['websocket']},
+            initMsg,
+            onError: (e) => {
+                console.error('assistant error', e)
+                alert('Failed to make socket connection!')
+            },
+            onUtter: (msg) =>
+                msg.action && handleCustomAssistantResponse(msg, botUtter),
+        }),
         viewRef = useRef(),
-
         [qrModalVisible, setQrModalVisibility] = useState(false),
         openModal = useCallback(() => setQrModalVisibility(true)),
         closeModal = useCallback(() => setQrModalVisibility(false))
 
-    return <View style={s.container}>
-        <View style={s.sessionCtrlView}>
-            <View style={s.headerBtn}/>
-            <Pressable
-                style={s.headerBtn}
-                onLongPress={restartSession}
-            >
-                <Icon name='assistant' />
-            </Pressable>
-            <Pressable
-                style={s.headerBtn}
-                onPress={onClose}
-            >
-                <Icon name='close-white' />
-            </Pressable>
-        </View>
-
-        <ScrollView
-            ref={viewRef}
-            style={s.msgHistoryContainer}
-            onContentSizeChange={() => viewRef.current.scrollToEnd()}
-        >
-            {msgHistory.map((m, mIdx) => {
-                if (m.text)
-                    return <MessageBubble 
-                        key={m.ts + '-txt'}
-                        direction={m.direction}>
-                        <Text
-                            style={m.direction === 'in' ? 
-                                s.textMsgIn : s.textMsgOut}
-                            direction={m.direction}
-                            children={m.text}
-                        />
-                    </MessageBubble>
-
-                if (m.quick_replies || m.buttons)
-                    return <View
-                        key={m.ts + '-btns'}
-                        style={s.optionBtnContainer}
-                    >
-                        {
-                            (m.quick_replies || m.buttons).map((opt, optIdx) =>
-                                <Pressable
-                                    key={m.ts + '-btn-' + opt.payload}
-                                    onPress={() => selectOption(mIdx, optIdx)}
-                                >
-                                    <View style={s.optionBtn}>
-                                        <Text style={s.optionBtnText}>
-                                            {opt.title}
-                                        </Text>
-                                    </View>
-                                </Pressable>)
-                        }
-                    </View>
-
-                if (m.component) {
-                    return <MessageBubble direction={m.direction}> 
-                        {e(m.component, {
-                            key: m.ts + '-comp',
-                            msg: m,
-                        })}
-                    </MessageBubble>
-                }
-            })}
-
-        </ScrollView>
-
-        <View style={s.msgSendView}>
-            <Pressable  style={s.scanBtn} onPress={openModal} >
-                <Icon name='scan' />
-            </Pressable>
-
-            <View style={s.msgInputContainer}>
-                <TextInput
-                    value={userText}
-                    placeholder={'type here...'}
-                    onChangeText={setUserText}
-                    ref={onInputRef}
-                    style={s.msgInput}
-                />
-                <Pressable 
-                    style={s.sendBtn}
-                    onPress={sendUserText}>
-                    <Icon name='arrowUp' />
+    return (
+        <SafeAreaView style={s.container}>
+            <View style={s.sessionCtrlView}>
+                <View style={s.headerBtn} />
+                <Pressable style={s.headerBtn} onLongPress={restartSession}>
+                    <Icon name="assistant" />
+                </Pressable>
+                <Pressable style={s.headerBtn} onPress={onClose}>
+                    <Icon name="close" fill="white" />
                 </Pressable>
             </View>
-        </View>
 
-        <Modal
-            visible={qrModalVisible}
-            onRequestClose={closeModal}
-        >
-            <QRScanner onScan={({data}) => {
-                setUserText(userText + ' ' + data)
-                closeModal()
-            }} />
-        </Modal>
-    </View>
+            <ScrollView
+                ref={viewRef}
+                style={s.msgHistoryContainer}
+                onContentSizeChange={() => viewRef.current.scrollToEnd()}
+            >
+                {msgHistory.map((m, mIdx) => {
+                    if (m.text)
+                        return (
+                            <MessageBubble
+                                key={m.ts + '-txt'}
+                                direction={m.direction}
+                                onPress={m.onPress}
+                            >
+                                <MessageText
+                                    text={m.text}
+                                    direction={m.direction}
+                                />
+                            </MessageBubble>
+                        )
 
+                    if (m.quick_replies || m.buttons)
+                        return (
+                            <View
+                                key={m.ts + '-btns'}
+                                style={s.optionBtnContainer}
+                            >
+                                {(m.quick_replies || m.buttons).map(
+                                    (opt, optIdx) => (
+                                        <Pressable
+                                            key={m.ts + '-btn-' + opt.payload}
+                                            onPress={() =>
+                                                selectOption(mIdx, optIdx)
+                                            }
+                                        >
+                                            <View style={s.optionBtn}>
+                                                <Text style={s.optionBtnText}>
+                                                    {opt.title}
+                                                </Text>
+                                            </View>
+                                        </Pressable>
+                                    ),
+                                )}
+                            </View>
+                        )
+
+                    if (m.component) {
+                        return e(m.component, {
+                            key: m.ts + '-comp',
+                            msg: m,
+                        })
+                    }
+                })}
+            </ScrollView>
+
+            <View style={s.msgSendView}>
+                <Pressable style={s.scanBtn} onPress={openModal}>
+                    <Icon name="scan" />
+                </Pressable>
+
+                <View style={s.msgInputContainer}>
+                    <TextInput
+                        value={userText}
+                        placeholder={'type here...'}
+                        onChangeText={setUserText}
+                        ref={onInputRef}
+                        style={s.msgInput}
+                    />
+                    <Pressable style={s.sendBtn} onPress={sendUserText}>
+                        <Icon name="arrowUp" />
+                    </Pressable>
+                </View>
+            </View>
+
+            <Modal visible={qrModalVisible} onRequestClose={closeModal}>
+                <QRScanner
+                    onScan={({data}) => {
+                        setUserText(userText + ' ' + data)
+                        closeModal()
+                    }}
+                />
+            </Modal>
+        </SafeAreaView>
+    )
 }
 
 const s = StyleSheet.create({
@@ -159,18 +161,18 @@ const s = StyleSheet.create({
         color: 'white',
     },
     msgHistoryContainer: {
-        paddingHorizontal: theme.spacing(2), 
+        paddingHorizontal: theme.spacing(2),
         paddingTop: theme.spacing(1),
     },
     optionBtnContainer: {
-        flexDirection: 'row', 
+        flexDirection: 'row',
         flexWrap: 'wrap',
     },
     optionBtn: {
         backgroundColor: 'transparent',
         borderColor: '#125C7E',
         borderWidth: 1,
-        borderRadius: 24, 
+        borderRadius: 24,
         paddingHorizontal: theme.spacing(2),
         paddingVertical: theme.spacing(1),
         margin: theme.spacing(1),
@@ -200,14 +202,13 @@ const s = StyleSheet.create({
     msgInput: {flex: 1, fontSize: 16},
     scanBtn: {justifyContent: 'center', alignItems: 'center', width: 50},
     sendBtn: {
-        backgroundColor: '#49BFE0', 
-        borderRadius: 50, 
-        width: 50, 
-        height: 50, 
-        justifyContent: 'center', 
+        backgroundColor: '#49BFE0',
+        borderRadius: 50,
+        width: 50,
+        height: 50,
+        justifyContent: 'center',
         alignItems: 'center',
     },
 })
-
 
 module.exports = Assistant
