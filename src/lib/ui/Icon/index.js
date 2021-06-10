@@ -28,6 +28,7 @@ const icons = {
     eye: require('./assets/eye.svg').default,
     clipboard: require('./assets/clipboard.svg').default,
     ixo: require('./assets/wallet/IXO.svg').default,
+    arrowLeft: require('./assets/arrowLeft.svg').default,
 }
 
 const Icon = ({name, ...props}) => createElement(icons[name], props)

@@ -133,6 +133,8 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
                         setUserText(userText + ' ' + data)
                         closeModal()
                     }}
+                    text="Scan QR"
+                    onClose={closeModal}
                 />
             </Modal>
         </SafeAreaView>
