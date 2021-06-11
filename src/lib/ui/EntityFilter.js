@@ -105,7 +105,6 @@ const s = StyleSheet.create({
         fontWeight: 'bold',
         color: 'white',
         marginTop: 10,
-        borderTopWidth: 1,
         marginBottom: theme.spacing(1),
     },
 })
