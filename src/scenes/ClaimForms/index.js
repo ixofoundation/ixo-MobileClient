@@ -1,6 +1,6 @@
 const React = require('react'),
     {useState, useContext} = React,
-    {View, Text, StyleSheet} = require('react-native'),
+    {View, Text, StyleSheet, SafeAreaView} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {get, keyBy, sortBy, filter} = require('lodash-es'),
     MenuLayout = require('$/MenuLayout'),
@@ -12,6 +12,7 @@ const React = require('react'),
     ClaimTplActions = require('./ClaimTplActions'),
     {spacing, fontSizes} = require('$/theme')
 
+const {ScrollView} = require('react-native-gesture-handler')
 const {inspect} = require('util')
 
 const filterSpec = [
@@ -58,22 +59,23 @@ const ClaimForms = ({projectDid}) => {
     return (
         <MenuLayout>
             <AssistantLayout>
-                <View style={style.root}>
+                <SafeAreaView style={style.root}>
                     <ClaimTplListHeader
                         title="Available Claim Forms"
                         onFilterPress={() => toggleFilterWidget(true)}
                     />
-
-                    {claimTemplatesFiltered.map((tpl) => (
-                        <ClaimTpl
-                            key={'claim-' + tpl['@id']}
-                            name={tpl.title}
-                            description={tpl.description}
-                            startDate={tpl.startDate}
-                            endDate={tpl.endDate}
-                            onPress={() => setFocusedTpl(tpl['@id'])}
-                        />
-                    ))}
+                    <ScrollView>
+                        {claimTemplatesFiltered.map((tpl) => (
+                            <ClaimTpl
+                                key={'claim-' + tpl['@id']}
+                                name={tpl.title}
+                                description={tpl.description}
+                                startDate={tpl.startDate}
+                                endDate={tpl.endDate}
+                                onPress={() => setFocusedTpl(tpl['@id'])}
+                            />
+                        ))}
+                    </ScrollView>
 
                     <Modal
                         visible={filterWidgetShown}
@@ -102,7 +104,7 @@ const ClaimForms = ({projectDid}) => {
                             claimTpl={claimTemplatesByDid[focusedTplDid]}
                         />
                     </Modal>
-                </View>
+                </SafeAreaView>
             </AssistantLayout>
         </MenuLayout>
     )

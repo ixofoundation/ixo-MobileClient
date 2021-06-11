@@ -1,9 +1,9 @@
+const Loadable = require('$/lib/ui/Loadable')
+const {useNav} = require('$/lib/util')
+
 const React = require('react'),
-    {useContext} = React,
-    {View, ScrollView,
-        Text, StyleSheet, ActivityIndicator} = require('react-native'),
+    {View, ScrollView, Text, StyleSheet} = require('react-native'),
     {useQuery} = require('react-query'),
-    {NavigationContext} = require('navigation-react'),
     {keyBy, countBy, sortBy} = require('lodash-es'),
     moment = require('moment'),
     {useWallet, useProjects} = require('$/stores'),
@@ -17,48 +17,39 @@ const React = require('react'),
     {spacing, fontSizes} = require('$/theme'),
     {keys} = Object
 
-
 const Claims = () => {
-    const
-        ws = useWallet(),
-        {items: projectsById, getProject, listClaims} = useProjects(),
-        {stateNavigator: nav} = useContext(NavigationContext),
-
+    const {items: projectsById, getProject, listClaims} = useProjects(),
         claimQuery = useQuery({
             queryKey: 'claimData',
             queryFn: async () => {
-                const
-                    projectList =
-                        await Promise.all(keys(projectsById).map(projDid =>
+                const projectList = await Promise.all(
+                        keys(projectsById).map((projDid) =>
                             Promise.all([
                                 getProject(projDid),
                                 listClaims(projDid).catch(() => []),
                             ]),
-                        )),
-
-                    claimTemplates =
-                        projectList.flatMap(([proj]) =>
-                            proj.data.entityClaims.items.map(tpl => ({
-                                ...tpl,
-                                projectDid: proj.projectDid,
-                                projectName: proj.data.name,
-                            })),
                         ),
+                    ),
+                    claimTemplates = projectList.flatMap(([proj]) =>
+                        proj.data.entityClaims.items.map((tpl) => ({
+                            ...tpl,
+                            projectDid: proj.projectDid,
+                            projectName: proj.data.name,
+                        })),
+                    ),
+                    claims = projectList.flatMap(([proj, claimList]) => {
+                        const projClaimsById = keyBy(
+                            proj.data.claims,
+                            'claimId',
+                        )
 
-                    claims =
-                        projectList.flatMap(([proj, claimList]) => {
-                            const projClaimsById =
-                                keyBy(proj.data.claims, 'claimId')
-
-                            return claimList.map(c => ({
-                                ...c,
-                                projectName: proj.data.name,
-                                status: projClaimsById[c.txHash].status,
-                            }))
-                        }),
-
+                        return claimList.map((c) => ({
+                            ...c,
+                            projectName: proj.data.name,
+                            status: projClaimsById[c.txHash].status,
+                        }))
+                    }),
                     claimsSorted = sortBy(claims, '-datetime'),
-
                     claimCountsByStatus = countBy(claims, 'status')
 
                 return {
@@ -69,77 +60,92 @@ const Claims = () => {
             },
         })
 
-    return <AssistantLayout><MenuLayout><View style={style.root}>
-        <Header>
-            <Text
-                style={style.title}
-                children='Claims'
-            />
-        </Header>
-
-        {!claimQuery.isSuccess
-            ? <ActivityIndicator size='large' color='black' />
-
-            : <Tabs>
-                <Tab title='Activity'>
-                    <ClaimActivity
-                        submitted={claimQuery.data.claims.length}
-                        pending={claimQuery.data.claimCountsByStatus[0]}
-                        approved={claimQuery.data.claimCountsByStatus[1]}
-                        disputed={claimQuery.data.claimCountsByStatus[2]}
-                        rejected={claimQuery.data.claimCountsByStatus[3]}
+    return (
+        <AssistantLayout>
+            <MenuLayout>
+                <View style={style.root}>
+                    <Header>
+                        <Text style={style.title} children="Claims" />
+                    </Header>
+                    <Loadable
+                        loading={claimQuery.isLoading}
+                        error={claimQuery.error}
+                        data={claimQuery.data}
+                        render={ClaimTabs}
                     />
-                </Tab>
+                </View>
+            </MenuLayout>
+        </AssistantLayout>
+    )
+}
 
-                <Tab title='Submitted'>
-                    <ScrollView>
-                        <ClaimListHeader title='Submitted claims' />
+const ClaimTabs = ({claims, claimCountsByStatus, claimTemplates}) => {
+    const nav = useNav()
+    const ws = useWallet()
+    return (
+        <Tabs>
+            <Tab title="Activity">
+                <ClaimActivity
+                    submitted={claims.length}
+                    pending={claimCountsByStatus[0]}
+                    approved={claimCountsByStatus[1]}
+                    disputed={claimCountsByStatus[2]}
+                    rejected={claimCountsByStatus[3]}
+                />
+            </Tab>
 
-                        {claimQuery.data.claims.map(c =>
-                            <Claim
-                                key={c.txHash}
-                                name={
-                                    c.projectName
-                                    + ' / '
-                                    + moment(c._created).format('MMM D')
-                                }
-                                did={'did:ixo:' + ws.agent.did}
-                                savedAt={c._created}
-                                status={c.status}
-                                onPress={() => nav.navigate('claim-detail', {
+            <Tab title="Submitted">
+                <ScrollView>
+                    <ClaimListHeader title="Submitted claims" />
+
+                    {claims.map((c) => (
+                        <Claim
+                            key={c.txHash}
+                            name={
+                                c.projectName +
+                                ' / ' +
+                                moment(c._created).format('MMM D')
+                            }
+                            did={'did:ixo:' + ws.agent.did}
+                            savedAt={c._created}
+                            status={c.status}
+                            onPress={() =>
+                                nav.navigate('claim-detail', {
                                     projectDid: c.projectDid,
                                     claimId: c.txHash,
-                                })}
-                            />,
-                        )}
-                    </ScrollView>
-                </Tab>
+                                })
+                            }
+                        />
+                    ))}
+                </ScrollView>
+            </Tab>
 
-                <Tab title='New'>
-                    <ClaimListHeader title='Claim Templates' />
+            <Tab title="New">
+                <ClaimListHeader title="Claim Templates" />
 
-                    <P
-                        children=
-                            'Select a claim template to create a claim from:'
-                        style={{paddingTop: 0}}
-                    />
+                <P
+                    children="Select a claim template to create a claim from:"
+                    style={{paddingTop: 0}}
+                />
 
-                    {claimQuery.data.claimTemplates.map(t =>
-                        <ClaimTpl
-                            key={t['@id']}
-                            name={t.title}
-                            description={t.description}
-                            startDate={t.startDate}
-                            endDate={t.endDate}
-                            onPress={() => nav.navigate('new-claim', {
+                {claimTemplates.map((t) => (
+                    <ClaimTpl
+                        key={t['@id']}
+                        name={t.title}
+                        description={t.description}
+                        startDate={t.startDate}
+                        endDate={t.endDate}
+                        onPress={() =>
+                            nav.navigate('new-claim', {
                                 projectDid: t.projectDid,
                                 templateDid: t['@id'],
-                            })}
-                        />,
-                    )}
-                </Tab>
-            </Tabs>}
-    </View></MenuLayout></AssistantLayout>
+                            })
+                        }
+                    />
+                ))}
+            </Tab>
+        </Tabs>
+    )
 }
 
 const style = StyleSheet.create({
@@ -148,7 +154,7 @@ const style = StyleSheet.create({
         color: 'white',
         fontSize: fontSizes.h5,
     },
-    tabBadge: {marginLeft: spacing(.5)},
+    tabBadge: {marginLeft: spacing(0.5)},
 })
 
 module.exports = Claims

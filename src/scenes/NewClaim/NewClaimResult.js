@@ -1,4 +1,3 @@
-
 const React = require('react'),
     {View, Text, StyleSheet} = require('react-native'),
     {Icon, Button} = require('$/lib/ui'),
@@ -26,36 +25,54 @@ const contents = {
     },
 }
 
-
 const NewClaimResult = ({type = 'success', onNew, onEdit}) => {
     const content = contents[type]
     const higlightStyle = getHiglightStyle(content.color)
-    return <View style={style.container}>
-        <View style={style.root}>
-        
-            <View style={style.content}>
-                <View>
-                    <View style={higlightStyle.root}>
-                        <Icon name={content.icon}
-                            width={24} height={24} fill='white'/>
+    return (
+        <View style={style.container}>
+            <View style={style.root}>
+                <View style={style.content}>
+                    <View>
+                        <View style={higlightStyle.root}>
+                            <Icon
+                                name={content.icon}
+                                width={24}
+                                height={24}
+                                fill="white"
+                            />
+                        </View>
+                        <Text
+                            style={style.message}
+                            children={content.message}
+                        />
                     </View>
-                    <Text style={style.message} children={content.message}/>
+                    <View style={style.divider} />
+                    <Text style={style.extraInfo} children={content.info} />
                 </View>
-                <View style={style.divider}/>
-                <Text style={style.extraInfo} children={content.info}/>
+                {type === 'danger' && (
+                    <Button
+                        text="Edit Claim"
+                        type="outlined"
+                        style={style.newClaimBtn}
+                        onPress={onEdit}
+                    />
+                )}
+                <Button
+                    text="New Claim"
+                    type="contained"
+                    textStyle={style.newClaimBtnText}
+                    style={style.newClaimBtn}
+                    onPress={onNew}
+                />
             </View>
-            {type === 'danger' && 
-                <Button text='Edit Claim' type='outlined' 
-                    style={style.newClaimBtn} onPress={onEdit}/>}
-            <Button text='New Claim' type='contained'
-                textStyle={style.newClaimBtnText}
-                style={style.newClaimBtn} onPress={onNew}/>
         </View>
-    </View>
+    )
 }
 const style = StyleSheet.create({
     container: {
-        flex: 1, padding: spacing(3), backgroundColor: '#F0F3F9',
+        flex: 1,
+        padding: spacing(3),
+        backgroundColor: '#F0F3F9',
     },
     root: {
         backgroundColor: 'white',
@@ -92,15 +109,17 @@ const style = StyleSheet.create({
     },
 })
 
-const getHiglightStyle = memoize((color) => StyleSheet.create({
-    root: {
-        position: 'absolute',
-        padding: spacing(2), 
-        backgroundColor: color,
-        borderTopEndRadius: 4,
-        borderBottomEndRadius: 4,
-        left: -spacing(9),
-    },
-}))
+const getHiglightStyle = memoize((color) =>
+    StyleSheet.create({
+        root: {
+            position: 'absolute',
+            padding: spacing(2),
+            backgroundColor: color,
+            borderTopEndRadius: 4,
+            borderBottomEndRadius: 4,
+            left: -spacing(9),
+        },
+    }),
+)
 
 module.exports = NewClaimResult
