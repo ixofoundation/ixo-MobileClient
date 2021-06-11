@@ -37,14 +37,20 @@ const bgStyles = StyleSheet.create({
         color: 'white',
         fontSize: fontSizes.p1,
     },
+    loadingBg: {
+        flex: 1,
+        backgroundColor: '#002D42',
+    },
 })
 
 const Loadable = ({data, loading, error, render, empty}) => {
     if (loading) {
         return (
-            <Container>
-                <ActivityIndicator size="large" color="#03D0FB" />
-            </Container>
+            <View style={bgStyles.loadingBg}>
+                <Container>
+                    <ActivityIndicator size="large" color="#03D0FB" />
+                </Container>
+            </View>
         )
     }
 
