@@ -6,79 +6,96 @@ const React = require('react'),
 const Icon = require('./Icon')
 
 const QRScanner = ({onScan, onClose = noop, text, style: overrideStyles}) => (
-    <RNCamera
-        type={RNCamera.Constants.Type.back}
-        onBarCodeRead={onScan}
-        flashMode={RNCamera.Constants.FlashMode.on}
-        captureAudio={false}
-        style={{...styles.root, ...overrideStyles}}
-    >
-        <View styles={styles.frameContainer}>
-            <View style={styles.frame} />
-            <View style={styles.midFrameContainer}>
-                <View style={styles.midFrame} />
-                <View style={styles.midFrame} />
+    <>
+        <RNCamera
+            type={RNCamera.Constants.Type.back}
+            onBarCodeRead={onScan}
+            flashMode={RNCamera.Constants.FlashMode.on}
+            captureAudio={false}
+            style={{...styles.root, ...overrideStyles}}
+        >
+            <View styles={styles.frameContainer}>
+                <View style={styles.frameTop} />
+                <View style={styles.midFrameContainer}>
+                    <View style={styles.midFrame} />
+                    <View style={styles.midFrame} />
+                </View>
+                <View style={styles.frameBottom} />
             </View>
-            <View style={styles.frame} />
-        </View>
 
-        <View style={styles.titleContainer}>
-            <View style={styles.titleLayout}>
-                <Pressable
-                    style={styles.closeIcon}
-                    children={
-                        <Icon
-                            name="arrowLeft"
-                            fill="white"
-                            width={30}
-                            height={30}
-                        />
-                    }
-                    onPress={onClose}
-                />
-                {text && <Text style={styles.titleText}>{text}</Text>}
-                <View style={styles.titlePad} />
+            <View style={styles.titleContainer}>
+                <View style={styles.titleLayout}>
+                    <Pressable
+                        style={styles.closeIcon}
+                        children={
+                            <Icon
+                                name="arrowLeft"
+                                fill="white"
+                                width={30}
+                                height={30}
+                            />
+                        }
+                        onPress={onClose}
+                    />
+                    {text && <Text style={styles.titleText}>{text}</Text>}
+                    <View style={styles.titlePad} />
+                </View>
             </View>
-        </View>
 
-        <View style={styles.overlay}>
-            <View style={styles.cornerContainer}>
-                <View
-                    style={StyleSheet.compose(
-                        styles.corner,
-                        styles.topLeftCorner,
-                    )}
-                />
-                <View
-                    style={StyleSheet.compose(
-                        styles.corner,
-                        styles.topRightCorner,
-                    )}
-                />
+            <View style={styles.overlay}>
+                <View style={styles.cornerContainer}>
+                    <View
+                        style={StyleSheet.compose(
+                            styles.corner,
+                            styles.topLeftCorner,
+                        )}
+                    />
+                    <View
+                        style={StyleSheet.compose(
+                            styles.corner,
+                            styles.topRightCorner,
+                        )}
+                    />
+                </View>
+                <View style={styles.cornerContainer}>
+                    <View
+                        style={StyleSheet.compose(
+                            styles.corner,
+                            styles.bottomLeftCorner,
+                        )}
+                    />
+                    <View
+                        style={StyleSheet.compose(
+                            styles.corner,
+                            styles.botomRightCorner,
+                        )}
+                    />
+                </View>
             </View>
-            <View style={styles.cornerContainer}>
-                <View
-                    style={StyleSheet.compose(
-                        styles.corner,
-                        styles.bottomLeftCorner,
-                    )}
-                />
-                <View
-                    style={StyleSheet.compose(
-                        styles.corner,
-                        styles.botomRightCorner,
-                    )}
-                />
-            </View>
+        </RNCamera>
+        <View style={styles.footer}>
+            <Pressable
+                onPress={onClose}
+                children={<Icon name="assistant" fill="white" />}
+            />
         </View>
-    </RNCamera>
+    </>
 )
 
-const {width, height} = Dimensions.get('window')
-const overlayCenterSize = width * 0.7
+const {width, height} = Dimensions.get('screen')
+const overlayCenterSize = width * 0.5
 const overlayBorderSize = 2
+
+const footerHeight = spacing(2) + 42
+
 const styles = StyleSheet.create({
     root: {flex: 1},
+    footer: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: spacing(1),
+        backgroundColor: '#56CCF2',
+    },
     titleText: {
         color: 'white',
         fontSize: fontSizes.h5,
@@ -106,9 +123,14 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-between',
     },
-    frame: {
+    frameTop: {
         backgroundColor: 'rgba(1,1,1,0.6)',
-        height: (height - overlayCenterSize) / 2,
+        height: (height - overlayCenterSize) / 2 - footerHeight,
+        width: '100%',
+    },
+    frameBottom: {
+        backgroundColor: 'rgba(1,1,1,0.6)',
+        height: (height - overlayCenterSize) / 2 + footerHeight,
         width: '100%',
     },
     midFrameContainer: {
@@ -152,7 +174,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         height: overlayCenterSize + overlayBorderSize * 2,
         width: overlayCenterSize + overlayBorderSize * 2,
-        top: (height - overlayCenterSize) / 2 - overlayBorderSize,
+        top:
+            (height - overlayCenterSize) / 2 - overlayBorderSize - footerHeight,
         left: (width - overlayCenterSize) / 2 - overlayBorderSize,
     },
 })

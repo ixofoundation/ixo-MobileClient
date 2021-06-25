@@ -1,19 +1,16 @@
 const React = require('react'),
     {useState, useContext} = React,
-    {View, Text, StyleSheet, SafeAreaView} = require('react-native'),
+    {ScrollView, StyleSheet, SafeAreaView} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {get, keyBy, sortBy, filter} = require('lodash-es'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
     {useProjects} = require('$/stores'),
-    {Modal, Header, Button, EntityFilter, Icon} = require('$/lib/ui'),
+    {Modal, EntityFilter} = require('$/lib/ui'),
     ClaimTplListHeader = require('./ClaimTplListHeader'),
     ClaimTpl = require('./ClaimTpl'),
     ClaimTplActions = require('./ClaimTplActions'),
-    {spacing, fontSizes} = require('$/theme')
-
-const {ScrollView} = require('react-native-gesture-handler')
-const {inspect} = require('util')
+    {fontSizes} = require('$/theme')
 
 const filterSpec = [
     {
