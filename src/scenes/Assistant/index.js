@@ -9,6 +9,7 @@ const React = require('react'),
         TextInput,
         Pressable,
         SafeAreaView,
+        KeyboardAvoidingView,
     } = require('react-native'),
     useBot = require('react-rasa-assistant'),
     {Modal, Text, QRScanner, Icon} = require('$/lib/ui'),
@@ -43,14 +44,14 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
         closeModal = useCallback(() => setQrModalVisibility(false))
 
     return (
-        <SafeAreaView style={s.container}>
+        <KeyboardAvoidingView behavior="padding" style={s.container}>
             <View style={s.sessionCtrlView}>
-                <View style={s.headerBtn} />
-                <Pressable style={s.headerBtn} onLongPress={restartSession}>
+                <Pressable
+                    style={s.headerBtn}
+                    onLongPress={restartSession}
+                    onPress={onClose}
+                >
                     <Icon name="assistant" />
-                </Pressable>
-                <Pressable style={s.headerBtn} onPress={onClose}>
-                    <Icon name="close" fill="white" />
                 </Pressable>
             </View>
 
@@ -133,11 +134,10 @@ const Assistant = ({initMsg, onClose = () => {}}) => {
                         setUserText(userText + ' ' + data)
                         closeModal()
                     }}
-                    text="Scan QR"
                     onClose={closeModal}
                 />
             </Modal>
-        </SafeAreaView>
+        </KeyboardAvoidingView>
     )
 }
 
@@ -150,7 +150,7 @@ const s = StyleSheet.create({
         flexDirection: 'row',
         backgroundColor: 'black',
         padding: theme.spacing(1),
-        justifyContent: 'space-between',
+        justifyContent: 'center',
         alignItems: 'center',
     },
     headerBtn: {

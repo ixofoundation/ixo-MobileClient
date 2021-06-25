@@ -26,26 +26,24 @@ const {width: windowWidth} = Dimensions.get('window')
 
 const TransactionResult = ({status = 'pending', onView}) => {
     const state = states[status] || states.pending
-    return <View style={styles.root}>
-        <Icon
-            name='assistant'
-            width={windowWidth / 3} height={windowWidth / 3}
-            fill={state.color}
-        />
-        <Text style={styles.statusText} children={state.status}/>
-        <Text style={styles.infoText} children={state.info}/>
+    return (
+        <View style={styles.root}>
+            <Icon
+                name="assistant"
+                width={windowWidth / 3}
+                height={windowWidth / 3}
+                fill={state.color}
+            />
+            <Text style={styles.statusText} children={state.status} />
+            <Text style={styles.infoText} children={state.info} />
 
-        {
-            status === 'success' && 
-            <Button 
-                type='outlined'
-                style={styles.viewBtn}
-                onPress={onView}
-            >
-                <Icon name='eye' fill='#39C3E6'/>
-            </Button>
-        }
-    </View>
+            {status === 'success' && (
+                <Button type="outlined" style={styles.viewBtn} onPress={onView}>
+                    <Icon name="eye" fill="#39C3E6" />
+                </Button>
+            )}
+        </View>
+    )
 }
 
 const styles = StyleSheet.create({
@@ -56,12 +54,15 @@ const styles = StyleSheet.create({
         paddingTop: spacing(6),
     },
     statusText: {
-        fontSize: fontSizes.p1, color: '#5A879D',
+        fontSize: fontSizes.p1,
+        color: '#5A879D',
         marginTop: spacing(6),
     },
     infoText: {
-        fontSize: fontSizes.h5, color: 'white',
-        fontWeight: 'bold', textAlign: 'center',
+        fontSize: fontSizes.h5,
+        color: 'white',
+        fontWeight: 'bold',
+        textAlign: 'center',
         marginBottom: spacing(8),
     },
     viewBtn: {
@@ -69,7 +70,6 @@ const styles = StyleSheet.create({
         borderRadius: 24,
         alignSelf: 'center',
     },
-   
 })
 
 module.exports = TransactionResult

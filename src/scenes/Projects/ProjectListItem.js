@@ -1,12 +1,14 @@
-const
-    React = require('react'),
-    {View, Image, StyleSheet, Text, Pressable}
-        = require('react-native'),
+const {useState, useEffect} = require('react')
+const React = require('react'),
+    {View, Image, StyleSheet, Text, Pressable} = require('react-native'),
     theme = require('$/theme'),
     {Icon} = require('$/lib/ui'),
-    ProgressBar = require('./ProgressBar')
+    ProgressBar = require('./ProgressBar'),
+    {fixImageUrl, getProjectLatestClaimDateText} = require('./util')
 
-const ProjectListItem = ({project}) => {
+const LOGO_WIDTH = 40
+
+const ProjectListItem = ({project, onDetailPress}) => {
     const {
         data: {
             name,
@@ -14,113 +16,139 @@ const ProjectListItem = ({project}) => {
             image: imageUrl,
             description,
             claims: {length: claimCount},
-            entityClaims: {items: [claimTpl]},
-        }
+            entityClaims: {items: claims},
+        },
     } = project
+    const [claimTpl] = claims
 
-    return <View style={style.root}>
-        <Image
-            source={{uri: imageUrl}}
-            style={style.coverImg}
-        />
+    const [logoRatio, setLogoRatio] = useState(1)
+    useEffect(() => {
+        Image.getSize(logoUrl, (width, height) => {
+            setLogoRatio(width / height)
+        })
+    }, [logoUrl])
 
-        <View style={style.card}>
-            <View style={style.headingContainer}>
-                <Text children={name} style={style.heading} />
+    return (
+        <View style={style.root}>
+            <Image
+                source={{
+                    uri: fixImageUrl(imageUrl),
+                }}
+                style={style.coverImg}
+            />
 
+            <Image
+                source={{
+                    uri: fixImageUrl(logoUrl),
+                }}
+                style={{
+                    width: LOGO_WIDTH,
+                    height: logoRatio * LOGO_WIDTH,
+                    position: 'absolute',
+                    left: 0,
+                    borderBottomEndRadius: 8,
+                }}
+            />
 
-                <View style={style.logoContainer}>
-                    <Image
-                        source={{uri: logoUrl}}
-                        style={style.logoImg}
-                    />
-                    <Pressable
-                        onPress={() => console.log('detail is clicked!')}
-                    >
+            <View style={style.card}>
+                <View style={style.headingContainer}>
+                    <Text children={name} style={style.heading} />
+                    <Pressable onPress={onDetailPress}>
                         <Icon
-                            name='dotsVertical'
-                            height={40} width={40} 
-                            fill='#085F7D'
+                            name="dotsVertical"
+                            height={36}
+                            width={36}
+                            fill="#085F7D"
                         />
                     </Pressable>
                 </View>
-            </View>
 
-            <View style={{flexDirection: 'row'}}>
-                <Text 
-                    style={style.progressValueText} 
-                    children={claimCount}
-                />
-                <Text 
-                    style={style.progressText} 
-                    children={'/' + claimTpl.targetMax}
+                <View
+                    style={{
+                        flexDirection: 'row',
+                        marginBottom: theme.spacing(2) - 3,
+                    }}
+                >
+                    <Text
+                        style={style.progressValueText}
+                        children={claimCount}
+                    />
+                    <Text
+                        style={style.progressText}
+                        children={'/' + claimTpl.targetMax}
+                    />
+                </View>
+                <Text style={style.detailText} children={description} />
+                <View style={{marginBottom: theme.spacing(2) - 3}}>
+                    <ProgressBar percent={40} progress={35} />
+                </View>
+                <Text
+                    style={style.lastClaimText}
+                    children={getProjectLatestClaimDateText(project)}
                 />
             </View>
-            <Text 
-                style={style.detailText} 
-                children={description}
-            />
-            <ProgressBar percent={40} progress={35}/>
-            <Text 
-                style={style.lastClaimText} 
-                children={'Your last claim submitted on 05-05-18'}
-            />
         </View>
-    </View>
+    )
 }
 
 const style = StyleSheet.create({
     root: {
-        backgroundColor: '#002D42',
-        margin: theme.spacing(1),
+        backgroundColor: theme.colors.primary.darkBlue,
+        marginBottom: theme.spacing(2),
         alignItems: 'center',
     },
     coverImg: {
-        width: '100%', 
-        height: 150,
+        width: '100%',
+        height: 180,
     },
     card: {
-        padding: theme.spacing(1),
+        padding: theme.spacing(2),
         borderColor: '#0E536B',
         borderWidth: 1,
         borderTopWidth: 0,
+        borderBottomEndRadius: 8,
+        borderBottomStartRadius: 8,
     },
     headingContainer: {
         width: '100%',
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center',
+        alignItems: 'flex-end',
+        marginBottom: theme.spacing(2),
     },
     heading: {
-        flex: 1, 
-        fontWeight: 'bold', 
-        color: 'white', 
-        fontSize: theme.fontSizes.h4,
+        flex: 1,
+        fontWeight: '500',
+        color: theme.colors.white,
+        fontSize: theme.fontSizes.h2,
     },
     progressText: {
-        fontSize: theme.fontSizes.h3, 
-        color: 'white',
+        fontSize: theme.fontSizes.numbersLarge,
+        color: theme.colors.white,
     },
     progressValueText: {
-        fontSize: theme.fontSizes.h3, 
-        color: '#83D9F2',
+        fontSize: theme.fontSizes.numbersLarge,
+        color: theme.colors.primary.lightBlue,
     },
     detailText: {
-        fontSize: theme.fontSizes.h5, 
-        color: 'white',
+        fontSize: theme.fontSizes.p1,
+        fontWeight: '400',
+        color: theme.colors.white,
+        marginBottom: theme.spacing(2) - 3,
     },
     lastClaimText: {
-        fontSize: theme.fontSizes.p1, 
-        color: '#83D9F2',
+        fontSize: theme.fontSizes.smallBody,
+        color: theme.colors.primary.lightBlue,
+        fontWeight: '400',
     },
     logoImg: {
-        flex: 0, 
-        width: 40, 
-        height: 40,
+        width: 30,
+        height: 30,
+        borderRadius: 30,
     },
     logoContainer: {
-        flexDirection: 'row', 
-        justifyContent: 'center', 
+        flexDirection: 'row',
+        justifyContent: 'center',
         alignItems: 'center',
     },
 })
