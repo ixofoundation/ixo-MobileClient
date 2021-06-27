@@ -123,10 +123,10 @@ const styles = StyleSheet.create({
         backgroundColor: '#002233',
     },
     headerContainer: {alignItems: 'center'},
-    title: {color: '#5A879D', fontSize: fontSizes.p2},
+    title: {color: '#5A879D', fontSize: fontSizes.caption},
     headerInfoSection: {flexDirection: 'row'},
-    dollarText: {color: 'white', fontSize: fontSizes.h4},
-    dollarAmount: {color: 'white', fontSize: fontSizes.h2},
+    dollarText: {color: 'white', fontSize: 20},
+    dollarAmount: {color: 'white', fontSize: fontSizes.numbersLarge},
     listContainer: {flex: 1, paddingHorizontal: spacing(2)},
 })
 

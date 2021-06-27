@@ -17,12 +17,13 @@ const styles = StyleSheet.create({
     },
     title: {
         color: 'white',
-        fontSize: fontSizes.h5,
+        fontSize: 20,
+        fontWeight: '400',
     },
     totalAmount: {
         color: 'white',
-        fontSize: fontSizes.h4,
-        fontWeight: 'bold',
+        fontSize: 20,
+        fontWeight: '500',
     },
 })
 
