@@ -1,16 +1,11 @@
-const Loadable = require('$/lib/ui/Loadable')
-const StepForm = require('$/lib/ui/StepForm')
-const {spacing, fontSizes} = require('$/theme')
-
 const debug = require('debug')('claims'),
     React = require('react'),
-    {createElement, useContext, useState, Fragment} = React,
+    {createElement, useContext, useState} = React,
     {
         View,
         ScrollView,
         Text,
         Pressable,
-        TouchableWithoutFeedback,
         ActivityIndicator,
         StyleSheet,
         Keyboard,
@@ -39,8 +34,11 @@ const debug = require('debug')('claims'),
         Header,
         Icon,
     } = require('$/lib/ui'),
+    StepForm = require('$/lib/ui/StepForm'),
+    Loadable = require('$/lib/ui/Loadable'),
     NewClaimResult = require('./NewClaimResult'),
-    {keys, values, entries} = Object
+    {keys, values, entries} = Object,
+    {spacing, fontSizes} = require('$/theme')
 
 const formComponents = {
     text: {comp: TextInput, icon: 'textShort'},
@@ -372,40 +370,42 @@ const ClaimFormSteps = ({
     const [formError, setFormError] = useState(null)
 
     return (
-        <StepForm
-            current={currentStepIdx}
-            total={totalSteps}
-            onNext={() => {
-                if (currentStepIdx > totalSteps) {
-                    return
-                }
-                const emptyVals = ['null', 'undefined', '']
+        <Pressable style={{flex: 1}} onPress={Keyboard.dismiss}>
+            <StepForm
+                current={currentStepIdx}
+                total={totalSteps}
+                onNext={() => {
+                    if (currentStepIdx > totalSteps) {
+                        return
+                    }
+                    const emptyVals = ['null', 'undefined', '']
 
-                if (emptyVals.includes(String(value[currentStep.id])))
-                    return setFormError('required')
+                    if (emptyVals.includes(String(value[currentStep.id])))
+                        return setFormError('required')
 
-                setFormError(null)
-                onNext()
-            }}
-            onPrev={() => {
-                if (currentStepIdx === 0) {
-                    return
-                }
-                setFormError(null)
-                onPrev()
-            }}
-        >
-            <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                    setFormError(null)
+                    onNext()
+                }}
+                onPrev={() => {
+                    if (currentStepIdx === 0) {
+                        return
+                    }
+                    setFormError(null)
+                    onPrev()
+                }}
+            >
                 <View>
-                    <Text
-                        style={formStyles.stepText}
-                        children={
-                            'QUESTION ' +
-                            (currentStepIdx + 1) +
-                            '/' +
-                            totalSteps
-                        }
-                    />
+                    <View style={formStyles.stepTextContainer}>
+                        <Text children="QUESTION" style={formStyles.stepText} />
+                        <Text
+                            children={' ' + (currentStepIdx + 1)}
+                            style={formStyles.currStepText}
+                        />
+                        <Text
+                            children={'/' + totalSteps}
+                            style={formStyles.stepText}
+                        />
+                    </View>
 
                     <Text
                         style={formStyles.title}
@@ -433,21 +433,34 @@ const ClaimFormSteps = ({
                         />
                     )}
                 </View>
-            </TouchableWithoutFeedback>
-        </StepForm>
+            </StepForm>
+        </Pressable>
     )
 }
 
 const formStyles = StyleSheet.create({
-    stepText: {marginBottom: spacing(1)},
+    stepText: {
+        color: '#A5ADB0',
+        fontSize: 10,
+        fontWeight: '400',
+    },
+    currStepText: {
+        color: '#00D2FF',
+        fontSize: 10,
+        fontWeight: '700',
+    },
+    stepTextContainer: {
+        flexDirection: 'row',
+        marginBottom: spacing(1),
+    },
     title: {
         fontSize: fontSizes.h5,
         color: '#333333',
         fontWeight: 'bold',
-        marginBottom: spacing(1),
+        marginBottom: spacing(2),
     },
     description: {
-        color: '#878F9F',
+        color: '#333333',
         fontSize: fontSizes.p1,
         marginBottom: spacing(2),
     },

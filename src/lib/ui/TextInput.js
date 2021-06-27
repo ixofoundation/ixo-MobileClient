@@ -1,22 +1,22 @@
 const React = require('react'),
     {forwardRef} = React,
-    {TextInput} = require('react-native')
+    {TextInput, StyleSheet} = require('react-native')
 
 module.exports = forwardRef(({style, onChange, ...props}, ref) => (
     <TextInput
-        style={{...style, ...inputStyle}}
+        style={StyleSheet.compose(inputStyle.root, style)}
+        placeholderTextColor="#BCC1CA"
         onChangeText={onChange}
         {...props}
         ref={ref}
     />
 ))
 
-const inputStyle = {
-    fontSize: 20,
-    backgroundColor: '#ddd',
-    padding: 5,
-    margin: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 5,
-    borderRadius: 10,
-}
+const inputStyle = StyleSheet.create({
+    root: {
+        fontSize: 16,
+        paddingVertical: 10,
+        borderBottomColor: '#BCC1CA',
+        borderBottomWidth: 1,
+    },
+})
