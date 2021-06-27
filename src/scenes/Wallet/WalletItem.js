@@ -11,8 +11,8 @@ const WalletItem = ({amount = 0, name, image = null, icon = null, onPress}) => {
                 {icon && (
                     <Icon
                         name={icon}
-                        width={50}
-                        height={50}
+                        width={24}
+                        height={24}
                         style={styles.icon}
                     />
                 )}
@@ -47,13 +47,13 @@ const styles = StyleSheet.create({
     icon: {marginRight: spacing(2)},
     name: {
         color: 'white',
-        fontSize: fontSizes.p1,
-        fontWeight: 'bold',
+        fontSize: fontSizes.body,
+        fontWeight: '700',
     },
     amount: {
         color: 'white',
-        fontSize: fontSizes.p1,
-        fontWeight: 'bold',
+        fontSize: fontSizes.body,
+        fontWeight: '700',
     },
     nameContainer: {marginRight: spacing(4)},
     leftContent: {flexDirection: 'row', alignItems: 'center'},
