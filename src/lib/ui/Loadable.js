@@ -39,7 +39,6 @@ const bgStyles = StyleSheet.create({
     },
     loadingBg: {
         flex: 1,
-        backgroundColor: '#002D42',
     },
 })
 
