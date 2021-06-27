@@ -29,6 +29,19 @@ const icons = {
     clipboard: require('./assets/clipboard.svg').default,
     ixo: require('./assets/wallet/IXO.svg').default,
     arrowLeft: require('./assets/arrowLeft.svg').default,
+    checkboxMultiple: require('./assets/checkboxMultiple.svg').default,
+    grid: require('./assets/grid.svg').default,
+    imagePlus: require('./assets/imagePlus.svg').default,
+    microphone: require('./assets/microphone.svg').default,
+    playBox: require('./assets/playBox.svg').default,
+    textShort: require('./assets/textShort.svg').default,
+    textLong: require('./assets/textLong.svg').default,
+    calendar: require('./assets/calendar.svg').default,
+    calendarRange: require('./assets/calendarRange.svg').default,
+    file: require('./assets/file.svg').default,
+    accountPlus: require('./assets/accountPlus.svg').default,
+    mapMarker: require('./assets/mapMarker.svg').default,
+    plus: require('./assets/plus.svg').default,
 }
 
 const Icon = ({name, ...props}) => createElement(icons[name], props)
