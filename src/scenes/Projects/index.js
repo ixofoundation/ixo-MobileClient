@@ -177,7 +177,7 @@ const Projects = () => {
 
 const style = StyleSheet.create({
     root: {
-        backgroundColor: theme.colors.primary.darkBlue,
+        backgroundColor: '#002233',
         flex: 1,
         paddingHorizontal: theme.spacing(2),
     },

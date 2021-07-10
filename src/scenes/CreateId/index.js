@@ -1,8 +1,13 @@
-const
-    React = require('react'),
+const React = require('react'),
     {useState, useContext, useCallback, useEffect, createElement} = React,
-    {View, Image, Platform,
-        Dimensions, TouchableOpacity} = require('react-native'),
+    {
+        View,
+        Image,
+        Platform,
+        Dimensions,
+        TouchableOpacity,
+        SafeAreaView,
+    } = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {randomBytes} = require('react-native-randombytes'),
     Swiper = require('react-native-swiper').default,
@@ -13,93 +18,108 @@ const
     {initForExistingWallet} = require('$/init'),
     {useWallet} = require('$/stores'),
     {sleep} = require('$/lib/util'),
-    {Modal, Text, Button, Heading,
-        ButtonGroup, QRScanner, TextInput, Code, Alert} = require('$/lib/ui'),
+    {
+        Modal,
+        Text,
+        Button,
+        Heading,
+        ButtonGroup,
+        QRScanner,
+        TextInput,
+        Code,
+        Alert,
+    } = require('$/lib/ui'),
     logo = require('./logo.png'),
     makeAnImpact = require('./ixoOnboarding1.mp4'),
     globe = require('./globe.mp4')
 
-
 const IdCreation = () => {
-    const
-        [currentSubscene, setSubscene] = useState(),
+    const [currentSubscene, setSubscene] = useState(),
         ws /*wallet store*/ = useWallet(),
         [idGenerating, setIdGenerating] = useState(false),
         {stateNavigator: nav} = useContext(NavigationContext)
+    return (
+        <SafeAreaView style={{flex: 1}}>
+            {!ws.secp ? (
+                <Foo>
+                    <Button
+                        type="outlined"
+                        text="Recover wallet with backup phrase"
+                        onPress={() => setSubscene('pasteMnemonic')}
+                        style={{marginBottom: 10}}
+                    />
 
-    return !ws.secp
-        ? <Foo>
-            <Button
-                type='outlined'
-                text='Recover wallet with backup phrase'
-                onPress={() => setSubscene('pasteMnemonic')}
-                style={{marginBottom: 10}}
-            />
+                    <Button
+                        type="contained"
+                        text="Create new wallet"
+                        onPress={() => setSubscene('createID')}
+                    />
 
-            <Button
-                type='contained'
-                text='Create new wallet'
-                onPress={() => setSubscene('createID')}
-            />
+                    <TouchableOpacity onPress={() => setSubscene('scanQR')}>
+                        <Text
+                            style={ConnectIXOStyles.recover}
+                            children="Import wallet from ixo KeySafe"
+                        />
+                    </TouchableOpacity>
 
-            <TouchableOpacity
-                onPress={() => setSubscene('scanQR')}
-            >
-                <Text
-                    style={ConnectIXOStyles.recover}
-                    children='Import wallet from ixo KeySafe'
-                />
-            </TouchableOpacity>
+                    <Modal
+                        visible={!!currentSubscene}
+                        onRequestClose={() => setSubscene(null)}
+                    >
+                        <View
+                            style={{
+                                backgroundColor: '#002B3F',
+                                justifyContent: 'center',
+                                flex: 1,
+                                padding: 20,
+                            }}
+                        >
+                            {idGenerating && (
+                                <Alert children="Your id is being generated. Please wait." />
+                            )}
 
-            <Modal
-                visible={!!currentSubscene}
-                onRequestClose={() => setSubscene(null)}
-            >
-                <View style={{
-                    backgroundColor: '#002B3F',
-                    justifyContent: 'center',
-                    flex: 1,
-                    padding: 20,
-                }}>
-                    {idGenerating &&
-                        <Alert children=
-                            'Your id is being generated. Please wait.'/>}
+                            {currentSubscene &&
+                                !idGenerating &&
+                                createElement(subScenes[currentSubscene], {
+                                    onReturn: async (mnemonic) => {
+                                        setIdGenerating(true)
+                                        await sleep(0) // See [0]
+                                        await ws.make(mnemonic)
+                                        setSubscene(null)
+                                        setIdGenerating(false)
+                                    },
+                                    onBack: () => {
+                                        setSubscene(null)
+                                    },
+                                })}
+                        </View>
+                    </Modal>
+                </Foo>
+            ) : (
+                <View
+                    style={{
+                        backgroundColor: '#002B3F',
+                        justifyContent: 'center',
+                        flex: 1,
+                        padding: 20,
+                    }}
+                >
+                    <Alert children="Your id is created and saved successfully:" />
 
-                    {(currentSubscene && !idGenerating) &&
-                        createElement(subScenes[currentSubscene], {
-                            onReturn: async mnemonic => {
-                                setIdGenerating(true)
-                                await sleep(0) // See [0]
-                                await ws.make(mnemonic)
-                                setSubscene(null)
-                                setIdGenerating(false)
-                            },
-                        })}
+                    <Code>did:ixo:{ws.agent.did}</Code>
+
+                    <Button
+                        type="contained"
+                        text="Proceed"
+                        onPress={() => initForExistingWallet(nav)}
+                    />
                 </View>
-            </Modal>
-        </Foo>
-
-        : <View style={{
-            backgroundColor: '#002B3F',
-            justifyContent: 'center',
-            flex: 1,
-            padding: 20,
-        }}>
-            <Alert children='Your id is created and saved successfully:' />
-
-            <Code>did:ixo:{ws.agent.did}</Code>
-
-            <Button
-                type='contained'
-                text='Proceed'
-                onPress={() => initForExistingWallet(nav)}
-            />
-        </View>
+            )}
+        </SafeAreaView>
+    )
 }
 
-
-
-const Foo = ({children}) =>
+const Foo = ({children}) => (
     <Swiper
         loop={false}
         activeDotColor={ThemeColors.blue_medium}
@@ -114,14 +134,14 @@ const Foo = ({children}) =>
         <View style={OnBoardingStyles.onboardingContainer} key={0}>
             <View style={OnBoardingStyles.logoContainer}>
                 <Image
-                    resizeMode='contain'
+                    resizeMode="contain"
                     style={OnBoardingStyles.logo}
                     source={logo}
                 />
             </View>
 
             <Video
-                resizeMode='contain'
+                resizeMode="contain"
                 source={makeAnImpact}
                 muted={true}
                 playWhenInactive={false}
@@ -147,14 +167,14 @@ const Foo = ({children}) =>
         <View style={OnBoardingStyles.onboardingContainer} key={1}>
             <View style={OnBoardingStyles.logoContainer}>
                 <Image
-                    resizeMode='contain'
+                    resizeMode="contain"
                     style={OnBoardingStyles.logo}
                     source={logo}
                 />
             </View>
 
             <Video
-                resizeMode='contain'
+                resizeMode="contain"
                 source={makeAnImpact}
                 muted={true}
                 playWhenInactive={false}
@@ -204,24 +224,17 @@ const Foo = ({children}) =>
                     }}
                 >
                     <Image
-                        resizeMode='contain'
+                        resizeMode="contain"
                         style={ConnectIXOStyles.logo}
                         source={logo}
                     />
                 </View>
 
-                <View style={{width: '100%'}}>
-                    {children}
-                </View>
+                <View style={{width: '100%'}}>{children}</View>
             </View>
         </View>
     </Swiper>
-
-
-
-
-
-
+)
 
 const windowDimensions = Dimensions.get('window')
 const videoBackgroundColor = Platform.OS === 'ios' ? '#003047' : '#053347'
@@ -248,7 +261,6 @@ const ThemeColors = {
     progressNotCounted: '#033C50',
     modalBackground: '#012639',
 }
-
 
 const OnBoardingStyles = {
     wrapper: {
@@ -363,88 +375,95 @@ const ConnectIXOStyles = {
 }
 
 const subScenes = {
-    scanQR: ({onReturn}) => {
-        const
-            [scanCompleted, setScanCompleted] = useState(false),
+    scanQR: ({onReturn, onBack}) => {
+        const [scanCompleted, setScanCompleted] = useState(false),
             [encryptedUserData, setEncryptedUserData] = useState(),
             [pwd, setPwd] = useState('')
 
-        return !scanCompleted
-            ? <QRScanner
-                onScan={({data}) => {
-                    setEncryptedUserData(data)
-                    setScanCompleted(true)
-                }}
-                text='Please scan QR code'
-            />
-
-            : <>
-                <Heading children='Unlock KeySafe'  />
+        return !scanCompleted ? (
+            <Modal visible={true}>
+                <QRScanner
+                    onScan={({data}) => {
+                        setEncryptedUserData(data)
+                        setScanCompleted(true)
+                    }}
+                    onClose={onBack}
+                    footer={false}
+                    text="Please scan QR code"
+                />
+            </Modal>
+        ) : (
+            <>
+                <Heading children="Unlock KeySafe" />
 
                 <TextInput
-                    placeholder='Enter KeySafe password'
+                    placeholder="Enter KeySafe password"
                     secureTextEntry={true}
                     onChange={setPwd}
                 />
 
                 <Button
-                    type='contained'
+                    type="contained"
                     onPress={() => {
                         const {mnemonic} = decryptAES(encryptedUserData, pwd)
                         onReturn(mnemonic)
                         setScanCompleted(false)
                         setEncryptedUserData(null)
                     }}
-                    text='Import'
+                    text="Import"
                     style={{margin: 5}}
                 />
             </>
+        )
     },
 
     pasteMnemonic: ({onReturn}) => {
         const [text, setText] = useState('')
 
-        return <>
-            <Heading children='Recover Wallet' />
+        return (
+            <>
+                <Heading children="Recover Wallet" />
 
-            <TextInput
-                multiline
-                numberOfLines={3}
-                placeholder='Enter backup phrase'
-                onChangeText={setText}
-            />
+                <TextInput
+                    multiline
+                    numberOfLines={3}
+                    placeholder="Enter backup phrase"
+                    onChangeText={setText}
+                />
 
-            <Button
-                type='contained'
-                onPress={() => onReturn(text)}
-                text='Done'
-                style={{margin: 5}}
-            />
-        </>
+                <Button
+                    type="contained"
+                    onPress={() => onReturn(text)}
+                    text="Done"
+                    style={{margin: 5}}
+                />
+            </>
+        )
     },
 
     createID: ({onReturn}) => {
-        const
-            [mmChosen, setMmChosen] = useState(false),
+        const [mmChosen, setMmChosen] = useState(false),
             [mm, setMm] = useState([]),
             [shuffledMm, setShuffledMm] = useState([]),
             [reconstructedMm, setReconstructedMm] = useState([]),
             generateMnemonic = useCallback(() =>
-                setMm(entropyToMnemonic(randomBytes(16)).split(' ')))
+                setMm(entropyToMnemonic(randomBytes(16)).split(' ')),
+            )
 
         useEffect(generateMnemonic, [])
 
-        return !mmChosen
-            ? <>
-                <Heading children='Create wallet' />
+        return !mmChosen ? (
+            <>
+                <Heading children="Create wallet" />
 
-                <Text style={{
-                    color: 'white',
-                    paddingBottom: 20,
-                }}>
-                    Your backup phrase is below.
-                    Please save it somewhere before proceeding.
-                    We will ask you for it in the next step.
+                <Text
+                    style={{
+                        color: 'white',
+                        paddingBottom: 20,
+                    }}
+                >
+                    Your backup phrase is below. Please save it somewhere before
+                    proceeding. We will ask you for it in the next step.
                 </Text>
 
                 <Code children={mm.slice(0, 4).join(' ')} />
@@ -452,39 +471,42 @@ const subScenes = {
                 <Code children={mm.slice(8, 12).join(' ')} />
 
                 <Button
-                    type='contained'
+                    type="contained"
                     onPress={() => {
                         setMmChosen(true)
                         setShuffledMm(shuffle(mm))
                     }}
-                    text='Proceed'
+                    text="Proceed"
                     style={{marginTop: 20}}
                 />
             </>
+        ) : (
+            <>
+                <Heading children="Create wallet" />
 
-            : <>
-                <Heading children='Create wallet' />
-
-                <Text style={{
-                    color: 'white',
-                    paddingBottom: 20,
-                }}>
+                <Text
+                    style={{
+                        color: 'white',
+                        paddingBottom: 20,
+                    }}
+                >
                     Prove that you saved your mnemonic, select the mnemonic
                     words with the right order:
                 </Text>
 
                 <ButtonGroup
-                    items={shuffledMm.map(word => ({
+                    items={shuffledMm.map((word) => ({
                         text: word,
                         onPress: () => {
-                            const nextReconstructedMm =
-                                [...reconstructedMm, word]
+                            const nextReconstructedMm = [
+                                ...reconstructedMm,
+                                word,
+                            ]
 
                             setShuffledMm(pull(shuffledMm, word))
                             setReconstructedMm(nextReconstructedMm)
 
-                            if (shuffledMm.length > 0)
-                                return
+                            if (shuffledMm.length > 0) return
 
                             if (isEqual(nextReconstructedMm, mm))
                                 onReturn(mm.join(' '))
@@ -499,7 +521,7 @@ const subScenes = {
                             margin: 8,
                         },
                     }))}
-                    type='contained'
+                    type="contained"
                     style={{marginBottom: 20}}
                 />
 
@@ -508,8 +530,8 @@ const subScenes = {
                 <Code children={reconstructedMm.slice(8, 12).join(' ')} />
 
                 <Button
-                    type='contained'
-                    text='Retry'
+                    type="contained"
+                    text="Retry"
                     onPress={() => {
                         setShuffledMm(shuffle(mm))
                         setReconstructedMm([])
@@ -517,24 +539,19 @@ const subScenes = {
                     style={{marginTop: 20}}
                 />
             </>
-
+        )
     },
 }
 
-
 const decryptAES = (text, pwd) => {
-    const
-        bytes = cryptoJS.AES.decrypt(text, pwd),
+    const bytes = cryptoJS.AES.decrypt(text, pwd),
         contentsHex = bytes.toString(cryptoJS.enc.Utf8),
         payloadJson = Buffer.from(contentsHex, 'hex').toString('utf8')
 
     return JSON.parse(payloadJson)
 }
 
-
 module.exports = IdCreation
-
-
 
 // [0]: Delaying the following code until the next tick as we first want to see
 //      the effects of "setIdGenerating". Although "setIdGenerating" returns
