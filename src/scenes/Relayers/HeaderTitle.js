@@ -7,9 +7,9 @@ const HeaderTitle = ({text}) => <Text style={styles.root} children={text} />
 const styles = StyleSheet.create({
     root: {
         color: 'white',
-        fontSize: fontSizes.p1,
+        fontSize: 14,
         marginLeft: spacing(1),
-        fontWeight: 'bold',
+        fontWeight: '700',
     },
 })
 

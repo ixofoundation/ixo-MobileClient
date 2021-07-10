@@ -6,8 +6,6 @@ const React = require('react'),
     ProgressBar = require('./ProgressBar'),
     {fixImageUrl, getProjectLatestClaimDateText} = require('./util')
 
-const LOGO_WIDTH = 40
-
 const ProjectListItem = ({project, onDetailPress}) => {
     const {
         data: {
@@ -21,13 +19,6 @@ const ProjectListItem = ({project, onDetailPress}) => {
     } = project
     const [claimTpl] = claims
 
-    const [logoRatio, setLogoRatio] = useState(1)
-    useEffect(() => {
-        Image.getSize(logoUrl, (width, height) => {
-            setLogoRatio(width / height)
-        })
-    }, [logoUrl])
-
     return (
         <View style={style.root}>
             <Image
@@ -37,30 +28,25 @@ const ProjectListItem = ({project, onDetailPress}) => {
                 style={style.coverImg}
             />
 
-            <Image
-                source={{
-                    uri: fixImageUrl(logoUrl),
-                }}
-                style={{
-                    width: LOGO_WIDTH,
-                    height: logoRatio * LOGO_WIDTH,
-                    position: 'absolute',
-                    left: 0,
-                    borderBottomEndRadius: 8,
-                }}
-            />
-
             <View style={style.card}>
                 <View style={style.headingContainer}>
                     <Text children={name} style={style.heading} />
-                    <Pressable onPress={onDetailPress}>
-                        <Icon
-                            name="dotsVertical"
-                            height={36}
-                            width={36}
-                            fill="#085F7D"
+                    <View style={style.logoContainer}>
+                        <Image
+                            source={{
+                                uri: fixImageUrl(logoUrl),
+                            }}
+                            style={style.logoImg}
                         />
-                    </Pressable>
+                        <Pressable onPress={onDetailPress}>
+                            <Icon
+                                name="dotsVertical"
+                                height={36}
+                                width={36}
+                                fill="#085F7D"
+                            />
+                        </Pressable>
+                    </View>
                 </View>
 
                 <View
@@ -93,13 +79,17 @@ const ProjectListItem = ({project, onDetailPress}) => {
 
 const style = StyleSheet.create({
     root: {
-        backgroundColor: theme.colors.primary.darkBlue,
+        backgroundColor: '#002D42',
         marginBottom: theme.spacing(2),
         alignItems: 'center',
+        borderTopEndRadius: 8,
+        borderTopStartRadius: 8,
     },
     coverImg: {
         width: '100%',
         height: 180,
+        borderTopEndRadius: 8,
+        borderTopStartRadius: 8,
     },
     card: {
         padding: theme.spacing(2),
@@ -144,11 +134,9 @@ const style = StyleSheet.create({
     logoImg: {
         width: 30,
         height: 30,
-        borderRadius: 30,
     },
     logoContainer: {
         flexDirection: 'row',
-        justifyContent: 'center',
         alignItems: 'center',
     },
 })

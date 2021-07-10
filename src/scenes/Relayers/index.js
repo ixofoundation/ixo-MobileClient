@@ -101,8 +101,8 @@ const Relayers = () => {
                 <View style={styles.root}>
                     <Header>
                         <View style={styles.title}>
-                            <Icon name="explore" fill="#FFFFFE" />
-                            <HeaderTitle text="impact relayers" />
+                            <Icon name="explore" fill="#FFFFFF" />
+                            <HeaderTitle text="Impact Relayers" />
                         </View>
                     </Header>
 
