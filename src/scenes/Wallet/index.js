@@ -38,7 +38,8 @@ const Wallet = () => {
     const {data, error, loading} = useAsyncData(getWallet)
 
     return (
-        <AssistantLayout>
+        <AssistantLayout
+            initMsg={{title:'Loading wallet', payload:'/cryptowallet'}}>
             <MenuLayout>
                 <Loadable
                     data={data}

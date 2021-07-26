@@ -156,7 +156,7 @@ const statusMap = {2: 'bonded', 1: 'unbonding', 0: 'unbonded'}
 const formatAddress = (addr) =>
     addr.length > 20 ? addr.slice(0, 20) + '...' : addr
 
-const RelayerDetail = ({relayerAddr}) => {
+const RelayerDetail = ({relayerAddr, name}) => {
     const {getValidatorDetail} = useStaking()
     const loadRelayerDetail = useCallback(
         () => getValidatorDetail(relayerAddr),
@@ -165,7 +165,10 @@ const RelayerDetail = ({relayerAddr}) => {
     const {data, error, loading} = useAsyncData(loadRelayerDetail)
 
     return (
-        <AssistantLayout>
+        <AssistantLayout
+            initMsg={{title: 'Loading Relayer',
+                      payload: '/relayerStake{"relayer":"' + name + '"}'}}>
+            
             <View style={styles.root}>
                 <Loadable
                     data={data}

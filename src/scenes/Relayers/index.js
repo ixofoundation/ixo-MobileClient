@@ -97,7 +97,9 @@ const Relayers = () => {
 
     return (
         <MenuLayout>
-            <AssistantLayout>
+            <AssistantLayout
+                initMsg={{title: 'Loading relayers',
+                    payload: '/relayerStake{"chainid":"pandora-3"}'}}>
                 <View style={styles.root}>
                     <Header>
                         <View style={styles.title}>
@@ -153,6 +155,7 @@ const Relayers = () => {
                                         onPress={() =>
                                             nav.navigate('relayer-detail', {
                                                 relayerAddr: operator_address,
+                                                name: moniker,
                                             })
                                         }
                                     />
