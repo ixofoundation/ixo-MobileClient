@@ -178,9 +178,7 @@ const RelayerDetail = ({relayerAddr}) => {
                         delegations,
                         unboundingDelegations,
                         rewards,
-                        availabeStake: {
-                            value: {coins: availabeStakeCoins},
-                        },
+                        balances,
                         avatarUrl,
                     }) => {
                         const {
@@ -212,7 +210,7 @@ const RelayerDetail = ({relayerAddr}) => {
 
                         const reward =
                             Number(rewards.total[0].amount) / Math.pow(10, 6)
-                        const availabeStakeTotal = availabeStakeCoins.reduce(
+                        const totalBalance = balances.reduce(
                             (acc, {amount}) => acc + Number(amount),
                             0,
                         )
@@ -256,7 +254,7 @@ const RelayerDetail = ({relayerAddr}) => {
                                     <View style={styles.stakeInfoContainer}>
                                         <StakeInfo
                                             label="Available"
-                                            info={availabeStakeTotal.toFixed(2)}
+                                            info={totalBalance.toFixed(2)}
                                         />
                                         <StakeInfo
                                             label="Delegated"
