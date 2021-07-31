@@ -106,7 +106,7 @@ const useWallet = makeSecurePersistentStore(
             const stakesPromise = delegations.map(
                 async ({validator_address, ...rest}) => {
                     const validator = validatorMap[validator_address]
-                    validator.image_url = await staking.validatorAvatarUrl(
+                    validator.image_url = await validatorAvatarUrl(
                         validator.description.identity,
                     )
                     return {validator, ...rest}
@@ -147,6 +147,29 @@ const useWallet = makeSecurePersistentStore(
             ),
     },
 )
+
+
+const validatorAvatarUrl = async identity => {
+    try {
+        const
+            kbFetch = path =>
+                fetch('https://keybase.io/_/api/1.0' + path)
+                    .then(resp =>
+                        resp.ok ? resp.json() : Promise.reject(resp)),
+
+            {keys: [{key_fingerprint}]}
+                = await kbFetch('/key/fetch.json?pgp_key_ids=' + identity),
+
+            {them: [{pictures: {primary: {url}}}]}
+                = await kbFetch(
+                    '/user/lookup.json?key_fingerprint=' + key_fingerprint)
+
+        return url
+    } catch (e) {
+        return null
+    }
+}
+
 
 const makeWalletAndUpdateInstances = async (walletSrc) => {
     const wallet = await makeWallet(walletSrc)
@@ -190,13 +213,13 @@ const useStaking = makePersistentStore('staking', (set, get) => ({
                 body: {result: distribution},
             },
             {
-                body: {result: availabeStake},
+                body: {result: balances},
             },
         ] = await Promise.all([
             staking.getValidator(addr),
             staking.pool(),
-            staking.validatorDistrubution(addr),
-            staking.availableStake(),
+            staking.validatorDistribution(addr),
+            staking.balances(),
         ])
 
         const [
@@ -208,14 +231,14 @@ const useStaking = makePersistentStore('staking', (set, get) => ({
             {result: unboundingDelegations},
         ] = await Promise.all([
             staking.delegation(distribution.operator_address, addr),
-            staking.delegetorRewards(distribution.operator_address),
+            staking.delegatorRewards(distribution.operator_address),
             staking.delegatorDelegations(distribution.operator_address),
             staking.delegatorUnboundingDelegations(
                 distribution.operator_address,
             ),
         ])
 
-        const avatarUrl = await staking.validatorAvatarUrl(
+        const avatarUrl = await validatorAvatarUrl(
             validator.description.identity,
         )
 
@@ -226,7 +249,7 @@ const useStaking = makePersistentStore('staking', (set, get) => ({
             rewards,
             delegations,
             unboundingDelegations,
-            availabeStake,
+            balances,
             avatarUrl,
         }
     },
