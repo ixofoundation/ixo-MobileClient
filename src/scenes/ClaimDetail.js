@@ -1,41 +1,49 @@
-const Loadable = require('$/lib/ui/Loadable')
-
 const React = require('react'),
     {useQuery} = require('react-query'),
-    {useProjects} = require('$/stores'),
+    {getClient} = require('$/ixoCli'),
     AssistantLayout = require('$/AssistantLayout'),
     MenuLayout = require('$/MenuLayout'),
+    Loadable = require('$/lib/ui/Loadable'),
     {claimTemplateToFormSpec, ClaimFormSummary} = require('$/scenes/NewClaim'),
     {fromEntries} = Object
 
-const ClaimDetail = ({projectDid, claimId}) => {
-    const {listClaims, getTemplate} = useProjects(),
-        claimQuery = useQuery(['claimAndFormSpec', claimId], async () => {
-            const claimList = await listClaims(projectDid),
-                claim = claimList.find((c) => c.txHash === claimId),
-                tpl = await getTemplate(claim.claimTemplateId),
-                formSpec = claimTemplateToFormSpec(tpl.data.page.content)
 
-            return {claim, formSpec}
-        })
+const ClaimDetail = ({projectDid, claimId}) => {
+    const
+        ixoCli = getClient(),
+
+        claimsQuery = useQuery({
+            queryKey: ['claims', {projectDid}],
+            queryFn: () => ixoCli.listClaims(projectDid),
+        }),
+
+        claim =
+            claimsQuery.isSuccess &&
+                claimsQuery.data.find(c => c.txHash === claimId),
+
+        tplQuery = useQuery({
+            enabled: Boolean(claim),
+            queryKey: ['template', claim.claimTemplateId],
+            queryFn: () => ixoCli.getTemplate(claim.claimTemplateId),
+        }),
+
+        formSpec =
+            tplQuery.isSuccess &&
+                claimTemplateToFormSpec(tplQuery.data.data.page.content)
 
     return (
         <AssistantLayout>
             <MenuLayout>
                 <Loadable
-                    loading={claimQuery.isLoading}
-                    error={claimQuery.error}
-                    data={claimQuery.data}
-                    render={(data) => (
+                    loading={claimsQuery.isLoading || tplQuery.isLoading}
+                    error={claimsQuery.error || tplQuery.error}
+                    data={{claim, formSpec}}
+                    render={({claim, formSpec}) => (
                         <ClaimFormSummary
                             editable={false}
-                            formSpec={data.formSpec}
+                            formSpec={formSpec}
                             formState={fromEntries(
-                                data.claim.items.map(({id, value}) => [
-                                    id,
-                                    value,
-                                ]),
-                            )}
+                                claim.items.map(({id, value}) => [id, value]))}
                         />
                     )}
                 />
@@ -43,5 +51,6 @@ const ClaimDetail = ({projectDid, claimId}) => {
         </AssistantLayout>
     )
 }
+
 
 module.exports = ClaimDetail

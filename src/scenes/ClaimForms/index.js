@@ -3,6 +3,8 @@ const React = require('react'),
     {ScrollView, StyleSheet, SafeAreaView} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
     {get, keyBy, sortBy, filter} = require('lodash-es'),
+    {useQuery} = require('react-query'),
+    {getClient} = require('$/ixoCli'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
     {useProjects} = require('$/stores'),
@@ -36,18 +38,32 @@ const filterSpec = [
 ]
 
 const ClaimForms = ({projectDid}) => {
-    const {stateNavigator: nav} = useContext(NavigationContext),
-        project = useProjects().items[projectDid],
-        claimTemplates = get(project, 'data.entityClaims.items', []),
+    const
+        {stateNavigator: nav} = useContext(NavigationContext),
+
+        ixoCli = getClient(),
+
+        projectQuery = useQuery({
+            queryKey: ['project', projectDid],
+            queryFn: () => ixoCli.getProject(projectDid),
+        }),
+
+        claimTemplates =
+            projectQuery.isSuccess
+                ? get(projectQuery.data, 'data.entityClaims.items', [])
+                : [],
         claimTemplatesByDid = keyBy(claimTemplates, '@id'),
+
         [filterWidgetShown, toggleFilterWidget] = useState(false),
         [filters, setFilters] = useState({}),
         [focusedTplDid, setFocusedTpl] = useState(),
+
         tplFilter = (t) =>
             !filters.dateRange
                 ? true
                 : t.startDate >= filters.dateRange[0] &&
                   t.endDate <= filters.dateRange[1],
+
         claimTemplatesFiltered = sortBy(
             filter(claimTemplates, tplFilter),
             filters.sortBy,

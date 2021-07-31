@@ -88,8 +88,8 @@ const style = StyleSheet.create({
     coverImg: {
         width: '100%',
         height: 180,
-        borderTopEndRadius: 8,
-        borderTopStartRadius: 8,
+        borderTopRightRadius: 8,
+        borderTopLeftRadius: 8,
     },
     card: {
         padding: theme.spacing(2),

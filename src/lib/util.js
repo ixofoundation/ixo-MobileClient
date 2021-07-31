@@ -4,7 +4,8 @@ const {useContext, useState, useEffect, useCallback} = require('react'),
     {readFile} = require('react-native-fs'),
     ms = require('ms'),
     retry = require('async-retry'),
-    {NavigationContext} = require('navigation-react')
+    {NavigationContext} = require('navigation-react'),
+    keychain = require('react-native-keychain')
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -67,36 +68,36 @@ const useNav = () => {
     return nav
 }
 
-const useAsyncData = (method, lazy = false) => {
-    const [error, setError] = useState(null)
-    const [loading, setLoading] = useState(!lazy)
-    const [data, setData] = useState(null)
+const validatorAvatarUrl = async identity => {
+    try {
+        const
+            kbFetch = path =>
+                fetch('https://keybase.io/_/api/1.0' + path)
+                    .then(resp =>
+                        resp.ok ? resp.json() : Promise.reject(resp)),
 
-    useEffect(() => {
-        if (lazy) return
-        method()
-            .then(setData)
-            .catch(setError)
-            .finally(() => setLoading(false))
-    }, [method])
+            {keys: [{key_fingerprint}]}
+                = await kbFetch('/key/fetch.json?pgp_key_ids=' + identity),
 
-    const load = useCallback(() => {
-        setLoading(true)
-        const result = method()
-        result
-            .then(setData)
-            .catch(setError)
-            .finally(() => setLoading(false))
-        return result
-    }, [method])
+            {them: [{pictures: {primary: {url}}}]}
+                = await kbFetch(
+                    '/user/lookup.json?key_fingerprint=' + key_fingerprint)
 
-    return {
-        error,
-        data,
-        loading,
-        load,
+        return url
+    } catch (e) {
+        return null
     }
 }
+
+const keychainStorage = {
+    getItem: key =>
+        keychain.getGenericPassword({service: key})
+            .then(({password}) => password),
+
+    setItem: (key, value) =>
+        keychain.setGenericPassword('ixouser', value, {service: key}),
+}
+
 
 module.exports = {
     sleep,
@@ -105,5 +106,6 @@ module.exports = {
     fileToDataURL,
     pollFor,
     useNav,
-    useAsyncData,
+    validatorAvatarUrl,
+    keychainStorage,
 }

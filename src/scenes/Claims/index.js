@@ -1,64 +1,63 @@
-const Loadable = require('$/lib/ui/Loadable')
-const {useNav} = require('$/lib/util')
 
 const React = require('react'),
+    {useMemo} = require('react'),
     {View, ScrollView, Text, StyleSheet} = require('react-native'),
-    {useQuery} = require('react-query'),
+    {useQueries} = require('react-query'),
     {keyBy, countBy, sortBy} = require('lodash-es'),
     moment = require('moment'),
-    {useWallet, useProjects} = require('$/stores'),
+    {getClient} = require('$/ixoCli'),
+    {getWallet} = require('$/wallet'),
+    {useProjects} = require('$/stores'),
     {Tabs, Tab, Header, P} = require('$/lib/ui'),
+    Loadable = require('$/lib/ui/Loadable'),
+    {useNav} = require('$/lib/util'),
     AssistantLayout = require('$/AssistantLayout'),
     MenuLayout = require('$/MenuLayout'),
     Claim = require('./Claim'),
     ClaimListHeader = require('./ClaimListHeader'),
     ClaimActivity = require('./ClaimActivity'),
     ClaimTpl = require('$/scenes/ClaimForms/ClaimTpl'),
-    {spacing, fontSizes} = require('$/theme'),
-    {keys} = Object
+    {spacing, fontSizes} = require('$/theme')
+
 
 const Claims = () => {
-    const {items: projectsById, getProject, listClaims} = useProjects(),
-        claimQuery = useQuery({
-            queryKey: 'claimData',
-            queryFn: async () => {
-                const projectList = await Promise.all(
-                        keys(projectsById).map((projDid) =>
-                            Promise.all([
-                                getProject(projDid),
-                                listClaims(projDid).catch(() => []),
-                            ]),
-                        ),
-                    ),
-                    claimTemplates = projectList.flatMap(([proj]) =>
-                        proj.data.entityClaims.items.map((tpl) => ({
-                            ...tpl,
-                            projectDid: proj.projectDid,
-                            projectName: proj.data.name,
-                        })),
-                    ),
-                    claims = projectList.flatMap(([proj, claimList]) => {
-                        const projClaimsById = keyBy(
-                            proj.data.claims,
-                            'claimId',
-                        )
+    const
+        ixoCli = getClient(),
 
-                        return claimList.map((c) => ({
-                            ...c,
-                            projectName: proj.data.name,
-                            status: projClaimsById[c.txHash].status,
-                        }))
-                    }),
-                    claimsSorted = sortBy(claims, '-datetime'),
-                    claimCountsByStatus = countBy(claims, 'status')
+        {items: projDids} = useProjects(),
 
-                return {
-                    claimTemplates,
-                    claims: claimsSorted,
-                    claimCountsByStatus,
-                }
-            },
-        })
+        projectQueries = useQueries(projDids.map(projDid => ({
+            queryKey: ['projects', projDid],
+            queryFn:  () => ixoCli.getProject(projDid),
+        }))),
+
+        claimQueries = useQueries(projDids.map(projDid => ({
+            queryKey: ['claims', {projectDid: projDid}],
+            queryFn: () => ixoCli.listClaims(projDid).catch(() => []),
+        }))),
+
+        isLoading =
+            projectQueries.some(q => q.isLoading)
+            || claimQueries.some(q => q.isLoading),
+
+        error =
+            projectQueries.find(q => q.error)
+            || claimQueries.find(q => q.error),
+
+        {
+            claimTemplates = [],
+            claims = [],
+            claimCountsByStatus = {0: 0, 1: 0, 2: 0, 3: 0},
+        } =
+            // Compute only after all queries are successfully loaded:
+            useMemo(
+                () =>
+                    isLoading
+                        ? {}
+                        : computeClaimData(projectQueries, claimQueries),
+
+                [isLoading],
+            )
 
     return (
         <AssistantLayout>
@@ -68,9 +67,9 @@ const Claims = () => {
                         <Text style={style.title} children="Claims" />
                     </Header>
                     <Loadable
-                        loading={claimQuery.isLoading}
-                        error={claimQuery.error}
-                        data={claimQuery.data}
+                        loading={isLoading}
+                        error={error}
+                        data={{claimTemplates, claims, claimCountsByStatus}}
                         render={ClaimTabs}
                     />
                 </View>
@@ -79,9 +78,57 @@ const Claims = () => {
     )
 }
 
+const computeClaimData = (projectQueries, claimQueries) => {
+    const
+        projects =
+            projectQueries
+                .filter(q => q.isSuccess)
+                .map(q => q.data),
+
+        claims =
+            claimQueries
+                .filter(q => q.isSuccess)
+                .flatMap(q => q.data),
+
+        projectsByDid =
+            keyBy(projects, 'projectDid'),
+
+        projectClaimsById =
+            keyBy(
+                projects.flatMap(p => p.data.claims),
+                'claimId',
+            ),
+
+        claimTemplates =
+            projects.flatMap(proj =>
+                proj.data.entityClaims.items.map(tpl => ({
+                    ...tpl,
+                    projectDid: proj.projectDid,
+                    projectName: proj.data.name,
+                })),
+            ),
+
+        claimsEnrichedSorted =
+            claims
+                .map(claim => ({
+                    ...claim,
+                    projectName: projectsByDid[claim.projectDid].data.name,
+                    status: projectClaimsById[claim.txHash].status,
+                }))
+                .sort((a, b) => b.dateTime.localeCompare(a.dateTime)),
+
+        claimCountsByStatus = countBy(claims, 'status')
+
+    return {
+        claimTemplates,
+        claims: claimsEnrichedSorted,
+        claimCountsByStatus,
+    }
+}
+
 const ClaimTabs = ({claims, claimCountsByStatus, claimTemplates}) => {
     const nav = useNav()
-    const ws = useWallet()
+    const wallet = getWallet()
     return (
         <Tabs>
             <Tab title="Activity">
@@ -106,7 +153,7 @@ const ClaimTabs = ({claims, claimCountsByStatus, claimTemplates}) => {
                                 ' / ' +
                                 moment(c._created).format('MMM D')
                             }
-                            did={'did:ixo:' + ws.agent.did}
+                            did={wallet.agent.did}
                             savedAt={c._created}
                             status={c.status}
                             onPress={() =>
@@ -156,5 +203,6 @@ const style = StyleSheet.create({
     },
     tabBadge: {marginLeft: spacing(0.5)},
 })
+
 
 module.exports = Claims

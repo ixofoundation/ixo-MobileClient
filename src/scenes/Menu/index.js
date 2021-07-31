@@ -1,22 +1,23 @@
 const React = require('react'),
     {useContext, useState} = React,
     {View, Text, Pressable} = require('react-native'),
-    {useWallet} = require('$/stores'),
     {Button, Icon, ToggleView} = require('$/lib/ui'),
     {NavigationContext} = require('navigation-react'),
+    {getWallet, setWallet} = require('$/wallet'),
     MenuItem = require('./MenuItem'),
     SubMenuItem = require('./SubMenuItem'),
     {spacing, fontSizes} = require('$/theme')
 
 const Menu = () => {
-    const ws = useWallet(),
+    const
+        wallet = getWallet(),
         {stateNavigator: nav} = useContext(NavigationContext)
 
     const [activeItems, setActiveItems] = useState([])
     const handleMenuItemClick = (index) =>
         setActiveItems(activeItems[0] === index ? [] : [index])
 
-    if (!ws.secp) return null
+    if (!wallet) return null
 
     return (
         <View style={style.root}>
@@ -30,7 +31,7 @@ const Menu = () => {
                     style={style.username}
                 />*/}
                     <Text
-                        children={'did:ixo:' + ws.agent.did}
+                        children={wallet.agent.did}
                         style={style.did}
                     />
                 </View>
@@ -56,7 +57,6 @@ const Menu = () => {
                         title="My Account"
                     >
                         <SubMenuItem title="Wallet" to="wallet" />
-                        <SubMenuItem title="Portfolio" to="portfolio" />
                         <SubMenuItem title="Staking" to="relayers" />
                     </MenuItem>
                     {/*
@@ -98,9 +98,9 @@ const Menu = () => {
                 text="Log out"
                 color="secondary"
                 size="lg"
-                onPress={() => {
+                onPress={async () => {
+                    await setWallet(null)
                     nav.navigate('createId')
-                    ws.reset()
                 }}
             />
         </View>

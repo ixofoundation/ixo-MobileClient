@@ -1,40 +1,32 @@
-const React = require('react'),
-    {
-        View,
-        Text,
-        StyleSheet,
-        TextInput,
-        FlatList,
-        Pressable,
-    } = require('react-native'),
+const
+    React = require('react'),
+    {useState} = require('react'),
+    {View, Text, TextInput, FlatList, Pressable} = require('react-native'),
+    {useQuery} = require('react-query'),
+    {getClient} = require('$/ixoCli'),
     {spacing, fontSizes} = require('$/theme'),
-    Avatar = require('$/lib/ui/Avatar'),
-    Header = require('$/lib/ui/Header'),
-    RadioButton = require('$/lib/ui/RadioButton'),
+    {Header, RadioButton, Icon} = require('$/lib/ui'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
-    Icon = require('$/lib/ui/Icon'),
     {useNav} = require('$/lib/util'),
-    {useStaking} = require('$/stores'),
-    {useEffect, useState} = require('react')
-const HeaderTitle = require('./HeaderTitle')
+    HeaderTitle = require('./HeaderTitle'),
+    {entries} = Object
 
-const RelayerItem = ({id, name, commission, onPress}) => {
-    return (
-        <Pressable style={itemStyles.root} onPress={onPress}>
-            <View style={itemStyles.nameContainer}>
-                <Text style={itemStyles.id} children={id} />
-                <Text style={itemStyles.name} children={name} />
-            </View>
-            <Text
-                style={itemStyles.commission}
-                children={commission.toFixed(2) + '%'}
-            />
-        </Pressable>
-    )
-}
 
-const itemStyles = StyleSheet.create({
+const RelayerItem = ({id, name, commission, onPress}) =>
+    <Pressable style={itemStyles.root} onPress={onPress}>
+        <View style={itemStyles.nameContainer}>
+            <Text children={id} style={itemStyles.id} />
+            <Text children={name} style={itemStyles.name} />
+        </View>
+
+        <Text
+            children={commission.toFixed(2) + '%'}
+            style={itemStyles.commission}
+        />
+    </Pressable>
+
+const itemStyles = {
     root: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -66,7 +58,7 @@ const itemStyles = StyleSheet.create({
         fontSize: fontSizes.p1,
         marginRight: spacing(2),
     },
-})
+}
 
 const statusFilterOptions = [
     {label: 'All', value: 'all'},
@@ -74,26 +66,34 @@ const statusFilterOptions = [
 ]
 
 const Relayers = () => {
-    const {validators, listValidators} = useStaking()
-    const [search, setSearch] = useState('')
-    const nav = useNav()
-    const [activityFilter, setActivityFilter] = useState(statusFilterOptions[0])
+    const
+        ixoCli = getClient(),
+        nav = useNav(),
+        [search, setSearch] = useState(''),
+        [activityFilter, setActivityFilter] = useState(statusFilterOptions[0]),
 
-    useEffect(() => {
-        listValidators().catch(console.error)
-    }, [])
+        validatorsQuery = useQuery({
+            queryKey: ['validators'],
+            queryFn: () => ixoCli.staking.listValidators(),
+            initialData: {result: []},
+        }),
 
-    const data = Object.entries(validators)
-        .map(([id, v]) => ({...v, id}))
-        .filter(({description: {moniker}, status}) => {
-            if (
-                activityFilter.value !== 'all' &&
-                status !== activityFilter.value
-            ) {
-                return false
-            }
-            return moniker.toLowerCase().startsWith(search.toLowerCase().trim())
-        })
+        data = entries(validatorsQuery.data.result)
+            .map(([id, v]) => ({...v, id}))
+
+            .filter(({description: {moniker}, status}) => {
+                if (
+                    activityFilter.value !== 'all' &&
+                    status !== activityFilter.value
+                )
+                    return false
+
+                return (
+                    moniker
+                        .toLowerCase()
+                        .startsWith(search.toLowerCase().trim())
+                )
+            })
 
     return (
         <MenuLayout>
@@ -166,7 +166,7 @@ const Relayers = () => {
     )
 }
 
-const styles = StyleSheet.create({
+const styles = {
     root: {
         flex: 1,
         backgroundColor: '#002233',
@@ -198,6 +198,7 @@ const styles = StyleSheet.create({
         color: '#5A879D',
         fontSize: fontSizes.p2,
     },
-})
+}
+
 
 module.exports = Relayers
