@@ -1,25 +1,28 @@
 const
     debug = require('debug')('init'),
-    {useWallet} = require('./stores')
+    {setClient, getClient} = require('./ixoCli'),
+    {loadWallet} = require('./wallet')
 
 
 const init = async nav => {
-    await useWallet.loaded
+    const wallet = await loadWallet()
 
-    const ws /*wallet store*/ = useWallet.getState()
-
-    if (!ws.secp) {
+    if (!wallet) {
         debug('No identity found, navigating to the id creation scene')
         return nav.navigate('createId')
     }
 
-    initForExistingWallet(nav)
+    setClient(wallet)
+
+    initForExistingWallet(nav, wallet)
 }
 
-const initForExistingWallet = async nav => {
-    const ws /*wallet store*/ = useWallet.getState()
+const initForExistingWallet = async (nav, wallet) => {
+    const
+        ixoCli = getClient(),
+        {error: didError} = await ixoCli.getDidDoc(wallet.agent.did)
 
-    if (await ws.isDidRegistered(ws.agent.did)) {
+    if (!didError) {
         debug('The DID is registered, navigating to the project listing scene')
         return nav.navigate('projects')
     }
@@ -27,7 +30,7 @@ const initForExistingWallet = async nav => {
     debug('The DID is not registered, checking for account balance')
 
     const
-        account = await ws.getSecpAccount(),
+        account = await ixoCli.getSecpAccount(),
 
         uixoBalance =
             !account

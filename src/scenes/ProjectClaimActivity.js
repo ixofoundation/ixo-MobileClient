@@ -4,21 +4,23 @@ const React = require('react'),
     {useQueries} = require('react-query'),
     moment = require('moment'),
     {countBy} = require('lodash-es'),
-    {useProjects} = require('$/stores'),
+    {getClient} = require('$/ixoCli'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
     ClaimActivity = require('$/scenes/Claims/ClaimActivity')
 
 const ProjectClaimActivity = ({projectDid, templateDid}) => {
-    const {getProject, getTemplate} = useProjects(),
+    const ixoCli = getClient()
+
+    const
         [projQuery, tplQuery] = useQueries([
             {
                 queryKey: ['projects', projectDid],
-                queryFn: () => getProject(projectDid),
+                queryFn: () => ixoCli.getProject(projectDid),
             },
             {
                 queryKey: ['templates', templateDid],
-                queryFn: () => getTemplate(templateDid),
+                queryFn: () => ixoCli.getTemplate(templateDid),
             },
         ])
 

@@ -2,17 +2,19 @@ const React = require('react'),
     {useContext, useCallback} = React,
     {View, Alert} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
-    {useWallet} = require('$/stores'),
+    {getClient} = require('$/ixoCli'),
+    {getWallet, setWallet} = require('$/wallet'),
     AssistantLayout = require('$/AssistantLayout'),
     {Heading, Button, Text, Code} = require('$/lib/ui')
 
 const Register = () => {
-    const ws /*wallet store*/ = useWallet(),
+    const
+        wallet = getWallet(),
         {stateNavigator: nav} = useContext(NavigationContext)
 
     const register = useCallback(async () => {
         try {
-            await ws.register()
+            await getClient().register()
             alert('Registration complete!')
             nav.navigate('projects')
         } catch (e) {
@@ -29,10 +31,10 @@ const Register = () => {
 
     const createNewId = useCallback(() => {
         nav.navigate('createId')
-        ws.reset()
+        setWallet(null)
     })
 
-    if (!ws.secp) return null
+    if (!wallet) return null
 
     return (
         <AssistantLayout>
@@ -50,7 +52,7 @@ const Register = () => {
                     children="You have already generated an identity:"
                 />
 
-                <Code style={{marginBottom: 20}}>did:ixo:{ws.agent.did}</Code>
+                <Code style={{marginBottom: 20}}>{wallet.agent.did}</Code>
 
                 <Text
                     style={{color: 'white', marginBottom: 20}}

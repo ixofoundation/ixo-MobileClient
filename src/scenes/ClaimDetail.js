@@ -2,6 +2,7 @@ const Loadable = require('$/lib/ui/Loadable')
 
 const React = require('react'),
     {useQuery} = require('react-query'),
+    {getClient} = require('$/ixoCli'),
     {useProjects} = require('$/stores'),
     AssistantLayout = require('$/AssistantLayout'),
     MenuLayout = require('$/MenuLayout'),
@@ -9,11 +10,13 @@ const React = require('react'),
     {fromEntries} = Object
 
 const ClaimDetail = ({projectDid, claimId}) => {
-    const {listClaims, getTemplate} = useProjects(),
+    const
+        ixoCli = getClient(),
+
         claimQuery = useQuery(['claimAndFormSpec', claimId], async () => {
-            const claimList = await listClaims(projectDid),
+            const claimList = await ixoCli.listClaims(projectDid),
                 claim = claimList.find((c) => c.txHash === claimId),
-                tpl = await getTemplate(claim.claimTemplateId),
+                tpl = await ixoCli.getTemplate(claim.claimTemplateId),
                 formSpec = claimTemplateToFormSpec(tpl.data.page.content)
 
             return {claim, formSpec}

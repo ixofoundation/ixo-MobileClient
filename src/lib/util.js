@@ -4,7 +4,8 @@ const {useContext, useState, useEffect, useCallback} = require('react'),
     {readFile} = require('react-native-fs'),
     ms = require('ms'),
     retry = require('async-retry'),
-    {NavigationContext} = require('navigation-react')
+    {NavigationContext} = require('navigation-react'),
+    keychain = require('react-native-keychain')
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -98,6 +99,37 @@ const useAsyncData = (method, lazy = false) => {
     }
 }
 
+const validatorAvatarUrl = async identity => {
+    try {
+        const
+            kbFetch = path =>
+                fetch('https://keybase.io/_/api/1.0' + path)
+                    .then(resp =>
+                        resp.ok ? resp.json() : Promise.reject(resp)),
+
+            {keys: [{key_fingerprint}]}
+                = await kbFetch('/key/fetch.json?pgp_key_ids=' + identity),
+
+            {them: [{pictures: {primary: {url}}}]}
+                = await kbFetch(
+                    '/user/lookup.json?key_fingerprint=' + key_fingerprint)
+
+        return url
+    } catch (e) {
+        return null
+    }
+}
+
+const keychainStorage = {
+    getItem: key =>
+        keychain.getGenericPassword({service: key})
+            .then(({password}) => password),
+
+    setItem: (key, value) =>
+        keychain.setGenericPassword('ixouser', value, {service: key}),
+}
+
+
 module.exports = {
     sleep,
     selectFile,
@@ -106,4 +138,6 @@ module.exports = {
     pollFor,
     useNav,
     useAsyncData,
+    validatorAvatarUrl,
+    keychainStorage,
 }

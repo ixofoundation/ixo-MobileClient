@@ -9,11 +9,11 @@ const React = require('react'),
         Alert,
     } = require('react-native'),
     {spacing, fontSizes} = require('$/theme'),
+    {getClient} = require('./ixoCli'),
     Avatar = require('$/lib/ui/Avatar'),
     Icon = require('$/lib/ui/Icon'),
     {memoize} = require('lodash'),
-    {useAsyncData} = require('$/lib/util'),
-    {useStaking} = require('$/stores'),
+    {useAsyncData, validatorAvatarUrl} = require('$/lib/util'),
     AssistantLayout = require('$/AssistantLayout'),
     Loadable = require('$/lib/ui/Loadable'),
     Clipboard = require('@react-native-clipboard/clipboard').default
@@ -157,7 +157,6 @@ const formatAddress = (addr) =>
     addr.length > 20 ? addr.slice(0, 20) + '...' : addr
 
 const RelayerDetail = ({relayerAddr}) => {
-    const {getValidatorDetail} = useStaking()
     const loadRelayerDetail = useCallback(
         () => getValidatorDetail(relayerAddr),
         [relayerAddr],
@@ -333,6 +332,57 @@ const RelayerDetail = ({relayerAddr}) => {
             </View>
         </AssistantLayout>
     )
+}
+
+const getValidatorDetail = async (addr) => {
+    const ixoCli = getClient()
+
+    const [
+        {result: validator},
+        {result: pool},
+        {
+            body: {result: distribution},
+        },
+        {
+            body: {result: balances},
+        },
+    ] = await Promise.all([
+        ixoCli.staking.getValidator(addr),
+        ixoCli.staking.pool(),
+        ixoCli.staking.validatorDistribution(addr),
+        ixoCli.staking.balances(),
+    ])
+
+    const [
+        {result: delegation},
+        {
+            body: {result: rewards},
+        },
+        {result: delegations},
+        {result: unboundingDelegations},
+    ] = await Promise.all([
+        ixoCli.staking.delegation(distribution.operator_address, addr),
+        ixoCli.staking.delegatorRewards(distribution.operator_address),
+        ixoCli.staking.delegatorDelegations(distribution.operator_address),
+        ixoCli.staking.delegatorUnboundingDelegations(
+            distribution.operator_address,
+        ),
+    ])
+
+    const avatarUrl = await validatorAvatarUrl(
+        validator.description.identity,
+    )
+
+    return {
+        validator,
+        pool,
+        delegation,
+        rewards,
+        delegations,
+        unboundingDelegations,
+        balances,
+        avatarUrl,
+    }
 }
 
 const styles = StyleSheet.create({

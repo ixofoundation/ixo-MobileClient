@@ -1,10 +1,11 @@
 const React = require('react'),
     {View, Text, StyleSheet} = require('react-native'),
+    {sum, sumBy} = require('lodash-es'),
+    {getClient} = require('$/ixoCli'),
     {spacing, fontSizes} = require('$/theme'),
     AssistantLayout = require('$/AssistantLayout'),
     Loadable = require('$/lib/ui/Loadable'),
-    {useAsyncData} = require('$/lib/util'),
-    {useWallet} = require('$/stores'),
+    {useAsyncData, validatorAvatarUrl} = require('$/lib/util'),
     WalletList = require('./WalletList'),
     MenuLayout = require('$/MenuLayout'),
     WalletItem = require('./WalletItem'),
@@ -33,8 +34,6 @@ const parseStakes = ({
 })
 
 const Wallet = () => {
-    const {getWallet} = useWallet()
-
     const {data, error, loading} = useAsyncData(getWallet)
 
     return (
@@ -114,6 +113,97 @@ const Wallet = () => {
             </MenuLayout>
         </AssistantLayout>
     )
+}
+
+const getWallet = async () => {
+    const ixoCli = getClient()
+
+    const [
+        secpAccount,
+        agentAccount,
+        {result: validators},
+        {result: delegations},
+        {body: {result: bonds}},
+    ] = await Promise.all([
+        ixoCli.getSecpAccount(),
+        ixoCli.getAgentAccount(),
+        ixoCli.staking.listValidators(),
+        ixoCli.staking.myDelegations(),
+        ixoCli.client.bonds.list(),
+    ])
+
+    // Account
+    const account = []
+    const ixo =
+        sum(
+            secpAccount.balance
+                .filter(({denom}) => denom === 'uixo')
+                .map(({amount}) => amount),
+        ) /
+        10 ** 6
+    account.push({
+        asset: 'uixo',
+        amount: ixo,
+        name: 'IXO',
+        icon: 'ixo',
+    })
+    // TODO: other assets be in here added (BTC, $, € etc.)
+
+    // Portfolio
+    const bondsMap = Object.fromEntries(
+        bonds.map((bond) => {
+            const {
+                supply: {denom},
+            } = bond
+            return [denom, bond]
+        }),
+    )
+    const portfolioPromise = agentAccount.balance
+        .filter(({denom}) => !!bondsMap[denom])
+        .map(async ({amount, denom}) => {
+            const {
+                body: {result: bond},
+            } = await ixoCli.bonds.byId(bondsMap[denom].did)
+            return {bond, amount, denom}
+        })
+
+    // Stakes
+    const validatorMap = Object.fromEntries(
+        validators.map((data) => [data.operator_address, data]),
+    )
+    const stakesPromise = delegations.map(
+        async ({validator_address, ...rest}) => {
+            const validator = validatorMap[validator_address]
+            validator.image_url = await validatorAvatarUrl(
+                validator.description.identity,
+            )
+            return {validator, ...rest}
+        },
+    )
+
+    const [portfolio, stakes] = await Promise.all([
+        Promise.all(portfolioPromise),
+        Promise.all(stakesPromise),
+    ])
+
+    const accountTotal = sumBy(account, ({amount}) => Number(amount))
+    const portfolioTotal = sumBy(portfolio, ({amount}) =>
+        Number(amount),
+    )
+    const stakesTotal = sumBy(stakes, ({balance: {amount}}) =>
+        Number(amount),
+    )
+    const total = Number(accountTotal + portfolioTotal + stakesTotal)
+
+    return {
+        account,
+        portfolio,
+        stakes,
+        accountTotal,
+        portfolioTotal,
+        stakesTotal,
+        total,
+    }
 }
 
 const styles = StyleSheet.create({

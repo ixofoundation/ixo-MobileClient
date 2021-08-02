@@ -15,8 +15,9 @@ const React = require('react'),
     cryptoJS = require('crypto-js'),
     {shuffle, pull, isEqual} = require('lodash-es'),
     {entropyToMnemonic} = require('bip39'),
+    {makeWallet} = require('@ixo/client-sdk'),
+    {getWallet} = require('$/wallet'),
     {initForExistingWallet} = require('$/init'),
-    {useWallet} = require('$/stores'),
     {sleep} = require('$/lib/util'),
     {
         Modal,
@@ -35,12 +36,12 @@ const React = require('react'),
 
 const IdCreation = () => {
     const [currentSubscene, setSubscene] = useState(),
-        ws /*wallet store*/ = useWallet(),
+        wallet = getWallet(),
         [idGenerating, setIdGenerating] = useState(false),
         {stateNavigator: nav} = useContext(NavigationContext)
     return (
         <SafeAreaView style={{flex: 1}}>
-            {!ws.secp ? (
+            {!wallet ? (
                 <Foo>
                     <Button
                         type="outlined"
@@ -84,7 +85,7 @@ const IdCreation = () => {
                                     onReturn: async (mnemonic) => {
                                         setIdGenerating(true)
                                         await sleep(0) // See [0]
-                                        await ws.make(mnemonic)
+                                        await setWallet(await makeWallet(mnemonic))
                                         setSubscene(null)
                                         setIdGenerating(false)
                                     },
@@ -106,12 +107,12 @@ const IdCreation = () => {
                 >
                     <Alert children="Your id is created and saved successfully:" />
 
-                    <Code>did:ixo:{ws.agent.did}</Code>
+                    <Code>{wallet.agent.did}</Code>
 
                     <Button
                         type="contained"
                         text="Proceed"
-                        onPress={() => initForExistingWallet(nav)}
+                        onPress={() => initForExistingWallet(nav, wallet)}
                     />
                 </View>
             )}

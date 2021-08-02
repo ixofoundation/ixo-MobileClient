@@ -6,6 +6,7 @@ const React = require('react'),
     {useQuery} = require('react-query'),
     {keyBy, countBy, sortBy} = require('lodash-es'),
     moment = require('moment'),
+    {getClient} = require('$/ixoCli'),
     {useWallet, useProjects} = require('$/stores'),
     {Tabs, Tab, Header, P} = require('$/lib/ui'),
     AssistantLayout = require('$/AssistantLayout'),
@@ -18,15 +19,17 @@ const React = require('react'),
     {keys} = Object
 
 const Claims = () => {
-    const {items: projectsById, getProject, listClaims} = useProjects(),
+    const ixoCli = getClient()
+
+    const {items: projectsById} = useProjects(),
         claimQuery = useQuery({
             queryKey: 'claimData',
             queryFn: async () => {
                 const projectList = await Promise.all(
                         keys(projectsById).map((projDid) =>
                             Promise.all([
-                                getProject(projDid),
-                                listClaims(projDid).catch(() => []),
+                                ixoCli.getProject(projDid),
+                                ixoCli.listClaims(projDid).catch(() => []),
                             ]),
                         ),
                     ),
@@ -106,7 +109,7 @@ const ClaimTabs = ({claims, claimCountsByStatus, claimTemplates}) => {
                                 ' / ' +
                                 moment(c._created).format('MMM D')
                             }
-                            did={'did:ixo:' + ws.agent.did}
+                            did={ws.agent.did}
                             savedAt={c._created}
                             status={c.status}
                             onPress={() =>
