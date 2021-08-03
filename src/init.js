@@ -1,7 +1,7 @@
 const
     debug = require('debug')('init'),
     {setClient, getClient} = require('./ixoCli'),
-    {loadWallet} = require('./wallet')
+    {loadWallet, setWallet} = require('./wallet')
 
 
 const init = async nav => {
@@ -29,13 +29,9 @@ const initForExistingWallet = async (nav, wallet) => {
 
     debug('The DID is not registered, checking for account balance')
 
-    const
-        account = await ixoCli.getSecpAccount(),
+    const uixoBalance = await ixoCli.balances('secp', 'uixo')
 
-        uixoBalance =
-            !account
-                ? 0
-                : account.balance.find(tok => tok.denom === 'uixo').amount
+    console.info('GOT UIXO BALANCE', uixoBalance)
 
     if (uixoBalance < 100) {
         debug('Too little account balance, navigating to the credit scene')

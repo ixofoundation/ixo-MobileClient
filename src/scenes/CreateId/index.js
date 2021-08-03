@@ -16,7 +16,8 @@ const React = require('react'),
     {shuffle, pull, isEqual} = require('lodash-es'),
     {entropyToMnemonic} = require('bip39'),
     {makeWallet} = require('@ixo/client-sdk'),
-    {getWallet} = require('$/wallet'),
+    {getWallet, setWallet} = require('$/wallet'),
+    {setClient} = require('$/ixoCli'),
     {initForExistingWallet} = require('$/init'),
     {sleep} = require('$/lib/util'),
     {
@@ -85,7 +86,8 @@ const IdCreation = () => {
                                     onReturn: async (mnemonic) => {
                                         setIdGenerating(true)
                                         await sleep(0) // See [0]
-                                        await setWallet(await makeWallet(mnemonic))
+                                        const wallet = await setWallet(await makeWallet(mnemonic))
+                                        setClient(wallet)
                                         setSubscene(null)
                                         setIdGenerating(false)
                                     },
