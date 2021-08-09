@@ -29,9 +29,8 @@ const initForExistingWallet = async (nav, wallet) => {
 
     debug('The DID is not registered, checking for account balance')
 
-    const uixoBalance = await ixoCli.balances('secp', 'uixo')
-
-    console.info('GOT UIXO BALANCE', uixoBalance)
+    const {balance: {amount: uixoBalance}} =
+        await ixoCli.balances('secp', 'uixo')
 
     if (uixoBalance < 100) {
         debug('Too little account balance, navigating to the credit scene')

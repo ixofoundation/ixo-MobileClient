@@ -7,7 +7,8 @@ const React = require('react'),
     {keyBy, countBy, sortBy} = require('lodash-es'),
     moment = require('moment'),
     {getClient} = require('$/ixoCli'),
-    {useWallet, useProjects} = require('$/stores'),
+    {getWallet} = require('$/wallet'),
+    {useProjects} = require('$/stores'),
     {Tabs, Tab, Header, P} = require('$/lib/ui'),
     AssistantLayout = require('$/AssistantLayout'),
     MenuLayout = require('$/MenuLayout'),
@@ -84,7 +85,7 @@ const Claims = () => {
 
 const ClaimTabs = ({claims, claimCountsByStatus, claimTemplates}) => {
     const nav = useNav()
-    const ws = useWallet()
+    const wallet = getWallet()
     return (
         <Tabs>
             <Tab title="Activity">
@@ -109,7 +110,7 @@ const ClaimTabs = ({claims, claimCountsByStatus, claimTemplates}) => {
                                 ' / ' +
                                 moment(c._created).format('MMM D')
                             }
-                            did={ws.agent.did}
+                            did={wallet.agent.did}
                             savedAt={c._created}
                             status={c.status}
                             onPress={() =>

@@ -19,7 +19,7 @@ const loadWallet = async () => {
     if (!serializableWallet)
         return null
 
-    wallet = makeWallet(serializableWallet)
+    wallet = await makeWallet(serializableWallet)
 
     return wallet
 }
@@ -36,7 +36,7 @@ const setWallet = async newWallet => {
 
     await keychainStorage.setItem('wallet', JSON.stringify(serializableWallet))
 
-    debug('SAVED WALLET', serializableWallet)
+    debug('Saved wallet', serializableWallet)
 
     return wallet
 }
