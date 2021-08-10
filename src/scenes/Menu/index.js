@@ -99,9 +99,9 @@ const Menu = () => {
                 text="Log out"
                 color="secondary"
                 size="lg"
-                onPress={() => {
+                onPress={async () => {
+                    await setWallet(null)
                     nav.navigate('createId')
-                    setWallet(null)
                 }}
             />
         </View>

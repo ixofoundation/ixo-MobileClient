@@ -14,7 +14,7 @@
     "deploy:beta": "cd ./ios && bundle exec fastlane beta --env development"
   },
   "dependencies": {
-    "@ixo/client-sdk": "^1.10.0",
+    "@ixo/client-sdk": "^1.10.1",
     "@react-native-async-storage/async-storage": "^1.13.2",
     "@react-native-clipboard/clipboard": "^1.8.1",
     "@react-native-community/audio-toolkit": "^2.0.3",

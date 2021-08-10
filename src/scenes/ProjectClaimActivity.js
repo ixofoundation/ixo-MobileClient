@@ -1,7 +1,7 @@
 const Loadable = require('$/lib/ui/Loadable')
 const React = require('react'),
     {ActivityIndicator, View} = require('react-native'),
-    {useQueries} = require('react-query'),
+    {useQuery} = require('react-query'),
     moment = require('moment'),
     {countBy} = require('lodash-es'),
     {getClient} = require('$/ixoCli'),
@@ -10,26 +10,20 @@ const React = require('react'),
     ClaimActivity = require('$/scenes/Claims/ClaimActivity')
 
 const ProjectClaimActivity = ({projectDid, templateDid}) => {
-    const ixoCli = getClient()
-
     const
-        [projQuery, tplQuery] = useQueries([
-            {
-                queryKey: ['projects', projectDid],
-                queryFn: () => ixoCli.getProject(projectDid),
-            },
-            {
-                queryKey: ['templates', templateDid],
-                queryFn: () => ixoCli.getTemplate(templateDid),
-            },
-        ])
+        ixoCli = getClient(),
+
+        projQuery = useQuery({
+            queryKey: ['project', projectDid],
+            queryFn: () => ixoCli.getProject(projectDid),
+        })
 
     return (
         <MenuLayout>
             <AssistantLayout>
                 <Loadable
-                    loading={tplQuery.isLoading || projQuery.isLoading}
-                    data={{project: projQuery.data, tpl: tplQuery.data}}
+                    loading={projQuery.isLoading}
+                    data={{project: projQuery.data}}
                     render={({project, tpl}) => (
                         <ClaimActivity
                             dateRange={fmtDateRange(

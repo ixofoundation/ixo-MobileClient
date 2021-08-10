@@ -1,5 +1,3 @@
-const Loadable = require('$/lib/ui/Loadable')
-const {useNav} = require('$/lib/util')
 
 const React = require('react'),
     {View, ScrollView, Text, StyleSheet} = require('react-native'),
@@ -10,24 +8,28 @@ const React = require('react'),
     {getWallet} = require('$/wallet'),
     {useProjects} = require('$/stores'),
     {Tabs, Tab, Header, P} = require('$/lib/ui'),
+    Loadable = require('$/lib/ui/Loadable'),
+    {useNav} = require('$/lib/util'),
     AssistantLayout = require('$/AssistantLayout'),
     MenuLayout = require('$/MenuLayout'),
     Claim = require('./Claim'),
     ClaimListHeader = require('./ClaimListHeader'),
     ClaimActivity = require('./ClaimActivity'),
     ClaimTpl = require('$/scenes/ClaimForms/ClaimTpl'),
-    {spacing, fontSizes} = require('$/theme'),
-    {keys} = Object
+    {spacing, fontSizes} = require('$/theme')
+
 
 const Claims = () => {
-    const ixoCli = getClient()
+    const
+        ixoCli = getClient(),
 
-    const {items: projectsById} = useProjects(),
+        {items: projDids} = useProjects(),
+
         claimQuery = useQuery({
             queryKey: 'claimData',
             queryFn: async () => {
                 const projectList = await Promise.all(
-                        keys(projectsById).map((projDid) =>
+                        projDids.map((projDid) =>
                             Promise.all([
                                 ixoCli.getProject(projDid),
                                 ixoCli.listClaims(projDid).catch(() => []),
@@ -160,5 +162,6 @@ const style = StyleSheet.create({
     },
     tabBadge: {marginLeft: spacing(0.5)},
 })
+
 
 module.exports = Claims

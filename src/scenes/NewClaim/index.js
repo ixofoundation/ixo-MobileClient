@@ -148,11 +148,13 @@ const NewClaim = ({templateDid, projectDid}) => {
         ixoCli = getClient(),
         {stateNavigator: nav} = useContext(NavigationContext),
         [formShown, toggleForm] = useState(false),
-        {isLoading, error, data} = useQuery(['tpl', templateDid], () =>
-            ixoCli.getTemplate(templateDid).then((tpl) =>
-                claimTemplateToFormSpec(tpl.data.page.content),
-            ),
-        )
+        tplQuery = useQuery({
+            queryKey: ['template', templateDid],
+            queryFn: () => ixoCli.getTemplate(templateDid),
+        }),
+        formSpec =
+            tplQuery.isSuccess &&
+                claimTemplateToFormSpec(tplQuery.data.data.page.content)
 
     return (
         <MenuLayout>
@@ -163,13 +165,13 @@ const NewClaim = ({templateDid, projectDid}) => {
                         style={newClaimStyle.title}
                     />
                     <Loadable
-                        loading={isLoading}
-                        error={error}
-                        data={data}
-                        render={(d) => {
+                        loading={tplQuery.isLoading}
+                        error={tplQuery.error}
+                        data={formSpec}
+                        render={formSpec => {
                             return (
                                 <ClaimStepsView
-                                    steps={d}
+                                    steps={formSpec}
                                     onBack={() => nav.navigateBack(1)}
                                     onSubmit={() => toggleForm(true)}
                                 />
@@ -182,7 +184,7 @@ const NewClaim = ({templateDid, projectDid}) => {
                         onRequestClose={() => toggleForm(false)}
                         children={
                             <ClaimForm
-                                formSpec={data}
+                                formSpec={formSpec}
                                 projectDid={projectDid}
                                 templateDid={templateDid}
                                 onClose={() => toggleForm(false)}
@@ -262,7 +264,7 @@ const ClaimForm = ({formSpec, projectDid, templateDid, onClose = noop}) => {
                                 value.uri,
                             )
 
-                            const remoteURL = await ixoCli.uploadFile(
+                            const remoteURL = await ixoCli.createEntityFile(
                                 projectDid,
                                 dataURL,
                             )
