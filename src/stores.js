@@ -6,7 +6,7 @@ const
 const useProjects = makePersistentStore('projects', set => ({
     items: [], // project DIDs
 
-    connect: async projDid =>
+    connect: projDid =>
         set(({items}) => ({items: [...items, projDid]})),
 
     disconnect: projDid =>

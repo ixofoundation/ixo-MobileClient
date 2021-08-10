@@ -3,7 +3,9 @@ const url = require('url'),
     {useState, useContext} = React,
     {ScrollView, View, StyleSheet, Text, Pressable} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
-    {sortBy, filter} = require('lodash-es'),
+    {get} = require('lodash-es'),
+    {useQueries} = require('react-query'),
+    {getClient} = require('$/ixoCli'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
     ProjectActions = require('./ProjectActions'),
@@ -48,10 +50,18 @@ const filterSpec = [
 const Projects = () => {
     const {stateNavigator: nav} = useContext(NavigationContext),
         ps = useProjects(),
+        ixoCli = getClient(),
+
         [scannerShown, toggleScanner] = useState(false),
         [filterShown, toggleFilter] = useState(false),
         [filters, setFilters] = useState({}),
         [focusedProjDid, setFocusedProj] = useState(),
+
+        projectQueries = useQueries(ps.items.map(projDid => ({
+            queryKey: ['project', projDid],
+            queryFn: () => ixoCli.getProject(projDid),
+        }))),
+
         projFilter = (p) => {
             if (filters.stage && !filters.stage.includes(p.data.stage))
                 return false
@@ -61,20 +71,28 @@ const Projects = () => {
                 : p.data.startDate >= filters.dateRange[0] &&
                       p.data.endDate <= filters.dateRange[1]
         },
-        projects = sortBy(filter(ps.items, projFilter), filters.sortBy)
+
+        projects =
+            projectQueries
+                .filter(q => q.isSuccess)
+                .map(q => q.data)
+                .filter(projFilter)
+                .sort((a, b) =>
+                    get(a, filters.sortBy)
+                        .localeCompare(get(b, filters.sortBy))),
+
+        focusedProj = projects.find(p =>
+            focusedProjDid && p.projectDid == focusedProjDid)
 
     const handleScan = async ({data}) => {
         toggleScanner(false)
 
         const projDid = url.parse(data).path.split('/')[2]
 
-        if (ps.items[projDid]) return alert('Project already exists!')
+        if (ps.items.includes(projDid))
+            return alert('Project already exists!')
 
-        try {
-            await ps.connect(projDid)
-        } catch (e) {
-            alert('Couldnt connect to project, please try again later!') // eslint-disable-line max-len
-        }
+        ps.connect(projDid)
     }
 
     return (
@@ -144,6 +162,12 @@ const Projects = () => {
                         visible={scannerShown}
                         onRequestClose={() => toggleScanner(false)}
                     >
+                        <Button
+                            text='dummy'
+                            onPress={() =>
+                                handleScan('did:ixo:EA4XpByjFM8WbQo9mzSemc')}
+                        />
+
                         <QRScanner
                             onScan={handleScan}
                             onClose={() => toggleScanner(false)}
@@ -151,12 +175,12 @@ const Projects = () => {
                     </Modal>
 
                     <Modal
-                        visible={!!focusedProjDid}
+                        visible={!!focusedProj}
                         onRequestClose={() => setFocusedProj(null)}
                         transparent
                         children={
                             <ProjectActions
-                                project={ps.items[focusedProjDid]}
+                                project={focusedProj}
                                 onClose={() => setFocusedProj(null)}
                                 onDisconnect={() => {
                                     setFocusedProj(null)
