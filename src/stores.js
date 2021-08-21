@@ -14,6 +14,16 @@ const useProjects = makePersistentStore('projects', set => ({
 }))
 
 
+const useWalletConnect = makePersistentStore('walletconnect', set => ({
+    session: null,
+    error: null,
+
+    setSession: session => set({session}),
+    setError: error => set({error}),
+}))
+
+
 module.exports = {
     useProjects,
+    useWalletConnect,
 }

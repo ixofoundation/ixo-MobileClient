@@ -4,6 +4,8 @@ const React = require('react'),
     {Button, Icon, ToggleView} = require('$/lib/ui'),
     {NavigationContext} = require('navigation-react'),
     {getWallet, setWallet} = require('$/wallet'),
+    {getWalletConnectClient} = require('$/walletconnect'),
+    {useWalletConnect} = require('$/stores'),
     MenuItem = require('./MenuItem'),
     SubMenuItem = require('./SubMenuItem'),
     {spacing, fontSizes} = require('$/theme')
@@ -11,6 +13,7 @@ const React = require('react'),
 const Menu = () => {
     const
         wallet = getWallet(),
+        {setSession: setWcSession} = useWalletConnect(),
         {stateNavigator: nav} = useContext(NavigationContext)
 
     const [activeItems, setActiveItems] = useState([])
@@ -100,6 +103,8 @@ const Menu = () => {
                 size="lg"
                 onPress={async () => {
                     await setWallet(null)
+                    getWalletConnectClient().killSession()
+                    setWcSession(null)
                     nav.navigate('createId')
                 }}
             />

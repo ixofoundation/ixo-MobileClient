@@ -1,7 +1,9 @@
 const
     debug = require('debug')('init'),
     {setClient, getClient} = require('./ixoCli'),
-    {loadWallet, setWallet} = require('./wallet')
+    {loadWallet, setWallet} = require('./wallet'),
+    {initWalletConnect} = require('./walletconnect'),
+    {useWalletConnect} = require('./stores')
 
 
 const init = async nav => {
@@ -23,6 +25,8 @@ const initForExistingWallet = async (nav, wallet) => {
         {error: didError} = await ixoCli.getDidDoc(wallet.agent.did)
 
     if (!didError) {
+        initWalletConnect_()
+
         debug('The DID is registered, navigating to the project listing scene')
         return nav.navigate('projects')
     }
@@ -39,6 +43,15 @@ const initForExistingWallet = async (nav, wallet) => {
 
     debug('Navigating to the registration scene')
     nav.navigate('register')
+}
+
+const initWalletConnect_ = () => {
+    const existingWcSession = useWalletConnect.getState().session
+
+    if (existingWcSession) {
+        debug('WalletConnect session found, initializing')
+        initWalletConnect({session: existingWcSession})
+    }
 }
 
 

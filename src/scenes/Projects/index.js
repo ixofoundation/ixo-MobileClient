@@ -1,16 +1,19 @@
 const url = require('url'),
     React = require('react'),
-    {useState, useContext} = React,
-    {ScrollView, View, StyleSheet, Text, Pressable} = require('react-native'),
+    {useState, useContext, useCallback} = React,
+    {ScrollView, View,
+        StyleSheet, Text, Pressable, Alert} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
-    {get} = require('lodash-es'),
+    {get, memoize} = require('lodash-es'),
     {useQueries} = require('react-query'),
     {getClient} = require('$/ixoCli'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
     ProjectActions = require('./ProjectActions'),
     ProjectListItem = require('./ProjectListItem'),
-    {useProjects} = require('$/stores'),
+    {useProjects, useWalletConnect} = require('$/stores'),
+    {getWallet} = require('$/wallet'),
+    {initWalletConnect, getWalletConnectClient} = require('$/walletconnect'),
     {Modal, Button, QRScanner, EntityFilter, Icon} = require('$/lib/ui'),
     theme = require('$/theme')
 
@@ -50,9 +53,11 @@ const filterSpec = [
 const Projects = () => {
     const {stateNavigator: nav} = useContext(NavigationContext),
         ps = useProjects(),
+        {session: wcSession} = useWalletConnect(),
         ixoCli = getClient(),
 
         [scannerShown, toggleScanner] = useState(false),
+        [wcScannerShown, toggleWcScanner] = useState(false),
         [filterShown, toggleFilter] = useState(false),
         [filters, setFilters] = useState({}),
         [focusedProjDid, setFocusedProj] = useState(),
@@ -94,6 +99,39 @@ const Projects = () => {
 
         ps.connect(projDid)
     }
+
+    const handleWcScan = useCallback(async ({data}) => {
+        toggleWcScanner(false)
+
+        const
+            wc = await initWalletConnect({uri: data}),
+            peerMeta = wc.session.peerMeta
+
+        Alert.alert(
+            'WalletConnect',
+            `Do you want to connect to ${peerMeta.name} (${peerMeta.url})?`,
+            [{
+                text: 'Cancel',
+                style: 'cancel',
+                onPress: () => wc.rejectSession(),
+            }, {
+                text: 'Accept',
+                style: 'default',
+                onPress: () =>
+                    wc.approveSession({
+                        chainId: 1,
+
+                        accounts: [{
+                            name: 'ixo Wallet User',
+                            didDoc: {
+                                did: getWallet().agent.did,
+                                pubKey: getWallet().agent.didDoc.verifyKey,
+                            },
+                        }],
+                    })
+            }],
+        )
+    })
 
     return (
         <MenuLayout>
@@ -140,6 +178,33 @@ const Projects = () => {
                         children={
                             <Text children="+" style={style.connectBtnText} />
                         }
+                    />
+
+                    <Pressable
+                        onPress={() => {
+                            if (!wcSession)
+                                return toggleWcScanner(true)
+
+                            const {peerMeta} = wcSession
+
+                            Alert.alert(
+                                'WalletConnect',
+                                `${peerMeta.name} (${peerMeta.url})`,
+                                [{
+                                    text: 'Disconnect',
+                                    style: 'cancel',
+                                    onPress: () =>
+                                        getWalletConnectClient().killSession(),
+                                }, {
+                                    text: 'OK',
+                                    style: 'default',
+                                    // onPress: noop,
+                                }],
+                            )
+                        }}
+                        style={style.wcBtn(Boolean(wcSession))}
+                        children={
+                            <Text children='W' style={style.wcBtnText} />}
                     />
 
                     <Modal
@@ -193,13 +258,24 @@ const Projects = () => {
                             />
                         }
                     />
+
+                    <Modal
+                        visible={wcScannerShown}
+                        onRequestClose={() => toggleWcScanner(false)}
+                    >
+                        <QRScanner
+                            onScan={handleWcScan}
+                            onClose={() => toggleWcScanner(false)}
+                            footer={false}
+                        />
+                    </Modal>
                 </View>
             </AssistantLayout>
         </MenuLayout>
     )
 }
 
-const style = StyleSheet.create({
+const style = {
     root: {
         backgroundColor: '#002233',
         flex: 1,
@@ -254,6 +330,21 @@ const style = StyleSheet.create({
         color: 'white',
         fontSize: 30,
     },
-})
+    wcBtn: memoize(wcConnected => ({
+        position: 'absolute',
+        bottom: 20,
+        left: 20,
+        width: 50,
+        height: 50,
+        borderRadius: 50,
+        backgroundColor: wcConnected ? '#3c84fc' : '#a11c43',
+        justifyContent: 'center',
+        alignItems: 'center',
+    })),
+    wcBtnText: {
+        color: 'white',
+        fontSize: 30,
+    },
+}
 
 module.exports = Projects

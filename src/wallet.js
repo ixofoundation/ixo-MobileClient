@@ -43,5 +43,28 @@ const setWallet = async newWallet => {
 
 const getWallet = () => wallet
 
+// @param enum targetWalletType: "secp" or "agent"
+// @param any data: A value of any kind
+//
+// @returns {type, created, creator, publicKkey, signatureValue}
+//   This format comes from the legacy KeySafe browser extension that
+//   was being used for signatures. We dare not change it to not break
+//   anything.
+const sign = async (targetWalletType, data) => {
+    const
+        targetWallet = getWallet()[targetWalletType],
+        [account] = await targetWallet.getAccounts(),
+        {signature: {signature, pub_key}} =
+            await targetWallet.signAmino(account.address, data)
 
-module.exports = {loadWallet, setWallet, getWallet}
+    return {
+        type: account.algo,
+        created: new Date(),
+        creator: getWallet().agent.did,
+        publicKey: pub_key.value,
+        signatureValue: signature,
+    }
+}
+
+
+module.exports = {loadWallet, setWallet, getWallet, sign}

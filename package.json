@@ -14,10 +14,11 @@
     "deploy:beta": "cd ./ios && bundle exec fastlane beta --env development"
   },
   "dependencies": {
-    "@ixo/client-sdk": "^1.10.1",
+    "@ixo/client-sdk": "^1.10.2",
     "@react-native-async-storage/async-storage": "^1.13.2",
     "@react-native-clipboard/clipboard": "^1.8.1",
     "@react-native-community/audio-toolkit": "^2.0.3",
+    "@walletconnect/client": "^1.6.2",
     "async-retry": "^1.3.1",
     "bip39": "^3.0.3",
     "crypto-js": "^4.0.0",
