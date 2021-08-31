@@ -13,7 +13,7 @@ const debug = require('debug')('claims'),
     {NavigationContext} = require('navigation-react'),
     {useQuery} = require('react-query'),
     {noop, keyBy} = require('lodash-es'),
-    {useProjects} = require('$/stores'),
+    {getClient} = require('$/ixoCli'),
     {fileToDataURL, pollFor} = require('$/lib/util'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
@@ -144,14 +144,17 @@ const ClaimStepsView = ({steps, onBack, onSubmit}) => (
 )
 
 const NewClaim = ({templateDid, projectDid}) => {
-    const {getTemplate} = useProjects(),
+    const
+        ixoCli = getClient(),
         {stateNavigator: nav} = useContext(NavigationContext),
         [formShown, toggleForm] = useState(false),
-        {isLoading, error, data} = useQuery(['tpl', templateDid], () =>
-            getTemplate(templateDid).then((tpl) =>
-                claimTemplateToFormSpec(tpl.data.page.content),
-            ),
-        )
+        tplQuery = useQuery({
+            queryKey: ['template', templateDid],
+            queryFn: () => ixoCli.getTemplate(templateDid),
+        }),
+        formSpec =
+            tplQuery.isSuccess &&
+                claimTemplateToFormSpec(tplQuery.data.data.page.content)
 
     return (
         <MenuLayout>
@@ -162,13 +165,13 @@ const NewClaim = ({templateDid, projectDid}) => {
                         style={newClaimStyle.title}
                     />
                     <Loadable
-                        loading={isLoading}
-                        error={error}
-                        data={data}
-                        render={(d) => {
+                        loading={tplQuery.isLoading}
+                        error={tplQuery.error}
+                        data={formSpec}
+                        render={formSpec => {
                             return (
                                 <ClaimStepsView
-                                    steps={d}
+                                    steps={formSpec}
                                     onBack={() => nav.navigateBack(1)}
                                     onSubmit={() => toggleForm(true)}
                                 />
@@ -181,7 +184,7 @@ const NewClaim = ({templateDid, projectDid}) => {
                         onRequestClose={() => toggleForm(false)}
                         children={
                             <ClaimForm
-                                formSpec={data}
+                                formSpec={formSpec}
                                 projectDid={projectDid}
                                 templateDid={templateDid}
                                 onClose={() => toggleForm(false)}
@@ -234,7 +237,8 @@ const newClaimStyle = StyleSheet.create({
 })
 
 const ClaimForm = ({formSpec, projectDid, templateDid, onClose = noop}) => {
-    const {uploadFile, createClaim, listClaims} = useProjects(),
+    const
+        ixoCli = getClient(),
         [formState, setFormState] = useState({}),
         [isComplete, toggleComplete] = useState(false),
         [currentStepIdx, setCurrentStep] = useState(0),
@@ -260,7 +264,7 @@ const ClaimForm = ({formSpec, projectDid, templateDid, onClose = noop}) => {
                                 value.uri,
                             )
 
-                            const remoteURL = await uploadFile(
+                            const remoteURL = await ixoCli.createEntityFile(
                                 projectDid,
                                 dataURL,
                             )
@@ -273,13 +277,13 @@ const ClaimForm = ({formSpec, projectDid, templateDid, onClose = noop}) => {
                         value,
                         attribute: formSpecById[id].attribute,
                     })),
-                    claimTxHash = await createClaim(
+                    claimTxHash = await ixoCli.createClaim(
                         projectDid,
                         templateDid,
                         claimItems,
                     ),
                     projectClaims = await pollFor({
-                        query: () => listClaims(projectDid),
+                        query: () => ixoCli.listClaims(projectDid),
                         predicate: (claims) =>
                             claims.find((c) => c.txHash === claimTxHash),
                     }),

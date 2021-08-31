@@ -1,46 +1,20 @@
-const {spacing, fontSizes} = require('$/theme')
-const React = require('react'),
-    {View, Text, StyleSheet, ActivityIndicator} = require('react-native')
+const
+    React = require('react'),
+    {View, Text, ActivityIndicator} = require('react-native'),
+    {spacing, fontSizes} = require('$/theme')
 
-const style = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-})
 
-const Container = ({children}) => (
-    <View style={style.container}>{children}</View>
-)
+const Container = ({children}) =>
+    <View
+        children={children}
+        style={containerStyle}
+    />
 
-const bgStyles = StyleSheet.create({
-    error: {
-        borderRadius: 8,
-        backgroundColor: '#E2223B',
-        padding: spacing(1),
-    },
-    errorCode: {
-        color: 'white',
-        fontWeight: 'bold',
-        fontSize: fontSizes.h6,
-    },
-    errorMsg: {
-        color: 'white',
-        fontSize: fontSizes.p1,
-    },
-    empty: {
-        backgroundColor: '#ED9526',
-        padding: spacing(1),
-    },
-    emptyMsg: {
-        color: 'white',
-        fontSize: fontSizes.p1,
-    },
-    loadingBg: {
-        flex: 1,
-    },
-})
+const containerStyle = {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+}
 
 const Loadable = ({data, loading, error, render, empty}) => {
     if (loading) {
@@ -80,5 +54,34 @@ const Loadable = ({data, loading, error, render, empty}) => {
 
     return render(data)
 }
+
+const bgStyles = {
+    error: {
+        borderRadius: 8,
+        backgroundColor: '#E2223B',
+        padding: spacing(1),
+    },
+    errorCode: {
+        color: 'white',
+        fontWeight: 'bold',
+        fontSize: fontSizes.h6,
+    },
+    errorMsg: {
+        color: 'white',
+        fontSize: fontSizes.p1,
+    },
+    empty: {
+        backgroundColor: '#ED9526',
+        padding: spacing(1),
+    },
+    emptyMsg: {
+        color: 'white',
+        fontSize: fontSizes.p1,
+    },
+    loadingBg: {
+        flex: 1,
+    },
+}
+
 
 module.exports = Loadable

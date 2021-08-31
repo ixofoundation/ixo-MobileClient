@@ -4,9 +4,11 @@ module.exports = {
     Header: require('./Header'),
     Code: require('./Code'),
     Alert: require('./Alert'),
+    Avatar: require('./Avatar'),
     Button: require('./Button'),
     ButtonGroup: require('./ButtonGroup'),
     Link: require('./Link'),
+    Loadable: require('./Loadable'),
     QRScanner: require('./QRScanner'),
     Text: require('./Text'),
     P: require('./P'),
@@ -30,4 +32,5 @@ module.exports = {
     DateRangeInput: require('./DateRangeInput'),
     VideoInput: require('./VideoInput'),
     LocationInput: require('./LocationInput'),
+    RadioButton: require('./RadioButton'),
 }

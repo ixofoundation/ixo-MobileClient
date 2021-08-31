@@ -1,38 +1,40 @@
 const
     debug = require('debug')('init'),
-    {useWallet} = require('./stores')
+    {setClient, getClient} = require('./ixoCli'),
+    {loadWallet, setWallet} = require('./wallet'),
+    {initWalletConnect} = require('./walletconnect'),
+    {useWalletConnect} = require('./stores')
 
 
 const init = async nav => {
-    await useWallet.loaded
+    const wallet = await loadWallet()
 
-    const ws /*wallet store*/ = useWallet.getState()
-
-    if (!ws.secp) {
+    if (!wallet) {
         debug('No identity found, navigating to the id creation scene')
         return nav.navigate('createId')
     }
 
-    initForExistingWallet(nav)
+    setClient(wallet)
+
+    initForExistingWallet(nav, wallet)
 }
 
-const initForExistingWallet = async nav => {
-    const ws /*wallet store*/ = useWallet.getState()
+const initForExistingWallet = async (nav, wallet) => {
+    const
+        ixoCli = getClient(),
+        {error: didError} = await ixoCli.getDidDoc(wallet.agent.did)
 
-    if (await ws.isDidRegistered(ws.agent.did)) {
+    if (!didError) {
+        initWalletConnect_()
+
         debug('The DID is registered, navigating to the project listing scene')
         return nav.navigate('projects')
     }
 
     debug('The DID is not registered, checking for account balance')
 
-    const
-        account = await ws.getSecpAccount(),
-
-        uixoBalance =
-            !account
-                ? 0
-                : account.balance.find(tok => tok.denom === 'uixo').amount
+    const {balance: {amount: uixoBalance}} =
+        await ixoCli.balances('secp', 'uixo')
 
     if (uixoBalance < 100) {
         debug('Too little account balance, navigating to the credit scene')
@@ -41,6 +43,15 @@ const initForExistingWallet = async nav => {
 
     debug('Navigating to the registration scene')
     nav.navigate('register')
+}
+
+const initWalletConnect_ = () => {
+    const existingWcSession = useWalletConnect.getState().session
+
+    if (existingWcSession) {
+        debug('WalletConnect session found, initializing')
+        initWalletConnect({session: existingWcSession})
+    }
 }
 
 

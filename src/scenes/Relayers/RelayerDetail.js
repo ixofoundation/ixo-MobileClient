@@ -1,79 +1,59 @@
-const React = require('react'),
+const
+    React = require('react'),
     {useCallback} = React,
-    {
-        View,
-        Text,
-        StyleSheet,
-        Pressable,
-        Linking,
-        Alert,
-    } = require('react-native'),
-    {spacing, fontSizes} = require('$/theme'),
-    Avatar = require('$/lib/ui/Avatar'),
-    Icon = require('$/lib/ui/Icon'),
+    {View, Text, Pressable, Linking, Alert} = require('react-native'),
+    Clipboard = require('@react-native-clipboard/clipboard').default,
+    {useQuery} = require('react-query'),
     {memoize} = require('lodash'),
-    {useAsyncData} = require('$/lib/util'),
-    {useStaking} = require('$/stores'),
+    {spacing, fontSizes} = require('$/theme'),
+    {getClient} = require('$/ixoCli'),
     AssistantLayout = require('$/AssistantLayout'),
-    Loadable = require('$/lib/ui/Loadable'),
-    Clipboard = require('@react-native-clipboard/clipboard').default
+    {Avatar, Icon, Loadable} = require('$/lib/ui'),
+    {validatorAvatarUrl} = require('$/lib/util')
 
-const statuses = {
-    bonded: {
-        color: '#85AD5C',
-        text: 'ACTIVE',
-    },
-    unbonding: {
-        color: '#ED9526',
-        text: 'UNBONDING',
-    },
-    unbonded: {
-        color: '#AD245C',
-        text: 'UNBONDED',
-    },
-}
 
-const StatusBadge = ({status}) => {
-    const style = badgeStyles(status)
-    const {text} = statuses[status]
-    return (
-        <View style={style.container}>
-            <View style={style.root}>
-                <Text style={style.text} children={text} />
-            </View>
-        </View>
-    )
-}
-
-const badgeStyles = memoize((status) => {
-    return StyleSheet.create({
-        root: {
-            backgroundColor: statuses[status].color,
-            borderRadius: 4,
-            padding: spacing(0.5),
-        },
-        container: {flexDirection: 'row'},
-        text: {
-            color: 'white',
-            fontSize: fontSizes.p2,
-            fontWeight: 'bold',
-        },
-    })
-})
-
-const StakeInfoTitle = ({name, amount, currency}) => {
-    return (
-        <View style={stakeInfoTitleStyles.root}>
-            <Text style={stakeInfoTitleStyles.name} children={name} />
+const StatusBadge = ({statusCode}) =>
+    <View style={badgeStyles.container}>
+        <View style={badgeStyles.root(statusCode)}>
             <Text
-                style={stakeInfoTitleStyles.amount}
-                children={amount + ' ' + currency}
+                children={
+                    ['UNSPECIFIED', 'UNBONDED', 'UNBONDING', 'ACTIVE']
+                        [statusCode]
+                }
+                style={badgeStyles.text}
             />
         </View>
-    )
+    </View>
+
+const badgeStyles = {
+    root: memoize(statusCode => ({
+        borderRadius: 4,
+        padding: spacing(0.5),
+        backgroundColor:
+            ['#AD245C', '#AD245C', '#ED9526', '#85AD5C'][statusCode],
+    })),
+    container: {flexDirection: 'row'},
+    text: {
+        color: 'white',
+        fontSize: fontSizes.p2,
+        fontWeight: 'bold',
+    },
 }
 
-const stakeInfoTitleStyles = StyleSheet.create({
+const StakeInfoTitle = ({name, amount, currency}) =>
+    <View style={stakeInfoTitleStyles.root}>
+        <Text
+            children={name}
+            style={stakeInfoTitleStyles.name}
+        />
+
+        <Text
+            children={amount + ' ' + currency}
+            style={stakeInfoTitleStyles.amount}
+        />
+    </View>
+
+const stakeInfoTitleStyles = {
     root: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -87,7 +67,7 @@ const stakeInfoTitleStyles = StyleSheet.create({
         color: 'white',
         fontSize: fontSizes.p1,
     },
-})
+}
 
 const StakeInfo = ({label, info}) => {
     return (
@@ -98,7 +78,7 @@ const StakeInfo = ({label, info}) => {
     )
 }
 
-const stakeInfoStyles = StyleSheet.create({
+const stakeInfoStyles = {
     root: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -112,22 +92,19 @@ const stakeInfoStyles = StyleSheet.create({
         color: '#5A879D',
         fontSize: fontSizes.p2,
     },
-})
-
-const RelayerInfo = ({label, info, icon}) => {
-    return (
-        <View style={relayerInfoStyles.root}>
-            <Text style={relayerInfoStyles.label} children={label} />
-            <View style={relayerInfoStyles.container}>
-                <Text style={relayerInfoStyles.info} children={info} />
-                {icon && <View style={relayerInfoStyles.spacing} />}
-                {icon}
-            </View>
-        </View>
-    )
 }
 
-const relayerInfoStyles = StyleSheet.create({
+const RelayerInfo = ({label, info, icon}) =>
+    <View style={relayerInfoStyles.root}>
+        <Text style={relayerInfoStyles.label} children={label} />
+        <View style={relayerInfoStyles.container}>
+            <Text style={relayerInfoStyles.info} children={info} />
+            {icon && <View style={relayerInfoStyles.spacing} />}
+            {icon}
+        </View>
+    </View>
+
+const relayerInfoStyles = {
     root: {
         flexDirection: 'row',
         justifyContent: 'space-between',
@@ -149,37 +126,30 @@ const relayerInfoStyles = StyleSheet.create({
         color: '#5A879D',
         fontSize: fontSizes.p2,
     },
-})
-
-const statusMap = {2: 'bonded', 1: 'unbonding', 0: 'unbonded'}
+}
 
 const formatAddress = (addr) =>
     addr.length > 20 ? addr.slice(0, 20) + '...' : addr
 
-const RelayerDetail = ({relayerAddr, name}) => {
-    const {getValidatorDetail} = useStaking()
-    const loadRelayerDetail = useCallback(
-        () => getValidatorDetail(relayerAddr),
-        [relayerAddr],
-    )
-    const {data, error, loading} = useAsyncData(loadRelayerDetail)
+const RelayerDetail = ({relayerAddr}) => {
+    const validatorQuery = useQuery({
+        queryKey: ['validator-mixed'],
+        queryFn: () => getValidatorDetail(relayerAddr),
+    })
 
     return (
-        <AssistantLayout
-            initMsg={{title: 'Loading Relayer',
-                      payload: '/relayerStake{"relayer":"' + name + '"}'}}>
-            
+        <AssistantLayout>
             <View style={styles.root}>
                 <Loadable
-                    data={data}
-                    error={error}
-                    loading={loading}
+                    data={validatorQuery.data}
+                    error={validatorQuery.error}
+                    loading={validatorQuery.isLoading}
                     render={({
                         validator,
                         pool,
                         delegation,
                         delegations,
-                        unboundingDelegations,
+                        unbondingDelegations,
                         rewards,
                         balances,
                         avatarUrl,
@@ -205,8 +175,8 @@ const RelayerDetail = ({relayerAddr, name}) => {
                                 0,
                             ) / Math.pow(10, 6)
 
-                        const unbounding =
-                            unboundingDelegations.reduce(
+                        const unbonding =
+                            unbondingDelegations.reduce(
                                 (acc, {balance}) => acc + Number(balance),
                                 0,
                             ) / Math.pow(10, 6)
@@ -243,9 +213,7 @@ const RelayerDetail = ({relayerAddr, name}) => {
                                             style={styles.title}
                                             children={name}
                                         />
-                                        <StatusBadge
-                                            status={statusMap[status]}
-                                        />
+                                        <StatusBadge statusCode={status} />
                                     </View>
                                 </View>
                                 <View style={styles.stakeContainer}>
@@ -265,7 +233,7 @@ const RelayerDetail = ({relayerAddr, name}) => {
                                         />
                                         <StakeInfo
                                             label="Unbonding"
-                                            info={unbounding.toFixed(2)}
+                                            info={unbonding.toFixed(2)}
                                         />
                                         <StakeInfo
                                             label="Reward"
@@ -338,7 +306,41 @@ const RelayerDetail = ({relayerAddr, name}) => {
     )
 }
 
-const styles = StyleSheet.create({
+const getValidatorDetail = async addr => {
+    const
+        ixoCli = getClient(),
+
+        {result: dist} = await ixoCli.staking.validatorDistribution(addr),
+
+        [
+            {balances},
+            {result: validator},
+            {result: pool},
+            {result: delegation},
+            {result: rewards},
+            {result: delegations},
+            {result: unbondingDelegations},
+        ] =
+            await Promise.all([
+                ixoCli.balances('secp'),
+                ixoCli.staking.getValidator(addr),
+                ixoCli.staking.pool(),
+                ixoCli.staking.delegation(dist.operator_address, addr),
+                ixoCli.staking.delegatorRewards(dist.operator_address),
+                ixoCli.staking.delegatorDelegations(dist.operator_address),
+                ixoCli.staking.delegatorUnbondingDelegations(
+                    dist.operator_address),
+            ]),
+
+        avatarUrl = await validatorAvatarUrl(validator.description.identity)
+
+    return {
+        validator, pool, delegation, rewards, delegations, unbondingDelegations,
+        balances, avatarUrl,
+    }
+}
+
+const styles = {
     root: {
         flex: 1,
         backgroundColor: '#002233',
@@ -380,6 +382,6 @@ const styles = StyleSheet.create({
         padding: spacing(2),
         marginTop: spacing(2),
     },
-})
+}
 
 module.exports = RelayerDetail

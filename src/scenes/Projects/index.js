@@ -1,14 +1,19 @@
 const url = require('url'),
     React = require('react'),
-    {useState, useContext} = React,
-    {ScrollView, View, StyleSheet, Text, Pressable} = require('react-native'),
+    {useState, useContext, useCallback} = React,
+    {ScrollView, View,
+        StyleSheet, Text, Pressable, Alert} = require('react-native'),
     {NavigationContext} = require('navigation-react'),
-    {sortBy, filter} = require('lodash-es'),
+    {get, memoize} = require('lodash-es'),
+    {useQueries} = require('react-query'),
+    {getClient} = require('$/ixoCli'),
     MenuLayout = require('$/MenuLayout'),
     AssistantLayout = require('$/AssistantLayout'),
     ProjectActions = require('./ProjectActions'),
     ProjectListItem = require('./ProjectListItem'),
-    {useProjects} = require('$/stores'),
+    {useProjects, useWalletConnect} = require('$/stores'),
+    {getWallet} = require('$/wallet'),
+    {initWalletConnect, getWalletConnectClient} = require('$/walletconnect'),
     {Modal, Button, QRScanner, EntityFilter, Icon} = require('$/lib/ui'),
     theme = require('$/theme')
 
@@ -48,10 +53,20 @@ const filterSpec = [
 const Projects = () => {
     const {stateNavigator: nav} = useContext(NavigationContext),
         ps = useProjects(),
+        {session: wcSession} = useWalletConnect(),
+        ixoCli = getClient(),
+
         [scannerShown, toggleScanner] = useState(false),
+        [wcScannerShown, toggleWcScanner] = useState(false),
         [filterShown, toggleFilter] = useState(false),
         [filters, setFilters] = useState({}),
         [focusedProjDid, setFocusedProj] = useState(),
+
+        projectQueries = useQueries(ps.items.map(projDid => ({
+            queryKey: ['project', projDid],
+            queryFn: () => ixoCli.getProject(projDid),
+        }))),
+
         projFilter = (p) => {
             if (filters.stage && !filters.stage.includes(p.data.stage))
                 return false
@@ -61,21 +76,62 @@ const Projects = () => {
                 : p.data.startDate >= filters.dateRange[0] &&
                       p.data.endDate <= filters.dateRange[1]
         },
-        projects = sortBy(filter(ps.items, projFilter), filters.sortBy)
+
+        projects =
+            projectQueries
+                .filter(q => q.isSuccess)
+                .map(q => q.data)
+                .filter(projFilter)
+                .sort((a, b) =>
+                    get(a, filters.sortBy)
+                        .localeCompare(get(b, filters.sortBy))),
+
+        focusedProj = projects.find(p =>
+            focusedProjDid && p.projectDid == focusedProjDid)
 
     const handleScan = async ({data}) => {
         toggleScanner(false)
 
         const projDid = url.parse(data).path.split('/')[2]
 
-        if (ps.items[projDid]) return alert('Project already exists!')
+        if (ps.items.includes(projDid))
+            return alert('Project already exists!')
 
-        try {
-            await ps.connect(projDid)
-        } catch (e) {
-            alert('Couldnt connect to project, please try again later!') // eslint-disable-line max-len
-        }
+        ps.connect(projDid)
     }
+
+    const handleWcScan = useCallback(async ({data}) => {
+        toggleWcScanner(false)
+
+        const
+            wc = await initWalletConnect({uri: data}),
+            peerMeta = wc.session.peerMeta
+
+        Alert.alert(
+            'WalletConnect',
+            `Do you want to connect to ${peerMeta.name} (${peerMeta.url})?`,
+            [{
+                text: 'Cancel',
+                style: 'cancel',
+                onPress: () => wc.rejectSession(),
+            }, {
+                text: 'Accept',
+                style: 'default',
+                onPress: () =>
+                    wc.approveSession({
+                        chainId: 1,
+
+                        accounts: [{
+                            name: 'ixo Wallet User',
+                            didDoc: {
+                                did: getWallet().agent.did,
+                                pubKey: getWallet().agent.didDoc.verifyKey,
+                            },
+                        }],
+                    })
+            }],
+        )
+    })
 
     return (
         <MenuLayout>
@@ -124,6 +180,33 @@ const Projects = () => {
                         }
                     />
 
+                    <Pressable
+                        onPress={() => {
+                            if (!wcSession)
+                                return toggleWcScanner(true)
+
+                            const {peerMeta} = wcSession
+
+                            Alert.alert(
+                                'WalletConnect',
+                                `${peerMeta.name} (${peerMeta.url})`,
+                                [{
+                                    text: 'Disconnect',
+                                    style: 'cancel',
+                                    onPress: () =>
+                                        getWalletConnectClient().killSession(),
+                                }, {
+                                    text: 'OK',
+                                    style: 'default',
+                                    // onPress: noop,
+                                }],
+                            )
+                        }}
+                        style={style.wcBtn(Boolean(wcSession))}
+                        children={
+                            <Text children='W' style={style.wcBtnText} />}
+                    />
+
                     <Modal
                         visible={filterShown}
                         onRequestClose={() => toggleFilter(false)}
@@ -144,6 +227,12 @@ const Projects = () => {
                         visible={scannerShown}
                         onRequestClose={() => toggleScanner(false)}
                     >
+                        <Button
+                            text='dummy'
+                            onPress={() =>
+                                handleScan('did:ixo:EA4XpByjFM8WbQo9mzSemc')}
+                        />
+
                         <QRScanner
                             onScan={handleScan}
                             onClose={() => toggleScanner(false)}
@@ -151,12 +240,12 @@ const Projects = () => {
                     </Modal>
 
                     <Modal
-                        visible={!!focusedProjDid}
+                        visible={!!focusedProj}
                         onRequestClose={() => setFocusedProj(null)}
                         transparent
                         children={
                             <ProjectActions
-                                project={ps.items[focusedProjDid]}
+                                project={focusedProj}
                                 onClose={() => setFocusedProj(null)}
                                 onDisconnect={() => {
                                     setFocusedProj(null)
@@ -169,13 +258,24 @@ const Projects = () => {
                             />
                         }
                     />
+
+                    <Modal
+                        visible={wcScannerShown}
+                        onRequestClose={() => toggleWcScanner(false)}
+                    >
+                        <QRScanner
+                            onScan={handleWcScan}
+                            onClose={() => toggleWcScanner(false)}
+                            footer={false}
+                        />
+                    </Modal>
                 </View>
             </AssistantLayout>
         </MenuLayout>
     )
 }
 
-const style = StyleSheet.create({
+const style = {
     root: {
         backgroundColor: '#002233',
         flex: 1,
@@ -230,6 +330,21 @@ const style = StyleSheet.create({
         color: 'white',
         fontSize: 30,
     },
-})
+    wcBtn: memoize(wcConnected => ({
+        position: 'absolute',
+        bottom: 20,
+        left: 20,
+        width: 50,
+        height: 50,
+        borderRadius: 50,
+        backgroundColor: wcConnected ? '#3c84fc' : '#a11c43',
+        justifyContent: 'center',
+        alignItems: 'center',
+    })),
+    wcBtnText: {
+        color: 'white',
+        fontSize: 30,
+    },
+}
 
 module.exports = Projects
