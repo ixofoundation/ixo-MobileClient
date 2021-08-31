@@ -539,12 +539,12 @@ SPEC CHECKSUMS:
   React-jsi: a0418934cf48f25b485631deb27c64dc40fb4c31
   React-jsiexecutor: 93bd528844ad21dc07aab1c67cb10abae6df6949
   React-jsinspector: 58aef7155bc9a9683f5b60b35eccea8722a4f53a
-  react-native-camera: d145df27a9178041b48b839b80ad79c9ef373fbd
-  react-native-document-picker: 50f47078c928691772b86a87a51a967b499a23a6
+  react-native-camera: cf8a153d33138dcc457172fc3c33fdf4e5d288d2
+  react-native-document-picker: cc847dd5fe2fc51c3a98bd8f2fd1e452db795c48
   react-native-geolocation-service: 7c9436da6dfdecd9526c62eac62ea2bc3f0cc8ea
   react-native-maps: f4b89da81626ad7f151a8bfcb79733295d31ce5c
-  react-native-randombytes: 45ae693012df24c9a07a5e578b3b567c01468581
-  react-native-video: 1574074179ecaf6a9dd067116c8f31bf9fec15c8
+  react-native-randombytes: b6677f7d495c27e9ee0dbd77ebc97b3c59173729
+  react-native-video: 0bb76b6d6b77da3009611586c7dbf817b947f30e
   React-RCTActionSheet: 89a0ca9f4a06c1f93c26067af074ccdce0f40336
   React-RCTAnimation: 1bde3ecc0c104c55df246eda516e0deb03c4e49b
   React-RCTBlob: a97d378b527740cc667e03ebfa183a75231ab0f0
@@ -555,9 +555,9 @@ SPEC CHECKSUMS:
   React-RCTText: 5c51df3f08cb9dedc6e790161195d12bac06101c
   React-RCTVibration: ae4f914cfe8de7d4de95ae1ea6cc8f6315d73d9d
   ReactCommon: 73d79c7039f473b76db6ff7c6b159c478acbbb3b
-  ReactNativeAudioToolkit: e3e27fbcd12080f54f8715c54de7a232d3beb98d
-  RNCAsyncStorage: bc2f81cc1df90c267ce9ed30bb2dbc93b945a8ee
-  RNCClipboard: e8e7226caf9f6e78c88a5aa55ace9ab0a1052bd9
+  ReactNativeAudioToolkit: de9610f323e855ac6574be8c99621f3d57c5df06
+  RNCAsyncStorage: 05bae7ecfab1cbd5441993f1ca098f7c3b3f8d0e
+  RNCClipboard: 4935717a8e86273de4a45f113d01dad949b5374b
   RNFileViewer: 83cc066ad795b1f986791d03b56fe0ee14b6a69f
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 9b7e605a741412e20e13c512738a31bd1611759b
